@@ -1,11 +1,11 @@
 <script setup>
 import VChart from 'vue-echarts'
 import { use } from 'echarts/core'
-import { ScatterChart } from 'echarts/charts'
+import { LineChart } from 'echarts/charts'
 import { GridComponent, TooltipComponent } from 'echarts/components'
 import { CanvasRenderer } from 'echarts/renderers'
 
-use([ScatterChart, GridComponent, TooltipComponent, CanvasRenderer])
+use([LineChart, GridComponent, TooltipComponent, CanvasRenderer])
 
 const props = defineProps({
   vectors: {
@@ -42,24 +42,20 @@ const option = {
     nameTextStyle: { color: '#aaa' },
   },
   series: props.vectors.map(v => ({
-    type: 'scatter',
-    data: [[v.x, v.y]],
-    symbolSize: 8,
-    itemStyle: { color: v.color },
+    type: 'line',
+    data: [[0, 0], [v.x, v.y]],
+    symbol: ['none', 'arrow'],
+    symbolSize: 10,
+    lineStyle: { color: v.color, width: 2 },
+    showSymbol: true,
     label: {
       show: true,
+      position: 'end',
       formatter: `${v.label} = (${v.x}, ${v.y})`,
-      position: 'right',
       color: v.color,
       fontSize: 13,
     },
-    markLine: {
-      silent: true,
-      symbol: ['none', 'arrow'],
-      symbolSize: 10,
-      lineStyle: { color: v.color, width: 2 },
-      data: [{ coord: [0, 0], coord2: [v.x, v.y] }],
-    },
+    emphasis: { disabled: true },
   })),
 }
 </script>

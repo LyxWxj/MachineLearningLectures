@@ -92,7 +92,7 @@ In the chart:
 
 **Key point**: points where $f'(x) = 0$ are extrema (max or min).
 
-**Which is the Basis of Optimization**
+**The Basis of Optimization**
 
 </v-click>
 
@@ -107,7 +107,7 @@ In the chart:
 |----------|----------------------|-----------|---------|
 | $y = cf(x)$ | $c\dfrac{df}{dx}$ | $dy=c\, df=cf'(x)dx$ | Constant multiple |
 | $y = f + g$ | $\dfrac{df}{dx} + \dfrac{dg}{dx}$ | $dy=df + dg=(f'(x)+g'(x))dx$ | Sum |
-| $y = f(g(x))$ | $\dfrac{df}{dg} \cdot \dfrac{dg}{dx}$ | $f'(g)\, dg=f'(g(x))g'(x)dx$ | **Chain rule** |
+| $y = f(g(x))$ | $\dfrac{df}{dg} \cdot \dfrac{dg}{dx}$ | $dy=f'(g)\, dg=f'(g(x))g'(x)dx$ | **Chain rule** |
 
 <v-click>
 
@@ -118,36 +118,6 @@ The **chain rule** is critical for backpropagation in neural networks. It comput
 $$\frac{\partial L}{\partial w_1} = \frac{\partial L}{\partial y} \cdot \frac{\partial y}{\partial z} \cdot \frac{\partial z}{\partial w_1}$$
 
 </div>
-
-</v-click>
-
----
-
-### Partial Derivative
-
-For a multivariable function $f(x_1, x_2, \ldots, x_n)$, the partial derivative is the rate of change when **only one variable** varies:
-
-$$\frac{\partial f}{\partial x_i} = \lim_{\Delta x_i \to 0} \frac{f(x_1, \ldots, x_i + \Delta x_i, \ldots, x_n) - f(x_1, \ldots, x_n)}{\Delta x_i}$$
-
-<v-click>
-Example
-</v-click>
-
-<v-click>
-
-The **gradient** is the vector of all partial derivatives:
-
-$$\nabla f = \left[\frac{\partial f}{\partial x_1}, \frac{\partial f}{\partial x_2}, \ldots, \frac{\partial f}{\partial x_n}\right]$$
-
-</v-click>
-
-<v-click>
-
-The gradient points in the direction of **steepest ascent**. In ML, we update parameters in the **opposite** direction to minimize the loss:
-
-$$\mathbf{w} \leftarrow \mathbf{w} - \eta \nabla L(\mathbf{w})$$
-
-where $\eta$ is the learning rate.
 
 </v-click>
 
@@ -194,89 +164,79 @@ In ML, model parameters are optimized iteratively this way.
 
 </div>
 </div>
+---
+
+### Partial Derivative
+
+For a multivariable function $f(x_1, x_2, \ldots, x_n)$, the partial derivative is the rate of change when **only one variable** varies:
+
+$$\frac{\partial f}{\partial x_i} = \lim_{\Delta x_i \to 0} \frac{f(x_1, \ldots, x_i + \Delta x_i, \ldots, x_n) - f(x_1, \ldots, x_n)}{\Delta x_i}$$
+
+<v-click>
+
+Example:
+
+$$
+y=f(x,y,z),\frac{\partial f}{\partial x}=\lim_{\Delta x_i}\frac{f(x+\Delta x_i,y,z)}{\Delta x_i}
+$$
+
+</v-click>
+
+<v-click>
+
+The **gradient** is the vector of all partial derivatives:
+
+$$\nabla f = \left[\frac{\partial f}{\partial x_1}, \frac{\partial f}{\partial x_2}, \ldots, \frac{\partial f}{\partial x_n}\right]$$
+
+</v-click>
+
+<v-click>
+
+The gradient points in the direction of **steepest ascent**. In ML, we update parameters in the **opposite** direction to minimize the loss:
+
+$$\mathbf{w} \leftarrow \mathbf{w} - \eta \nabla L(\mathbf{w})$$
+
+where $\eta$ is the learning rate.
+
+</v-click>
 
 ---
 
 ### Integral
 
+<script setup>
+import { ref } from 'vue'
+const n = ref(8)
+</script>
+
 A **definite integral** is the inverse of the derivative, representing the accumulated quantity over $[a, b]$:
 
 $$\int_a^b f(x)\, dx = \lim_{n \to \infty} \sum_{i=1}^{n} f(x_i) \Delta x$$
 
-<v-click>
-
-**Geometric meaning**: the definite integral equals the **signed area** between the curve and the x-axis.
-
-</v-click>
-
-<v-click>
-
-**Fundamental theorem of calculus**: if $F'(x) = f(x)$, then
-
-$$\int_a^b f(x)\, dx = F(b) - F(a)$$
-
-</v-click>
-
-<v-click>
-
-<div class="mt-4 p-4 bg-blue-900/20 rounded-lg">
-
-**In ML**: the integral of a PDF $p(x)$ over an interval gives the probability. Expectations of continuous random variables are also defined via integrals:
-
-$$E[X] = \int_{-\infty}^{\infty} x \cdot p(x)\, dx$$
-
-</div>
-
-</v-click>
-
----
-
-### Graphical Interpretation of Integrals
-
 <div class="grid grid-cols-2 gap-8">
-<div style="height: 320px;">
+<div style="height: 280px;">
 
-<IntegralChart :a="0.5" :b="2" />
+<div class="flex items-center justify-center gap-4 mb-2">
+  <button class="px-3 py-1 rounded border border-gray-500 hover:bg-gray-400/20 font-mono" @click="n = Math.max(1, n - 1)">−</button>
+  <span class="font-mono text-lg">n = {{ n }}</span>
+  <button class="px-3 py-1 rounded border border-gray-500 hover:bg-gray-400/20 font-mono" @click="n += 1">+</button>
+</div>
 
 </div>
-<div>
+<div style="height: 280px;">
 
-In the chart:
-
-- **Blue curve**: $f(x) = 0.5x^2 + 0.3$
-- **Blue shaded area**: value of $\int_{0.5}^{2} f(x)\, dx$
-
-<v-click>
-
-**Computation**:
-
-$$\int_{0.5}^{2} (0.5x^2 + 0.3)\, dx = \left[\frac{x^3}{6} + 0.3x\right]_{0.5}^{2}$$
-
-$$= \left(\frac{8}{6} + 0.6\right) - \left(\frac{0.125}{6} + 0.15\right) \approx 1.754$$
-
-</v-click>
-
-<v-click>
-
-Integration is everywhere in probability: computing probabilities, expectations, and variances.
-
-</v-click>
+<RiemannChart :a="0.5" :b="2" :n="n" />
 
 </div>
+</div>
+
+<div class="grid grid-cols-2 gap-8 mt-2">
+
 </div>
 
 ---
 
 ## Part 2: Linear Algebra
-
----
-
-layout: center
----
-
-### Scalar, Vector, Matrix, Tensor
-
----
 
 ### Basic Data Structures
 
@@ -426,13 +386,13 @@ In ML, a single layer of a neural network is essentially a **dot product** of th
 
 For $\mathbf{A} \in \mathbb{R}^{m \times k}$ and $\mathbf{B} \in \mathbb{R}^{k \times n}$, the product $\mathbf{C} = \mathbf{A}\mathbf{B} \in \mathbb{R}^{m \times n}$ is:
 
-$$C_{ij} = \sum_{p=1}^{k} A_{ip} B_{jp}$$
+$$C_{ij} = \sum_{p=1}^{k} A_{ip} B_{pj}$$
 
 <v-click>
 
 **Example**:
 
-$$\begin{bmatrix} 1 & 2 \\ 3 & 4 \end{bmatrix} \begin{bmatrix} 5 \\ 6 \end{bmatrix} = \begin{bmatrix} 1 \times 5 + 2 \times 6 \\ 3 \times 5 + 4 \times 6 \end{bmatrix} = \begin{bmatrix} 17 \\ 39 \end{bmatrix}$$
+$$\begin{bmatrix} 1 & 2 \\ 3 & 4 \end{bmatrix} \begin{bmatrix} 5 & 7 & 9 \\ 6 & 8 & 10 \end{bmatrix} = \begin{bmatrix} 1{\times}5+2{\times}6 & 1{\times}7+2{\times}8 & 1{\times}9+2{\times}10 \\ 3{\times}5+4{\times}6 & 3{\times}7+4{\times}8 & 3{\times}9+4{\times}10 \end{bmatrix} = \begin{bmatrix} 17 & 23 & 29 \\ 39 & 53 & 67 \end{bmatrix}$$
 
 </v-click>
 
@@ -454,22 +414,32 @@ where $\mathbf{W}$ is the weight matrix, $\mathbf{b}$ is the bias vector, and $\
 
 ### Other Important Matrix Operations
 
-| Operation | Definition | Notation |
+Let $\mathbf{A} = \begin{bmatrix} 1 & 2 \\ 3 & 4 \end{bmatrix}$, $\mathbf{B} = \begin{bmatrix} 5 & 6 \\ 7 & 8 \end{bmatrix}$, $c = 2$
+
+| Operation | Definition | Example |
 |------|------|------|
-| Transpose | Swap rows and columns | $\mathbf{A}^T$, where $(A^T)_{ij} = A_{ji}$ |
-| Inverse | $\mathbf{A}\mathbf{A}^{-1} = \mathbf{I}$ | $\mathbf{A}^{-1}$ (exists for square, full-rank matrices) |
-| Determinant | Scalar, reflects the "scaling factor" | $\det(\mathbf{A})$ or $\|\mathbf{A}\|$ |
-| Eigenvalue/Eigenvector | $\mathbf{A}\mathbf{v} = \lambda\mathbf{v}$ | $\lambda$ is the eigenvalue, $\mathbf{v}$ is the eigenvector |
+| **Transpose** | $(A^T)_{ij} = A_{ji}$ | $\begin{bmatrix} 1 & 3 \\ 2 & 4 \end{bmatrix}$ |
+| **Matrix Addition** | $(A+B)_{ij} = A_{ij} + B_{ij}$ | $\begin{bmatrix} 6 & 8 \\ 10 & 12 \end{bmatrix}$ |
+| **Scalar Addition** | $(A+c)_{ij} = A_{ij} + c$ | $\begin{bmatrix} 3 & 4 \\ 5 & 6 \end{bmatrix}$ |
+
+---
+
+### Matrix Operations (cont.)
+
+| Operation | Definition | Example |
+|------|------|------|
+| **Element-wise (Hadamard)** | $(A \odot B)_{ij} = A_{ij} \cdot B_{ij}$ | $\begin{bmatrix} 5 & 12 \\ 21 & 32 \end{bmatrix}$ |
+| **Matrix Multiplication** | $(AB)_{ij} = \sum_k A_{ik}B_{kj}$ | $\begin{bmatrix} 19 & 22 \\ 43 & 50 \end{bmatrix}$ |
 
 <v-click>
 
-<div class="mt-4">
+<div class="mt-4 p-4 bg-blue-900/20 rounded-lg">
 
-**Applications**:
+**In deep learning**:
 
-- **Transpose**: computing the covariance matrix $\Sigma = \frac{1}{n}\mathbf{X}^T\mathbf{X}$
-- **Inverse**: normal equation for linear regression $\mathbf{w} = (\mathbf{X}^T\mathbf{X})^{-1}\mathbf{X}^T\mathbf{y}$
-- **Eigendecomposition**: core of PCA — eigendecomposition of the covariance matrix
+- **Matrix multiplication** — forward/backward pass through linear layers: $\mathbf{y} = \mathbf{W}\mathbf{x} + \mathbf{b}$
+- **Element-wise ops** — activation functions, dropout, batch norm applied per element
+- **Transpose** — backpropagation of linear layers: $\frac{\partial L}{\partial \mathbf{W}} = \frac{\partial L}{\partial \mathbf{y}} \mathbf{x}^T$
 
 </div>
 
@@ -478,16 +448,6 @@ where $\mathbf{W}$ is the weight matrix, $\mathbf{b}$ is the bias vector, and $\
 ---
 
 ## Part 3: Probability
-
----
-
-layout: center
----
-
-### Random Variables and Distributions
-
----
-
 ### Random Variable
 
 A **random variable** is a mapping from outcomes of a random event to real numbers: $X: \Omega \to \mathbb{R}$.
@@ -551,7 +511,7 @@ $$P(a \leq X \leq b) = \int_a^b p(x)\, dx$$
 |------|-----|---------|
 | **Bernoulli** $X \sim \text{Bernoulli}(p)$ | $P(X=1)=p, \; P(X=0)=1-p$ | Binary labels |
 | **Binomial** $X \sim \text{Bin}(n,p)$ | $P(X=k)=\binom{n}{k}p^k(1-p)^{n-k}$ | Number of successes in $n$ trials |
-| **Categorical** $X \sim \text{Cat}(\boldsymbol{\pi})$ | $P(X=k)=\pi_k, \; \sum \pi_k = 1$ | Multi-class labels (softmax output) |
+
 
 <v-click>
 
@@ -560,7 +520,7 @@ $$P(a \leq X \leq b) = \int_a^b p(x)\, dx$$
 | Distribution | PDF | Typical Use |
 |------|-----|---------|
 | **Uniform** $X \sim U(a,b)$ | $p(x) = \frac{1}{b-a}$ | Random initialization |
-| **Normal** $X \sim \mathcal{N}(\mu, \sigma^2)$ | $p(x) = \frac{1}{sigma\sqrt{2\pi}}e^{-\frac{(x-\mu)^2}{2\sigma^2}}$ | Noise modeling, weight priors |
+| **Normal** $X \sim \mathcal{N}(\mu, \sigma^2)$ | $p(x) = \frac{1}{\sigma\sqrt{2\pi}}e^{-\frac{(x-\mu)^2}{2\sigma^2}}$ | Noise modeling, weight priors |
 
 </v-click>
 
@@ -653,20 +613,6 @@ $$P(Y = y \mid X = x) = \frac{P(X = x \mid Y = y) \cdot P(Y = y)}{P(X = x)}$$
 
 </v-click>
 
-<v-click>
-
-<div class="mt-4 p-4 bg-blue-900/20 rounded-lg">
-
-**Bayes' theorem in ML**:
-
-$$\underbrace{P(\theta \mid \text{data})}_{\text{posterior}} = \frac{\overbrace{P(\text{data} \mid \theta)}^{\text{likelihood}} \cdot \overbrace{P(\theta)}^{\text{prior}}}{P(\text{data})}$$
-
-This is the foundation of Bayesian ML: updating beliefs about parameters using observed data.
-
-</div>
-
-</v-click>
-
 ---
 
 #### Independence and Conditional Independence
@@ -696,7 +642,6 @@ In the Naive Bayes classifier, the core assumption is: **given the class label, 
 </v-click>
 
 ---
-
 layout: center
 ---
 
@@ -891,13 +836,12 @@ These are the most commonly used distributions in ML. Knowing their expectations
 </v-click>
 
 ---
-layout: center
+layout: two-cols
 ---
 
 ## Next Steps
 
-These concepts will appear repeatedly in later lectures.
+- 了解一些工具
+- 简单的代码
+- 动手机器学习
 
-Refer back to this lecture whenever you encounter unfamiliar terms.
-
-**Focus on intuition, not memorizing formulas.**

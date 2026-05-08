@@ -4,11 +4,11 @@ theme: seriph
 themeConfig:
   primary: '#5d8392'
 # some information about your slides (markdown enabled)
-title: Machine Learning Lectures
+title: Home Page
 background: beach-wave.png
 ---
 
-# Machine Learning Lectures
+# Dive into Machine Learning
 
 <Toc minDepth="1" maxDepth="1" />
 
