@@ -130,7 +130,7 @@ For a multivariable function $f(x_1, x_2, \ldots, x_n)$, the partial derivative 
 $$\frac{\partial f}{\partial x_i} = \lim_{\Delta x_i \to 0} \frac{f(x_1, \ldots, x_i + \Delta x_i, \ldots, x_n) - f(x_1, \ldots, x_n)}{\Delta x_i}$$
 
 <v-click>
-
+Example
 </v-click>
 
 <v-click>
