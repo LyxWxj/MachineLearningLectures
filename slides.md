@@ -5,7 +5,7 @@ themeConfig:
   primary: '#5d8392'
 # some information about your slides (markdown enabled)
 title: Machine Learning Lectures
-background: assets/beach-wave.png
+background: beach-wave.png
 ---
 
 # Machine Learning Lectures
