@@ -16,6 +16,7 @@ Calculus · Linear Algebra · Probability
 <Toc minDepth="2" maxDepth="2" />
 
 ---
+
 layout: center
 ---
 
@@ -211,7 +212,7 @@ const n = ref(8)
 
 A **definite integral** is the inverse of the derivative, representing the accumulated quantity over $[a, b]$:
 
-$$\int_a^b f(x)\, dx = \lim_{n \to \infty} \sum_{i=1}^{n} f(x_i) \Delta x$$
+$$\int_a^b f(x)\, dx = F(a)-F(b)=\left[F(x)\right]^{b}_{a}=\lim_{n \to \infty} \sum_{i=1}^{n} f(x_i) \Delta x$$
 
 <div class="grid grid-cols-2 gap-8">
 <div style="height: 280px;">
@@ -221,7 +222,15 @@ $$\int_a^b f(x)\, dx = \lim_{n \to \infty} \sum_{i=1}^{n} f(x_i) \Delta x$$
   <span class="font-mono text-lg">n = {{ n }}</span>
   <button class="px-3 py-1 rounded border border-gray-500 hover:bg-gray-400/20 font-mono" @click="n += 1">+</button>
 </div>
+<v-click>
 
+**Exact calculation** using the Fundamental Theorem of Calculus:
+
+$$\int_{0.5}^{2} \left(\frac{x^2}{2} + 0.3\right) dx = \left[\frac{x^3}{6} + 0.3x\right]_{0.5}^{2}$$
+
+$$= \underbrace{\left(\frac{2^3}{6} + 0.3 \times 2\right)}_{F(2) = \frac{29}{15} \approx 1.933} - \underbrace{\left(\frac{0.5^3}{6} + 0.3 \times 0.5\right)}_{F(0.5) = \frac{41}{240} \approx 0.171} = \frac{141}{80} \approx 1.7625$$
+
+</v-click>
 </div>
 <div style="height: 280px;">
 
@@ -230,9 +239,53 @@ $$\int_a^b f(x)\, dx = \lim_{n \to \infty} \sum_{i=1}^{n} f(x_i) \Delta x$$
 </div>
 </div>
 
-<div class="grid grid-cols-2 gap-8 mt-2">
+---
+
+### Indefinite Integral
+
+The **indefinite integral** is the antiderivative — the family of all functions whose derivative is $f(x)$:
+
+$$\int f(x)\, dx = F(x) + C$$
+
+<v-click>
+
+where $F'(x) = f(x)$ and $C$ is an arbitrary constant (since $(F(x)+C)' = f(x)$).
+
+</v-click>
+
+<v-click>
+
+**Common integration formulas**:
+
+| $f(x)$ | $\int f(x)\, dx$ |
+|------|------|
+| $x^n$ ($n \neq -1$) | $\dfrac{x^{n+1}}{n+1} + C$ |
+| $\dfrac{1}{x}$ | $\ln\|x\| + C$ |
+| $e^x$ | $e^x + C$ |
+
+</v-click>
+
+---
+
+### Example:
+<v-click>
+$$
+\int (3x^2 + 2x)\, dx = x^3 + x^2 + C
+$$
+
+Check by differentiation: $\frac{d}{dx}(x^3 + x^2 + C) = 3x^2 + 2x$ ✓
+
+</v-click>
+
+<v-click>
+
+<div class="mt-4 p-4 bg-blue-900/20 rounded-lg">
+
+**Connection**: definite integrals are computed via indefinite integrals — find $F(x)$, then evaluate $F(b) - F(a)$. In ML, integration appears in probability (computing $P(a \leq X \leq b)$) and in normalizing constants.
 
 </div>
+
+</v-click>
 
 ---
 
@@ -448,6 +501,7 @@ Let $\mathbf{A} = \begin{bmatrix} 1 & 2 \\ 3 & 4 \end{bmatrix}$, $\mathbf{B} = \
 ---
 
 ## Part 3: Probability
+
 ### Random Variable
 
 A **random variable** is a mapping from outcomes of a random event to real numbers: $X: \Omega \to \mathbb{R}$.
@@ -511,7 +565,6 @@ $$P(a \leq X \leq b) = \int_a^b p(x)\, dx$$
 |------|-----|---------|
 | **Bernoulli** $X \sim \text{Bernoulli}(p)$ | $P(X=1)=p, \; P(X=0)=1-p$ | Binary labels |
 | **Binomial** $X \sim \text{Bin}(n,p)$ | $P(X=k)=\binom{n}{k}p^k(1-p)^{n-k}$ | Number of successes in $n$ trials |
-
 
 <v-click>
 
@@ -615,6 +668,107 @@ $$P(Y = y \mid X = x) = \frac{P(X = x \mid Y = y) \cdot P(Y = y)}{P(X = x)}$$
 
 ---
 
+#### Prior, Likelihood, and Posterior
+
+Bayes' theorem has a powerful interpretation in ML classification. With sample $x$ and label $y$:
+
+$$\underbrace{P(y \mid x)}_{\text{posterior}} = \frac{\overbrace{P(x \mid y)}^{\text{likelihood}} \cdot \underbrace{P(y)}_{\text{prior}}}{P(x)}$$
+
+<v-click>
+
+| Term | Meaning | Example |
+|------|---------|---------|
+| **Prior** $P(y)$ | Probability of class $y$ **before** seeing $x$ | In a dataset: 60% cats, 40% dogs |
+| **Likelihood** $P(x \mid y)$ | How likely is sample $x$ given class $y$? | Given it's a cat, how likely is this fur pattern? |
+| **Posterior** $P(y \mid x)$ | Updated belief about $y$ **after** seeing $x$ | After seeing the image: 90% cat |
+
+</v-click>
+---
+
+<v-click>
+
+**Intuition**: posterior $\propto$ likelihood $\times$ prior
+
+- With **little data**, the posterior is dominated by the prior
+- With **lots of data**, the likelihood dominates and the prior "washes out"
+
+</v-click>
+
+<v-click>
+
+<div class="mt-4 p-4 bg-blue-900/20 rounded-lg">
+
+This is exactly how **Naive Bayes** works: estimate $P(y)$ from class frequencies, estimate $P(x \mid y)$ from feature statistics, then compute $P(y \mid x)$ for prediction.
+
+</div>
+
+</v-click>
+
+---
+
+#### Example: Coin Flip
+
+Is a coin fair? Let $\theta$ = probability of heads.
+
+<div class="grid grid-cols-2 gap-8">
+<div>
+
+<v-click>
+
+**Prior**: we believe the coin is roughly fair
+
+$$\theta \sim \text{Beta}(5, 5)$$
+
+This encodes: "most likely near 0.5"
+
+</v-click>
+
+<v-click>
+
+**Data**: flip 20 times, get 15 heads
+
+**Likelihood**:
+
+$$P(D \mid \theta) = \binom{20}{15} \theta^{15}(1-\theta)^5$$
+
+</v-click>
+
+</div>
+<div>
+
+<v-click>
+
+**Posterior**:
+
+$$P(\theta \mid D) \propto \theta^{15}(1-\theta)^5 \cdot \theta^4(1-\theta)^4$$
+
+$$= \text{Beta}(5+15, 5+5) = \text{Beta}(20, 10)$$
+
+</v-click>
+
+<v-click>
+
+**Result**: posterior mean = $\frac{20}{30} \approx 0.67$
+
+Shifted from prior (0.5) toward the data (0.75), balancing both sources of information.
+
+</v-click>
+
+</div>
+</div>
+
+<v-click>
+
+<div class="mt-4 p-4 bg-blue-900/20 rounded-lg">
+
+**In ML**: Maximum Likelihood Estimation (MLE) ignores the prior; Maximum A Posteriori (MAP) includes it. Bayesian methods keep the full posterior distribution.
+
+</div>
+
+</v-click>
+
+---
+
 #### Independence and Conditional Independence
 
 **Independent**: $X$ and $Y$ are independent iff
@@ -637,9 +791,18 @@ $$P(X, Y \mid Z) = P(X \mid Z) \cdot P(Y \mid Z)$$
 
 <v-click>
 
-In the Naive Bayes classifier, the core assumption is: **given the class label, features are conditionally independent**.
+In the Naive Bayes classifier, the core assumption is: **given the class label $y$, all features are conditionally independent**.
 
 </v-click>
+
+<v-click>
+
+If $\mathbf{x} = [x_1, x_2, \ldots, x_n]$ are $n$ features, the likelihood decomposes:
+
+$$P(\mathbf{x} \mid y) = P(x_1, x_2, \ldots, x_n \mid y) = \prod_{i=1}^{n} P(x_i \mid y)$$
+
+</v-click>
+
 
 ---
 layout: center
@@ -751,16 +914,6 @@ $$\rho(X, Y) = \frac{\text{Cov}(X, Y)}{\sigma_X \sigma_Y}, \quad \rho \in [-1, 1
 
 </v-click>
 
-<v-click>
-
-**Covariance matrix**: for a random vector $\mathbf{X} = [X_1, \ldots, X_n]^T$
-
-$$\boldsymbol{\Sigma} = \begin{bmatrix} \text{Var}(X_1) & \text{Cov}(X_1, X_2) & \cdots \\ \text{Cov}(X_2, X_1) & \text{Var}(X_2) & \cdots \\ \vdots & \vdots & \ddots \end{bmatrix}$$
-
-The covariance matrix is a core component of PCA, Gaussian distributions, and more.
-
-</v-click>
-
 ---
 
 ### Expectations and Variances of Common Distributions
@@ -841,7 +994,7 @@ layout: two-cols
 
 ## Next Steps
 
-- 了解一些工具
-- 简单的代码
-- 动手机器学习
-
+- Machine-learning concepts
+- Few tools
+- Some simple codes
+- Get hands dirty
