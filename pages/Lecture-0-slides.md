@@ -1,7 +1,7 @@
 ---
 theme: seriph
 themeConfig:
-  primary: '#5d8392'
+  primary: "#5d8392"
 title: "Lecture 0: Math Terminology for Machine Learning"
 transition: slide-left
 math: true
@@ -16,7 +16,6 @@ Calculus · Linear Algebra · Probability
 <Toc minDepth="2" maxDepth="2" />
 
 ---
-
 layout: center
 ---
 
@@ -26,11 +25,11 @@ layout: center
 
 Three main components:
 
-| Subject | Usage |
-|------|---------|
-| **Calculus** | Optimization — updating model parameters via gradient descent |
-| **Linear Algebra** | Representation — storing and computing data as vectors/matrices |
-| **Probability** | Modeling — describing uncertainty with probability distributions |
+| Subject            | Usage                                                            |
+| ------------------ | ---------------------------------------------------------------- |
+| **Calculus**       | Optimization — updating model parameters via gradient descent    |
+| **Linear Algebra** | Representation — storing and computing data as vectors/matrices  |
+| **Probability**    | Modeling — describing uncertainty with probability distributions |
 
 </v-click>
 
@@ -70,6 +69,72 @@ The sign of $\frac{df}{dx}$ indicates if $f$ increases by an increasing $x$.
 
 </div>
 </v-click>
+<v-click>
+<div class="mt-4 p-4 bg-blue-900/20 rounded-lg">
+
+Question: we have some $x_0$ and $x_1 = x_0 - \beta f'(x_0)$ ($\beta$ is small enough), then $f(x_0) \mathbf{O} f(x_1)$?
+
+</div>
+</v-click>
+
+---
+layout: default
+---
+
+<div class="grid grid-cols-2 gap-8">
+<div>
+
+### Intuition
+
+<v-click>
+
+$$x_1 = x_0 - \beta f'(x_0)$$
+
+- If $f'(x_0) > 0$: $f$ is increasing, $x_1 < x_0$ (move left) $\Rightarrow$ $f$ decreases
+- If $f'(x_0) < 0$: $f$ is decreasing, $x_1 > x_0$ (move right) $\Rightarrow$ $f$ decreases
+- Anyway $x_1$ moves in the direction that reduces $f$
+
+$$\boxed{f(x_0) \geq f(x_1)}$$
+
+</v-click>
+
+</div>
+<div>
+
+### Derivation (Taylor Expansion)
+
+<v-click>
+
+$$x_1 = x_0 - \beta f'(x_0)$$
+
+$$f(x_1) \approx f(x_0) + f'(x_0)(x_1 - x_0)$$
+
+Substitute $x_1 - x_0 = -\beta f'(x_0)$:
+
+$$f(x_1) \approx f(x_0) - \beta\left(f'(x_0)\right)^2$$
+
+Since $\beta > 0$ and $\left(f'(x_0)\right)^2 \geq 0$:
+
+$$\boxed{f(x_1) \leq f(x_0)}$$
+
+</v-click>
+
+</div>
+</div>
+
+<v-click>
+
+<div class="bg-blue-900/20 rounded-lg text-center">
+
+**Taylor Expansion**: For a smooth function $f$ near point $a$:
+
+$$f(x) = f(a) + f'(a)(x-a) + \frac{f''(a)}{2!}(x-a)^2 + \cdots+\frac{f^{(n)}(a)}{n!}(x-a)^n+o((x-a)^n)$$
+
+For $a=0$,$f(x) = f(0) + f'(0)(x) + \frac{f''(0)}{2!}(x)^2 + \cdots+\frac{f^{(n)}(0)}{n!}(x)^n+o((x)^n)$
+
+</div>
+
+</v-click>
 
 ---
 
@@ -102,17 +167,105 @@ In the chart:
 
 ---
 
-### Common Differentiation Rules
+### Taylor Expansion Visualization
 
-| Function $y$ | Derivative $\dfrac{dy}{dx}$ | Differential $dy$ | Rule |
-|----------|----------------------|-----------|---------|
-| $y = cf(x)$ | $c\dfrac{df}{dx}$ | $dy=c\, df=cf'(x)dx$ | Constant multiple |
-| $y = f + g$ | $\dfrac{df}{dx} + \dfrac{dg}{dx}$ | $dy=df + dg=(f'(x)+g'(x))dx$ | Sum |
-| $y = f(g(x))$ | $\dfrac{df}{dg} \cdot \dfrac{dg}{dx}$ | $dy=f'(g)\, dg=f'(g(x))g'(x)dx$ | **Chain rule** |
+<div class="grid grid-cols-2 gap-6" style="height: 380px;">
+<div>
+
+<TaylorExpansion type="poly6" />
+
+</div>
+<div>
+
+<TaylorExpansion type="ln" />
+
+</div>
+</div>
+
+---
+
+### Taylor Expansion Visualization-2
+
+<div class="grid grid-cols-2 gap-6" style="height: 380px;">
+<div>
+
+<TaylorExpansion type="exp" />
+
+</div>
+<div>
+
+<TaylorExpansion type="sin" />
+
+</div>
+</div>
+
+---
+
+### Questions
 
 <v-click>
 
-<div class="mt-4 p-4 bg-blue-900/20 rounded-lg">
+<div class="p-2 bg-blue-900/20 rounded-lg">
+
+**Q1**: For $f(x) = x^6 - 3x^4 + 2x^3 + x$ at $a=0$: why does $T_2(x)$ equal $T_1(x)$, and $T_5(x)$ equal $T_4(x)$?
+
+</div>
+
+</v-click>
+
+<v-click>
+
+<div class="mt-2 p-2 bg-blue-900/20 rounded-lg">
+
+**Q2**: For $\sin x$ at $a=0$: why does every even-order expansion equal the previous odd-order one? (i.e. $T_{2k} = T_{2k-1}$)
+
+</div>
+
+</v-click>
+
+<v-click>
+
+<div class="mt-2 text-sm text-gray-400 text-center">
+
+Hint: Look at which coefficients are zero and why.
+
+</div>
+
+</v-click>
+
+<v-click>
+
+<div class="mt-2 p-2 bg-green-900/20 rounded-lg">
+
+**A1**: $f(x) = x^6 - 3x^4 + 2x^3 + x$ has **no** $x^2$ or $x^5$ terms. At $a=0$, the Taylor coefficients $c_2 = \frac{f''(0)}{2!} = 0$ and $c_5 = \frac{f^{(5)}(0)}{5!} = 0$, so adding these terms changes nothing.
+
+</div>
+
+</v-click>
+
+<v-click>
+
+<div class="mt-2 p-2 bg-green-900/20 rounded-lg">
+
+**A2**: $\sin x$ is an **odd function** ($\sin(-x) = -\sin x$), so its Taylor series at $a=0$ contains only **odd** powers: $\sin x = x - \frac{x^3}{3!} + \frac{x^5}{5!} - \cdots$. All even-order coefficients are zero, hence $T_{2k} = T_{2k-1}$.
+
+</div>
+
+</v-click>
+
+---
+
+### Common Differentiation Rules
+
+| Function $y$  | Derivative $\dfrac{dy}{dx}$           | Differential $dy$               | Rule              |
+| ------------- | ------------------------------------- | ------------------------------- | ----------------- |
+| $y = cf(x)$   | $c\dfrac{df}{dx}$                     | $dy=c\, df=cf'(x)dx$            | Constant multiple |
+| $y = f + g$   | $\dfrac{df}{dx} + \dfrac{dg}{dx}$     | $dy=df + dg=(f'(x)+g'(x))dx$    | Sum               |
+| $y = f(g(x))$ | $\dfrac{df}{dg} \cdot \dfrac{dg}{dx}$ | $dy=f'(g)\, dg=f'(g(x))g'(x)dx$ | **Chain rule**    |
+
+<v-click>
+
+<div class="mt-4 p-3 bg-blue-900/20 rounded-lg">
 
 The **chain rule** is critical for backpropagation in neural networks. It computes derivatives of composite functions: propagating gradients backward layer by layer.
 
@@ -138,33 +291,107 @@ $$\frac{\partial L}{\partial w_1} = \frac{\partial L}{\partial y} \cdot \frac{\p
 
 <v-click>
 
-**Gradient descent process**:
+**Recall**: we proved $f(x_0) \geq f(x_1)$ for each step $x_1 = x_0 - \eta f'(x_0)$.
 
-1. Start at $x_0 = -0.5$
-2. Compute $f'(x) = 2(x-2)$
-3. Update $x_{n+1} = x_n - \eta \cdot f'(x_n)$
-4. Repeat until convergence
+This guarantees the function value **never increases** at each iteration.
 
 </v-click>
 
 <v-click>
 
-**Parameters**:
+**Two starting points**:
 
-- Learning rate $\eta = 0.3$
-- Red dots show each step
-- Converges to $x = 2$ (the minimum)
+- **Red path**: start from $x_0 = -0.5$ (left of minimum)
+- **Green path**: start from $x_0 = 4.5$ (right of minimum)
+- Both converge to $x = 2$
 
 </v-click>
 
 <v-click>
 
-In ML, model parameters are optimized iteratively this way.
+**Update rule**: $x_{n+1} = x_n - \eta \cdot f'(x_n)$, with $\eta = 0.3$
+
+No matter which side we start, gradient descent always descends toward the minimum.
 
 </v-click>
 
 </div>
 </div>
+
+---
+
+### Learning Rate: Too Small vs Too Large
+
+<div class="grid grid-cols-2 gap-8">
+<div style="height: 340px;">
+
+<GradientDescentLR />
+
+</div>
+<div>
+
+**Function**:
+
+$$f(x) = (x - 2)^2 + 1$$
+
+**Gradient**:
+
+$$f'(x) = 2(x - 2)$$
+
+**Update rule**:
+
+$$x_{n+1} = x_n - \eta \cdot f'(x_n)$$
+
+<v-click>
+
+**Try adjusting $\eta$** with the slider and observe:
+
+<div class="mt-4 p-3 bg-yellow-900/20 rounded-lg">
+
+**Tradeoff**: Small $\eta$ is safe but slow. Large $\eta$ is fast but risky. Choosing the right learning rate is critical in ML training.
+
+</div>
+
+</v-click>
+
+</div>
+</div>
+
+---
+
+### Multiple Local Minima
+
+<div class="grid grid-cols-2 gap-8">
+<div style="height: 340px;">
+
+<GradientDescentMulti />
+
+</div>
+<div>
+
+**Function**:
+
+$$f(x) = x^4 - 4x^3 + 2x^2 + 4x$$
+
+**Gradient**:
+
+$$f'(x) = 4x^3 - 12x^2 + 4x + 4$$
+
+<v-click>
+
+**Critical points** (where $f'(x) = 0$):
+
+| Point | Type |
+|-------|------|
+| $x \approx -0.41$ | Local min |
+| $x = 1$ | Local max |
+| $x \approx 2.41$ | Local min |
+
+</v-click>
+
+</div>
+</div>
+
 ---
 
 ### Partial Derivative
@@ -257,17 +484,18 @@ where $F'(x) = f(x)$ and $C$ is an arbitrary constant (since $(F(x)+C)' = f(x)$)
 
 **Common integration formulas**:
 
-| $f(x)$ | $\int f(x)\, dx$ |
-|------|------|
+| $f(x)$              | $\int f(x)\, dx$           |
+| ------------------- | -------------------------- |
 | $x^n$ ($n \neq -1$) | $\dfrac{x^{n+1}}{n+1} + C$ |
-| $\dfrac{1}{x}$ | $\ln\|x\| + C$ |
-| $e^x$ | $e^x + C$ |
+| $\dfrac{1}{x}$      | $\ln\|x\| + C$             |
+| $e^x$               | $e^x + C$                  |
 
 </v-click>
 
 ---
 
 ### Example:
+
 <v-click>
 $$
 \int (3x^2 + 2x)\, dx = x^3 + x^2 + C
@@ -469,20 +697,20 @@ where $\mathbf{W}$ is the weight matrix, $\mathbf{b}$ is the bias vector, and $\
 
 Let $\mathbf{A} = \begin{bmatrix} 1 & 2 \\ 3 & 4 \end{bmatrix}$, $\mathbf{B} = \begin{bmatrix} 5 & 6 \\ 7 & 8 \end{bmatrix}$, $c = 2$
 
-| Operation | Definition | Example |
-|------|------|------|
-| **Transpose** | $(A^T)_{ij} = A_{ji}$ | $\begin{bmatrix} 1 & 3 \\ 2 & 4 \end{bmatrix}$ |
+| Operation           | Definition                     | Example                                          |
+| ------------------- | ------------------------------ | ------------------------------------------------ |
+| **Transpose**       | $(A^T)_{ij} = A_{ji}$          | $\begin{bmatrix} 1 & 3 \\ 2 & 4 \end{bmatrix}$   |
 | **Matrix Addition** | $(A+B)_{ij} = A_{ij} + B_{ij}$ | $\begin{bmatrix} 6 & 8 \\ 10 & 12 \end{bmatrix}$ |
-| **Scalar Addition** | $(A+c)_{ij} = A_{ij} + c$ | $\begin{bmatrix} 3 & 4 \\ 5 & 6 \end{bmatrix}$ |
+| **Scalar Addition** | $(A+c)_{ij} = A_{ij} + c$      | $\begin{bmatrix} 3 & 4 \\ 5 & 6 \end{bmatrix}$   |
 
 ---
 
 ### Matrix Operations (cont.)
 
-| Operation | Definition | Example |
-|------|------|------|
-| **Element-wise (Hadamard)** | $(A \odot B)_{ij} = A_{ij} \cdot B_{ij}$ | $\begin{bmatrix} 5 & 12 \\ 21 & 32 \end{bmatrix}$ |
-| **Matrix Multiplication** | $(AB)_{ij} = \sum_k A_{ik}B_{kj}$ | $\begin{bmatrix} 19 & 22 \\ 43 & 50 \end{bmatrix}$ |
+| Operation                   | Definition                               | Example                                            |
+| --------------------------- | ---------------------------------------- | -------------------------------------------------- |
+| **Element-wise (Hadamard)** | $(A \odot B)_{ij} = A_{ij} \cdot B_{ij}$ | $\begin{bmatrix} 5 & 12 \\ 21 & 32 \end{bmatrix}$  |
+| **Matrix Multiplication**   | $(AB)_{ij} = \sum_k A_{ik}B_{kj}$        | $\begin{bmatrix} 19 & 22 \\ 43 & 50 \end{bmatrix}$ |
 
 <v-click>
 
@@ -561,18 +789,18 @@ $$P(a \leq X \leq b) = \int_a^b p(x)\, dx$$
 
 #### Discrete
 
-| Distribution | PMF | Typical Use |
-|------|-----|---------|
-| **Bernoulli** $X \sim \text{Bernoulli}(p)$ | $P(X=1)=p, \; P(X=0)=1-p$ | Binary labels |
-| **Binomial** $X \sim \text{Bin}(n,p)$ | $P(X=k)=\binom{n}{k}p^k(1-p)^{n-k}$ | Number of successes in $n$ trials |
+| Distribution                               | PMF                                 | Typical Use                       |
+| ------------------------------------------ | ----------------------------------- | --------------------------------- |
+| **Bernoulli** $X \sim \text{Bernoulli}(p)$ | $P(X=1)=p, \; P(X=0)=1-p$           | Binary labels                     |
+| **Binomial** $X \sim \text{Bin}(n,p)$      | $P(X=k)=\binom{n}{k}p^k(1-p)^{n-k}$ | Number of successes in $n$ trials |
 
 <v-click>
 
 #### Continuous
 
-| Distribution | PDF | Typical Use |
-|------|-----|---------|
-| **Uniform** $X \sim U(a,b)$ | $p(x) = \frac{1}{b-a}$ | Random initialization |
+| Distribution                                   | PDF                                                                  | Typical Use                   |
+| ---------------------------------------------- | -------------------------------------------------------------------- | ----------------------------- |
+| **Uniform** $X \sim U(a,b)$                    | $p(x) = \frac{1}{b-a}$                                               | Random initialization         |
 | **Normal** $X \sim \mathcal{N}(\mu, \sigma^2)$ | $p(x) = \frac{1}{\sigma\sqrt{2\pi}}e^{-\frac{(x-\mu)^2}{2\sigma^2}}$ | Noise modeling, weight priors |
 
 </v-click>
@@ -676,13 +904,14 @@ $$\underbrace{P(y \mid x)}_{\text{posterior}} = \frac{\overbrace{P(x \mid y)}^{\
 
 <v-click>
 
-| Term | Meaning | Example |
-|------|---------|---------|
-| **Prior** $P(y)$ | Probability of class $y$ **before** seeing $x$ | In a dataset: 60% cats, 40% dogs |
-| **Likelihood** $P(x \mid y)$ | How likely is sample $x$ given class $y$? | Given it's a cat, how likely is this fur pattern? |
-| **Posterior** $P(y \mid x)$ | Updated belief about $y$ **after** seeing $x$ | After seeing the image: 90% cat |
+| Term                         | Meaning                                        | Example                                           |
+| ---------------------------- | ---------------------------------------------- | ------------------------------------------------- |
+| **Prior** $P(y)$             | Probability of class $y$ **before** seeing $x$ | In a dataset: 60% cats, 40% dogs                  |
+| **Likelihood** $P(x \mid y)$ | How likely is sample $x$ given class $y$?      | Given it's a cat, how likely is this fur pattern? |
+| **Posterior** $P(y \mid x)$  | Updated belief about $y$ **after** seeing $x$  | After seeing the image: 90% cat                   |
 
 </v-click>
+
 ---
 
 <v-click>
@@ -803,7 +1032,6 @@ $$P(\mathbf{x} \mid y) = P(x_1, x_2, \ldots, x_n \mid y) = \prod_{i=1}^{n} P(x_i
 
 </v-click>
 
-
 ---
 layout: center
 ---
@@ -836,10 +1064,10 @@ $$E[X] = \int_{-\infty}^{+\infty} x \cdot p(x)\, dx$$
 
 **Properties of expectation**:
 
-| Property | Formula |
-|------|------|
-| Linearity | $E[aX + b] = aE[X] + b$ |
-| Sum | $E[X + Y] = E[X] + E[Y]$ |
+| Property              | Formula                   |
+| --------------------- | ------------------------- |
+| Linearity             | $E[aX + b] = aE[X] + b$   |
+| Sum                   | $E[X + Y] = E[X] + E[Y]$  |
 | Product (independent) | $E[XY] = E[X] \cdot E[Y]$ |
 
 </v-click>
@@ -898,11 +1126,11 @@ $$\text{Cov}(X, Y) = E[(X - \mu_X)(Y - \mu_Y)] = E[XY] - E[X]E[Y]$$
 
 <v-click>
 
-| $\text{Cov}(X,Y)$ | Meaning |
-|---|------|
-| $> 0$ | Positive correlation: $Y$ tends to increase with $X$ |
-| $= 0$ | Uncorrelated (in the linear sense) |
-| $< 0$ | Negative correlation: $Y$ tends to decrease with $X$ |
+| $\text{Cov}(X,Y)$ | Meaning                                              |
+| ----------------- | ---------------------------------------------------- |
+| $> 0$             | Positive correlation: $Y$ tends to increase with $X$ |
+| $= 0$             | Uncorrelated (in the linear sense)                   |
+| $< 0$             | Negative correlation: $Y$ tends to decrease with $X$ |
 
 </v-click>
 
@@ -918,13 +1146,13 @@ $$\rho(X, Y) = \frac{\text{Cov}(X, Y)}{\sigma_X \sigma_Y}, \quad \rho \in [-1, 1
 
 ### Expectations and Variances of Common Distributions
 
-| Distribution | $E[X]$ | $\text{Var}(X)$ |
-|------|------------|---------------------|
-| Bernoulli $\text{Bernoulli}(p)$ | $p$ | $p(1-p)$ |
-| Binomial $\text{Bin}(n, p)$ | $np$ | $np(1-p)$ |
-| Uniform $U(a, b)$ | $\frac{a+b}{2}$ | $\frac{(b-a)^2}{12}$ |
-| Normal $\mathcal{N}(\mu, \sigma^2)$ | $\mu$ | $\sigma^2$ |
-| Exponential $\text{Exp}(\lambda)$ | $\frac{1}{\lambda}$ | $\frac{1}{\lambda^2}$ |
+| Distribution                        | $E[X]$              | $\text{Var}(X)$       |
+| ----------------------------------- | ------------------- | --------------------- |
+| Bernoulli $\text{Bernoulli}(p)$     | $p$                 | $p(1-p)$              |
+| Binomial $\text{Bin}(n, p)$         | $np$                | $np(1-p)$             |
+| Uniform $U(a, b)$                   | $\frac{a+b}{2}$     | $\frac{(b-a)^2}{12}$  |
+| Normal $\mathcal{N}(\mu, \sigma^2)$ | $\mu$               | $\sigma^2$            |
+| Exponential $\text{Exp}(\lambda)$   | $\frac{1}{\lambda}$ | $\frac{1}{\lambda^2}$ |
 
 <v-click>
 

@@ -26,6 +26,13 @@ importers:
       vue-echarts:
         specifier: ^8.0.1
         version: 8.0.1(echarts@6.0.0)(vue@3.5.34(typescript@5.9.3))
+    devDependencies:
+      prettier:
+        specifier: ^3.8.3
+        version: 3.8.3
+      prettier-plugin-slidev:
+        specifier: ^1.0.5
+        version: 1.0.5(prettier@3.8.3)
 
 packages:
 
@@ -601,6 +608,10 @@ packages:
   '@slidev/client@52.15.1':
     resolution: {integrity: sha512-A/CZAuDQ8tEjAaGJ0R9d6bidetnE8AWOlZBkfX2jCkNdkj5YVXAIer1s2FoerQrKYJeBTMjlIxm3XuENo4WZmA==}
     engines: {node: '>=20.12.0'}
+
+  '@slidev/parser@0.47.5':
+    resolution: {integrity: sha512-KvqOEhIFuMDu8CjAsehMNKlAnnmAn2TRHiEymc3CMadid05oWa5zgTxqEyMxUl2rjWpYs3A1yDiendZsGYs3HA==}
+    engines: {node: '>=18.0.0'}
 
   '@slidev/parser@52.15.1':
     resolution: {integrity: sha512-beB5K9yNoQdIHJrkut40Km9ilewyBRn7NbhC0bCdwCnAQkZq/p0bCdZd7ejJ1rqWCutE2omIpwrOG1dVQaa/zw==}
@@ -2179,6 +2190,16 @@ packages:
   pptxgenjs@4.0.1:
     resolution: {integrity: sha512-TeJISr8wouAuXw4C1F/mC33xbZs/FuEG6nH9FG1Zj+nuPcGMP5YRHl6X+j3HSUnS1f3at6k75ZZXPMZlA5Lj9A==}
 
+  prettier-plugin-slidev@1.0.5:
+    resolution: {integrity: sha512-1xaKzOAX17QAcn1roUgQIAfeio3HPYYefCgzxh6Bzk+5rJJxq0I8HUhLrUyv9nCpIP6e9CDv/yDQSdEeqqRUuA==}
+    peerDependencies:
+      prettier: ^3.2.4
+
+  prettier@3.8.3:
+    resolution: {integrity: sha512-7igPTM53cGHMW8xWuVTydi2KO233VFiTNyF5hLJqpilHfmn8C8gPf+PS7dUT64YcXFbiMGZxS9pCSxL/Dxm/Jw==}
+    engines: {node: '>=14'}
+    hasBin: true
+
   prism-theme-vars@0.2.5:
     resolution: {integrity: sha512-/D8gBTScYzi9afwE6v3TC1U/1YFZ6k+ly17mtVRdLpGy7E79YjJJWkXFgUDHJ2gDksV/ZnXF7ydJ4TvoDm2z/Q==}
 
@@ -3495,6 +3516,11 @@ snapshots:
       - supports-color
       - svelte
       - vite
+
+  '@slidev/parser@0.47.5':
+    dependencies:
+      '@slidev/types': 0.47.5
+      js-yaml: 4.1.1
 
   '@slidev/parser@52.15.1(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(@nuxt/kit@3.21.4)(@vue/compiler-sfc@3.5.34)(typescript@5.9.3)(vite@8.0.11(@types/node@22.19.18)(jiti@2.7.0)(yaml@2.8.4))':
     dependencies:
@@ -5415,6 +5441,13 @@ snapshots:
       https: 1.0.0
       image-size: 1.2.1
       jszip: 3.10.1
+
+  prettier-plugin-slidev@1.0.5(prettier@3.8.3):
+    dependencies:
+      '@slidev/parser': 0.47.5
+      prettier: 3.8.3
+
+  prettier@3.8.3: {}
 
   prism-theme-vars@0.2.5: {}
 

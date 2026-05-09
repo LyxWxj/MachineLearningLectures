@@ -2,7 +2,7 @@
 # try also 'default' to start simple
 theme: seriph
 themeConfig:
-  primary: '#5d8392'
+  primary: "#5d8392"
 # some information about your slides (markdown enabled)
 title: Home Page
 background: beach-wave.png
