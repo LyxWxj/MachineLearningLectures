@@ -14,7 +14,6 @@ background: beach-wave.png
 
 ---
 src: ./pages/Lecture-0-slides.md
-hide: false
 ---
 
 ---

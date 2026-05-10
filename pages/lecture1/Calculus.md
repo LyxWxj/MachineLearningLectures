@@ -1,9 +1,3 @@
----
-title: "Part 1: Calculus"
-transition: slide-left
-math: true
----
-
 ## Part 1: Calculus
 
 ### Derivative-Definition
@@ -40,8 +34,6 @@ Question: we have some $x_0$ and $x_1 = x_0 - \beta f'(x_0)$ ($\beta$ is small e
 </div>
 </v-click>
 
----
-layout: default
 ---
 
 <div class="grid grid-cols-2 gap-8">
@@ -397,38 +389,215 @@ where $\eta$ is the learning rate.
 
 ---
 
-### Integral
+### Second-Order Derivative
 
-<script setup>
-import { ref } from 'vue'
-const n = ref(8)
-</script>
+The **second-order derivative** is the derivative of the derivative, measuring how the rate of change itself changes:
 
-A **definite integral** is the inverse of the derivative, representing the accumulated quantity over $[a, b]$:
+$$f''(x) = \frac{d^2 f}{dx^2} = \frac{d}{dx}\left(\frac{df}{dx}\right) = \lim_{\Delta x \to 0} \frac{f'(x + \Delta x) - f'(x)}{\Delta x}$$
 
-$$\int_a^b f(x)\, dx = F(a)-F(b)=\left[F(x)\right]^{b}_{a}=\lim_{n \to \infty} \sum_{i=1}^{n} f(x_i) \Delta x$$
-
-<div class="grid grid-cols-2 gap-8">
-<div style="height: 280px;">
-
-<div class="flex items-center justify-center gap-4 mb-2">
-  <button class="px-3 py-1 rounded border border-gray-500 hover:bg-gray-400/20 font-mono" @click="n = Math.max(1, n - 1)">−</button>
-  <span class="font-mono text-lg">n = {{ n }}</span>
-  <button class="px-3 py-1 rounded border border-gray-500 hover:bg-gray-400/20 font-mono" @click="n += 1">+</button>
-</div>
 <v-click>
 
-**Exact calculation** using the Fundamental Theorem of Calculus:
+**Geometric meaning**: $f''(x)$ describes the **concavity** of the function.
 
-$$\int_{0.5}^{2} \left(\frac{x^2}{2} + 0.3\right) dx = \left[\frac{x^3}{6} + 0.3x\right]_{0.5}^{2}$$
-
-$$= \underbrace{\left(\frac{2^3}{6} + 0.3 \times 2\right)}_{F(2) = \frac{29}{15} \approx 1.933} - \underbrace{\left(\frac{0.5^3}{6} + 0.3 \times 0.5\right)}_{F(0.5) = \frac{41}{240} \approx 0.171} = \frac{141}{80} \approx 1.7625$$
+- $f''(x) > 0$: the function is **concave up** (curves upward, like a cup) → local minimum at critical point
+- $f''(x) < 0$: the function is **concave down** (curves downward, like a cap) → local maximum at critical point
+- $f''(x) = 0$: possible **inflection point** (concavity changes)
 
 </v-click>
-</div>
-<div style="height: 280px;">
 
-<RiemannChart :a="0.5" :b="2" :n="n" />
+<v-click>
+
+<div class="mt-4 p-3 bg-blue-900/20 rounded-lg">
+
+**Example**: $f(x) = \frac{x^3}{3} - x$
+$f'(x) = x^2 - 1, \quad f''(x) = 2x$
+
+At $x = 1$: $f'(1) = 0$ (critical point), $f''(1) = 2 > 0$ → **local minimum**
+
+At $x = -1$: $f'(-1) = 0$ (critical point), $f''(-1) = -2 < 0$ → **local maximum**
+
+</div>
+
+</v-click>
+
+---
+
+### Second-Order Derivative & Optimization
+
+<div class="grid grid-cols-2 gap-8">
+<div>
+
+<v-click>
+
+**Second-Order Taylor Expansion** near point $a$:
+
+$$f(x) \approx f(a) + f'(a)(x-a) + \frac{f''(a)}{2}(x-a)^2$$
+
+</v-click>
+
+<v-click>
+
+At a critical point where $f'(a) = 0$:
+
+$$f(x) \approx f(a) + \frac{f''(a)}{2}(x-a)^2$$
+
+- If $f''(a) > 0$: $f(x) \geq f(a)$ → **local minimum**
+- If $f''(a) < 0$: $f(x) \leq f(a)$ → **local maximum**
+
+</v-click>
+
+</div>
+<div>
+
+<v-click>
+
+<div class="p-3 bg-blue-900/20 rounded-lg">
+
+**In machine learning**: The second derivative tells us about the **curvature** of the loss surface.
+
+- Large $f''$ → steep curvature → small steps are safer
+- Small $f''$ → flat region → can take larger steps
+
+This motivates **second-order optimization methods** like Newton's method:
+
+$$x_{n+1} = x_n - \frac{f'(x_n)}{f''(x_n)}$$
+
+</div>
+
+</v-click>
+
+</div>
+</div>
+
+---
+
+### Second-Order Partial Derivative
+
+For a multivariable function $f(x_1, x_2, \ldots, x_n)$, we can take partial derivatives with respect to the same variable twice:
+
+$$\frac{\partial^2 f}{\partial x_i^2} = \frac{\partial}{\partial x_i}\left(\frac{\partial f}{\partial x_i}\right)$$
+
+<v-click>
+
+**Example**: $f(x, y) = x^2 y + 3xy^2$
+
+$$\frac{\partial f}{\partial x} = 2xy + 3y^2, \quad \frac{\partial^2 f}{\partial x^2} = 2y$$
+
+$$\frac{\partial f}{\partial y} = x^2 + 6xy, \quad \frac{\partial^2 f}{\partial y^2} = 6x$$
+
+</v-click>
+
+<v-click>
+
+<div class="mt-4 p-3 bg-blue-900/20 rounded-lg">
+
+**Interpretation**: $\frac{\partial^2 f}{\partial x_i^2}$ measures the concavity of $f$ along the $x_i$ direction, holding all other variables constant.
+
+</div>
+
+</v-click>
+
+---
+
+### Second-Order Mixed Partial Derivative
+
+The **mixed partial derivative** involves taking partial derivatives with respect to **different variables**:
+
+$$\frac{\partial^2 f}{\partial x_j \partial x_i} = \frac{\partial}{\partial x_j}\left(\frac{\partial f}{\partial x_i}\right)$$
+
+<v-click>
+
+**Example**: $f(x, y) = x^2 y + 3xy^2$
+
+$$\frac{\partial f}{\partial x} = 2xy + 3y^2 \quad \Rightarrow \quad \frac{\partial^2 f}{\partial y \partial x} = \frac{\partial}{\partial y}(2xy + 3y^2) = 2x + 6y$$
+
+$$\frac{\partial f}{\partial y} = x^2 + 6xy \quad \Rightarrow \quad \frac{\partial^2 f}{\partial x \partial y} = \frac{\partial}{\partial x}(x^2 + 6xy) = 2x + 6y$$
+
+</v-click>
+
+<v-click>
+
+<div class="mt-4 p-3 bg-green-900/20 rounded-lg">
+
+**Clairaut's Theorem (Symmetry of Mixed Partials)**:
+
+If $f$ has continuous second-order partial derivatives, then:
+
+$$\boxed{\frac{\partial^2 f}{\partial x_j \partial x_i} = \frac{\partial^2 f}{\partial x_i \partial x_j}}$$
+
+The order of differentiation does not matter!
+
+</div>
+
+</v-click>
+
+---
+
+### Hessian Matrix
+
+The **Hessian matrix** collects all second-order partial derivatives of a multivariable function:
+
+$$H(f) = \begin{bmatrix} \dfrac{\partial^2 f}{\partial x_1^2} & \dfrac{\partial^2 f}{\partial x_1 \partial x_2} & \cdots & \dfrac{\partial^2 f}{\partial x_1 \partial x_n} \\[6pt] \dfrac{\partial^2 f}{\partial x_2 \partial x_1} & \dfrac{\partial^2 f}{\partial x_2^2} & \cdots & \dfrac{\partial^2 f}{\partial x_2 \partial x_n} \\[6pt] \vdots & \vdots & \ddots & \vdots \\[6pt] \dfrac{\partial^2 f}{\partial x_n \partial x_1} & \dfrac{\partial^2 f}{\partial x_n \partial x_2} & \cdots & \dfrac{\partial^2 f}{\partial x_n^2} \end{bmatrix}$$
+
+<v-click>
+
+**Example**: $f(x, y) = x^2 y + 3xy^2$
+
+$$H = \begin{bmatrix} \dfrac{\partial^2 f}{\partial x^2} & \dfrac{\partial^2 f}{\partial x \partial y} \\[6pt] \dfrac{\partial^2 f}{\partial y \partial x} & \dfrac{\partial^2 f}{\partial y^2} \end{bmatrix} = \begin{bmatrix} 2y & 2x + 6y \\ 2x + 6y & 6x \end{bmatrix}$$
+
+</v-click>
+
+---
+
+### Hessian & Optimization
+
+<div class="grid grid-cols-2 gap-8">
+<div>
+
+<v-click>
+
+**Multivariable second-order Taylor expansion** near point $\mathbf{a}$:
+
+$$f(\mathbf{x}) \approx f(\mathbf{a}) + \nabla f(\mathbf{a})^T (\mathbf{x} - \mathbf{a}) + \frac{1}{2}(\mathbf{x} - \mathbf{a})^T H(\mathbf{a}) (\mathbf{x} - \mathbf{a})$$
+
+</v-click>
+
+<v-click>
+
+At a critical point where $\nabla f(\mathbf{a}) = \mathbf{0}$:
+
+$$f(\mathbf{x}) \approx f(\mathbf{a}) + \frac{1}{2}(\mathbf{x} - \mathbf{a})^T H(\mathbf{a}) (\mathbf{x} - \mathbf{a})$$
+
+</v-click>
+
+</div>
+<div>
+
+<v-click>
+
+<div class="p-3 bg-blue-900/20 rounded-lg">
+
+**Classifying critical points** using the Hessian:
+
+- $H$ **positive definite** → all eigenvalues $> 0$ → **local minimum**
+- $H$ **negative definite** → all eigenvalues $< 0$ → **local maximum**
+- $H$ **indefinite** → mixed signs → **saddle point**
+
+</div>
+
+</v-click>
+
+<v-click>
+
+<div class="mt-4 p-3 bg-yellow-900/20 rounded-lg">
+
+**In ML**: The Hessian informs optimization algorithms. Newton's method uses $H^{-1}$ to adapt step size per direction, converging faster than gradient descent on smooth loss surfaces.
+
+$$\mathbf{w} \leftarrow \mathbf{w} - H^{-1} \nabla L(\mathbf{w})$$
+
+</div>
+
+</v-click>
 
 </div>
 </div>
@@ -490,6 +659,14 @@ Equivalently: $\int C f(x)\, dx = \int f(x)\, d(Cx) = C \int f(x)\, dx$
 </div>
 </v-click>
 
+<v-click>
+<div class="mt-4 p-3 bg-blue-900/20 rounded-lg">
+
+**Exerciese**: $\int x + e^x \, dx,\int x + \frac{1}{x}\,dx$
+
+</div>
+</v-click>
+
 ---
 
 ### Integration by Substitution (凑微分法)
@@ -521,13 +698,19 @@ Let $u = 3x$, then $du = 3\, dx$, so $dx = \frac{1}{3} du\r
 
 </v-click>
 
+<div class="bg-blue-900/20 rounded-lg">
+
+**Exerciese**: $\int e^{-x} \,dx$
+
+</div>
+
 ---
 
 ### Integration by Parts
 
 From the product rule $(uv)' = u'v + uv'$, we get:
 
-$$\boxed{\int u\, dv = uv - \int v\, du}$$
+$$\boxed{\int u\, dv = uv - \int v\, du} or \boxed{\int u\, dv + \int v\, du=uv}$$
 
 <v-click>
 
@@ -535,9 +718,58 @@ $$\boxed{\int u\, dv = uv - \int v\, du}$$
 
 Let $u = x$, $dv = e^x dx$. Then $du = dx$, $v = e^x$.
 
+</v-click>
+<v-click>
+
 $$\int x e^x\, dx = x e^x - \int e^x\, dx = x e^x - e^x + C = (x-1)e^x + C$$
 
 </v-click>
+
+<v-click>
+<div class="mt-4 p-3 bg-blue-900/20 rounded-lg">
+
+**Exerciese**: $\int \ln\,x \, dx,\int xe^{-x}\,dx$
+
+</div>
+</v-click>
+
+---
+
+### Integral
+
+<script setup>
+import { ref } from 'vue'
+const n = ref(8)
+</script>
+
+An **integral** is the inverse of the derivative, representing the accumulated quantity over $[a, b]$:
+
+$$\int_a^b f(x)\, dx = F(a)-F(b)=\left[F(x)\right]^{b}_{a}=\lim_{n \to \infty} \sum_{i=1}^{n} f(x_i) \Delta x$$
+
+<div class="grid grid-cols-2 gap-8">
+<div style="height: 280px;">
+
+<div class="flex items-center justify-center gap-4 mb-2">
+  <button class="px-3 py-1 rounded border border-gray-500 hover:bg-gray-400/20 font-mono" @click="n = Math.max(1, n - 1)">−</button>
+  <span class="font-mono text-lg">n = {{ n }}</span>
+  <button class="px-3 py-1 rounded border border-gray-500 hover:bg-gray-400/20 font-mono" @click="n += 1">+</button>
+</div>
+<v-click>
+
+**Exact calculation** using the Fundamental Theorem of Calculus:
+
+$$\int_{0.5}^{2} \left(\frac{x^2}{2} + 0.3\right) dx = \left[\frac{x^3}{6} + 0.3x\right]_{0.5}^{2}$$
+
+$$= \underbrace{\left(\frac{2^3}{6} + 0.3 \times 2\right)}_{F(2) = \frac{29}{15} \approx 1.933} - \underbrace{\left(\frac{0.5^3}{6} + 0.3 \times 0.5\right)}_{F(0.5) = \frac{41}{240} \approx 0.171} = \frac{141}{80} \approx 1.7625$$
+
+</v-click>
+</div>
+<div style="height: 280px;">
+
+<RiemannChart :a="0.5" :b="2" :n="n" />
+
+</div>
+</div>
 
 ---
 
@@ -599,14 +831,6 @@ An **ODE** relates a function $y(t)$ to its derivatives. The **order** is the hi
 
 <v-click>
 
-**General form of an $n$-th order ODE**:
-
-$$F\!\left(t,\; y,\; y',\; y'',\; \ldots,\; y^{(n)}\right) = 0$$
-
-</v-click>
-
-<v-click>
-
 **Examples**:
 
 | ODE                  | Order | Type                    |
@@ -614,7 +838,7 @@ $$F\!\left(t,\; y,\; y',\; y'',\; \ldots,\; y^{(n)}\right) = 0$$
 | $y' + 2y = 0$        | 1st   | Linear, homogeneous     |
 | $y' + 2y = e^t$      | 1st   | Linear, non-homogeneous |
 | $y'' + 3y' + 2y = 0$ | 2nd   | Linear, homogeneous     |
-| $y'' + y = \sin t$   | 2nd   | Linear, non-homogeneous |
+
 
 </v-click>
 
