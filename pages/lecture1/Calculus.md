@@ -1,5 +1,132 @@
 ## Part 1: Calculus
 
+### Limit: Definition
+
+The **limit** describes the value that $f(x)$ approaches as $x$ gets arbitrarily close to a point $a$:
+
+$$\lim_{x \to a} f(x) = L$$
+
+<v-click>
+
+Formally: for every $\varepsilon > 0$, there exists $\delta > 0$ such that
+
+$$0 < |x - a| < \delta \implies |f(x) - L| < \varepsilon$$
+
+</v-click>
+
+<v-click>
+
+<div class="mt-4 p-3 bg-blue-900/20 rounded-lg">
+
+**Intuition**: We can make $f(x)$ as close to $L$ as we want by choosing $x$ sufficiently close to $a$ (but $x \neq a$).
+
+</div>
+
+</v-click>
+
+---
+
+### Limit: Examples
+
+<div class="grid grid-cols-2 gap-8">
+<div>
+
+<v-click>
+
+**Direct substitution** (when continuous):
+
+$$\lim_{x \to 2} (x^2 + 1) = 2^2 + 1 = 5$$
+
+</v-click>
+
+<v-click>
+
+**Indeterminate form** $\frac{0}{0}$ — factor and cancel:
+
+$$\lim_{x \to 1} \frac{x^2 - 1}{x - 1} = \lim_{x \to 1} \frac{(x-1)(x+1)}{x-1} = \lim_{x \to 1}(x+1) = 2$$
+
+</v-click>
+
+</div>
+<div>
+
+<v-click>
+
+**Important limits**:
+
+$$\lim_{x \to 0} \frac{\sin x}{x} = 1$$
+
+$$\lim_{x \to 0} \frac{e^x - 1}{x} = 1$$
+
+$$\lim_{x \to \infty}\left(1 + \frac{1}{x}\right)^x = e$$
+
+</v-click>
+
+</div>
+</div>
+
+---
+
+### Limit: Properties
+
+<v-click>
+
+**1. Linearity**:
+
+$$\lim_{x \to a} [f(x) + g(x)] = \lim_{x \to a} f(x) + \lim_{x \to a} g(x)$$
+
+$$\lim_{x \to a} [c \cdot f(x)] = c \cdot \lim_{x \to a} f(x)$$
+
+</v-click>
+
+<v-click>
+
+**2. Product and Quotient**:
+
+$$\lim_{x \to a} [f(x) \cdot g(x)] = \lim_{x \to a} f(x) \cdot \lim_{x \to a} g(x)$$
+
+$$\lim_{x \to a} \frac{f(x)}{g(x)} = \frac{\displaystyle\lim_{x \to a} f(x)}{\displaystyle\lim_{x \to a} g(x)} \quad \text{(if } \lim_{x \to a} g(x) \neq 0\text{)}$$
+
+</v-click>
+
+<v-click>
+
+**3. Squeeze Theorem**: If $g(x) \leq f(x) \leq h(x)$ near $a$, and $\lim_{x \to a} g(x) = \lim_{x \to a} h(x) = L$, then $\lim_{x \to a} f(x) = L$.
+
+</v-click>
+
+---
+
+### Limit → Derivative
+
+The derivative is **defined** as a limit:
+
+$$f'(x) = \lim_{\Delta x \to 0} \frac{f(x + \Delta x) - f(x)}{\Delta x}$$
+
+<v-click>
+
+<div class="mt-4 p-3 bg-blue-900/20 rounded-lg">
+
+**Connection**: Without limits, we cannot rigorously define derivatives. The limit captures the idea of "instantaneous rate of change" — the slope of the tangent line as the two points on the secant line merge into one.
+
+</div>
+
+</v-click>
+
+<v-click>
+
+<div class="mt-4 p-3 bg-green-900/20 rounded-lg">
+
+**Example**: Derivative of $f(x) = x^2$ from first principles:
+
+$$f'(x) = \lim_{\Delta x \to 0} \frac{(x+\Delta x)^2 - x^2}{\Delta x} = \lim_{\Delta x \to 0} \frac{2x\Delta x + (\Delta x)^2}{\Delta x} = \lim_{\Delta x \to 0}(2x + \Delta x) = 2x$$
+
+</div>
+
+</v-click>
+
+---
+
 ### Derivative-Definition
 
 For a function $y=f(x)$, the derivative at point $x$ is:
@@ -142,6 +269,12 @@ Points where f'(x) =0,then f(x)?
 </div>
 </div>
 
+<div class="bg-blue-900/20 rounded-lg text-center">
+
+$$f(x) = f(a) + f'(a)(x-a) + \frac{f''(a)}{2!}(x-a)^2 + \cdots+\frac{f^{(n)}(a)}{n!}(x-a)^n+o((x-a)^n)$$
+
+</div>
+
 ---
 
 ### Taylor Expansion Visualization-2
@@ -157,6 +290,11 @@ Points where f'(x) =0,then f(x)?
 <TaylorExpansion type="sin" />
 
 </div>
+</div>
+<div class="bg-blue-900/20 rounded-lg text-center">
+
+$$f(x) = f(a) + f'(a)(x-a) + \frac{f''(a)}{2!}(x-a)^2 + \cdots+\frac{f^{(n)}(a)}{n!}(x-a)^n+o((x-a)^n)$$
+
 </div>
 
 ---
@@ -517,7 +655,7 @@ $$\frac{\partial f}{\partial y} = x^2 + 6xy \quad \Rightarrow \quad \frac{\parti
 
 <v-click>
 
-<div class="mt-4 p-3 bg-green-900/20 rounded-lg">
+<div class="p-1 bg-green-900/20 rounded-lg">
 
 **Clairaut's Theorem (Symmetry of Mixed Partials)**:
 
@@ -838,7 +976,6 @@ An **ODE** relates a function $y(t)$ to its derivatives. The **order** is the hi
 | $y' + 2y = 0$        | 1st   | Linear, homogeneous     |
 | $y' + 2y = e^t$      | 1st   | Linear, non-homogeneous |
 | $y'' + 3y' + 2y = 0$ | 2nd   | Linear, homogeneous     |
-
 
 </v-click>
 
