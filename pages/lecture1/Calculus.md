@@ -97,6 +97,301 @@ $$\lim_{x \to a} \frac{f(x)}{g(x)} = \frac{\displaystyle\lim_{x \to a} f(x)}{\di
 
 ---
 
+### Continuity
+
+A function $f$ is **continuous** at point $a$ if:
+
+$$\boxed{\lim_{x \to a} f(x) = f(a)}$$
+
+<v-click>
+
+This requires **three conditions**:
+
+1. $f(a)$ is defined (the point exists)
+2. $\lim_{x \to a} f(x)$ exists (left and right limits agree)
+3. $\lim_{x \to a} f(x) = f(a)$ (limit equals function value)
+
+</v-click>
+
+<v-click>
+
+<div class="mt-4 p-3 bg-blue-900/20 rounded-lg">
+
+**Intuition**: The graph has **no breaks, jumps, or holes** at $a$. You can draw through $a$ without lifting your pen.
+
+</div>
+
+</v-click>
+
+---
+
+### Types of Discontinuity
+
+<div class="grid grid-cols-3 gap-6">
+<div style="text-align: center;">
+
+**Removable (hole)**
+
+<div style="height: 180px; display: flex; align-items: center; justify-content: center;">
+
+<svg width="160" height="180" viewBox="0 0 160 180">
+  <line x1="20" y1="160" x2="140" y2="160" stroke="#666" stroke-width="1"/>
+  <line x1="20" y1="160" x2="20" y2="20" stroke="#666" stroke-width="1"/>
+  <path d="M 30 140 Q 80 40, 130 140" fill="none" stroke="#4fc3f7" stroke-width="2.5"/>
+  <circle cx="80" cy="90" r="5" fill="none" stroke="#4fc3f7" stroke-width="2.5"/>
+  <circle cx="80" cy="120" r="4" fill="#4fc3f7"/>
+</svg>
+
+</div>
+
+$\lim_{x \to a} f(x) = L$ exists, but $f(a) \neq L$ or $f(a)$ undefined
+
+</div>
+<div style="text-align: center;">
+
+**Jump**
+
+<div style="height: 180px; display: flex; align-items: center; justify-content: center;">
+
+<svg width="160" height="180" viewBox="0 0 160 180">
+  <line x1="20" y1="160" x2="140" y2="160" stroke="#666" stroke-width="1"/>
+  <line x1="20" y1="160" x2="20" y2="20" stroke="#666" stroke-width="1"/>
+  <line x1="30" y1="130" x2="80" y2="130" stroke="#ff8a65" stroke-width="2.5"/>
+  <circle cx="80" cy="130" r="4" fill="#ff8a65"/>
+  <line x1="80" y1="70" x2="130" y2="70" stroke="#ff8a65" stroke-width="2.5"/>
+  <circle cx="80" cy="70" r="4" fill="none" stroke="#ff8a65" stroke-width="2.5"/>
+  <line x1="80" y1="70" x2="80" y2="130" stroke="#ff8a65" stroke-width="1" stroke-dasharray="4"/>
+</svg>
+
+</div>
+
+$\lim_{x \to a^-} f(x) \neq \lim_{x \to a^+} f(x)$
+
+</div>
+<div style="text-align: center;">
+
+**Infinite / Essential**
+
+<div style="height: 180px; display: flex; align-items: center; justify-content: center;">
+
+<svg width="160" height="180" viewBox="0 0 160 180">
+  <line x1="20" y1="160" x2="140" y2="160" stroke="#666" stroke-width="1"/>
+  <line x1="20" y1="160" x2="20" y2="20" stroke="#666" stroke-width="1"/>
+  <path d="M 30 150 Q 60 140, 75 30" fill="none" stroke="#ce93d8" stroke-width="2.5"/>
+  <path d="M 85 150 Q 100 140, 130 150" fill="none" stroke="#ce93d8" stroke-width="2.5"/>
+  <line x1="80" y1="20" x2="80" y2="160" stroke="#ce93d8" stroke-width="1" stroke-dasharray="4"/>
+</svg>
+
+</div>
+
+$\lim_{x \to a} f(x) = \pm\infty$ or does not exist
+
+</div>
+</div>
+
+---
+
+### Continuity & Differentiability
+
+A function $f$ is **differentiable** at $a$ if the derivative exists:
+
+$$f'(a) = \lim_{\Delta x \to 0} \frac{f(a + \Delta x) - f(a)}{\Delta x} \quad \text{exists}$$
+
+<v-click>
+
+<div class="mt-4 p-4 bg-blue-900/20 rounded-lg">
+
+**Key relationship**:
+
+$$\text{Differentiable at } a \implies \text{Continuous at } a$$
+
+**But NOT the converse!** A function can be continuous at $a$ but not differentiable there.
+
+</div>
+
+</v-click>
+
+<v-click>
+
+**Why?** If $f'(a)$ exists, then:
+
+$$\lim_{\Delta x \to 0}[f(a+\Delta x) - f(a)] = \lim_{\Delta x \to 0} \frac{f(a+\Delta x) - f(a)}{\Delta x} \cdot \Delta x = f'(a) \cdot 0 = 0$$
+
+$$\implies \lim_{\Delta x \to 0} f(a+\Delta x) = f(a) \implies \text{continuous}$$
+
+</v-click>
+
+---
+
+### Counterexample: Continuous but NOT Differentiable
+
+<div class="grid grid-cols-2 gap-8">
+<div style="height: 300px; display: flex; align-items: center; justify-content: center;">
+
+<svg width="280" height="260" viewBox="0 0 280 260">
+  <line x1="20" y1="220" x2="260" y2="220" stroke="#666" stroke-width="1"/>
+  <line x1="140" y1="220" x2="140" y2="30" stroke="#666" stroke-width="1"/>
+  <!-- |x| -->
+  <path d="M 40 120 L 140 220 L 240 120" fill="none" stroke="#4fc3f7" stroke-width="2.5"/>
+  <circle cx="140" cy="220" r="5" fill="#4fc3f7"/>
+</svg>
+
+</div>
+<div>
+
+**$f(x) = |x|$** at $x = 0$:
+
+<v-click>
+
+- **Continuous**: $\lim_{x \to 0}|x| = 0 = f(0)$ ✓
+
+</v-click>
+
+<v-click>
+
+- **NOT differentiable**: left and right derivatives disagree:
+
+$$f'_-(0) = \lim_{\Delta x \to 0^-}\frac{|\Delta x|}{\Delta x} = -1$$
+
+$$f'_+(0) = \lim_{\Delta x \to 0^+}\frac{|\Delta x|}{\Delta x} = +1$$
+
+The sharp **corner** means no unique tangent line exists.
+
+</v-click>
+
+</div>
+</div>
+
+---
+
+### Summary: Implication Chain
+
+<div class="flex items-center justify-center mt-6">
+
+<div style="display: flex; align-items: center; gap: 0;">
+
+<div style="background: rgba(76, 175, 80, 0.2); border: 2px solid #4caf50; border-radius: 12px; padding: 16px 24px; text-align: center; min-width: 140px;">
+
+**Differentiable**
+
+$f'(a)$ exists
+
+</div>
+
+<div style="font-size: 28px; color: #4caf50; margin: 0 8px;">
+
+$\Longrightarrow$
+
+</div>
+
+<div style="background: rgba(33, 150, 243, 0.2); border: 2px solid #2196f3; border-radius: 12px; padding: 16px 24px; text-align: center; min-width: 140px;">
+
+**Continuous**
+
+$\lim_{x\to a}f(x)=f(a)$
+
+</div>
+
+<div style="font-size: 28px; color: #2196f3; margin: 0 8px;">
+
+$\Longrightarrow$
+
+</div>
+
+<div style="background: rgba(255, 152, 0, 0.2); border: 2px solid #ff9800; border-radius: 12px; padding: 16px 24px; text-align: center; min-width: 140px;">
+
+**Limit Exists**
+
+$\lim_{x\to a}f(x)=L$
+
+</div>
+
+</div>
+</div>
+
+<v-click>
+
+<div class="mt-6 p-3 bg-yellow-900/20 rounded-lg">
+
+**Converse is FALSE** (each arrow is one-directional):
+
+| Converse                                    | Counterexample                                                   |
+| ------------------------------------------- | ---------------------------------------------------------------- |
+| Continuous $\not\Rightarrow$ Differentiable | $f(x)=\|x\|$ at $x=0$ (corner)                                   |
+| Limit exists $\not\Rightarrow$ Continuous   | $f(x)=\begin{cases}x^2 & x\neq 0 \\ 1 & x=0\end{cases}$ at $x=0$ |
+
+</div>
+
+</v-click>
+
+---
+
+### Differentiability: Visual Intuition
+
+<div class="grid grid-cols-3 gap-6" style="height: 280px;">
+<div style="text-align: center;">
+
+**Differentiable**
+
+<div style="height: 200px; display: flex; align-items: center; justify-content: center;">
+
+<svg width="160" height="180" viewBox="0 0 160 180">
+  <line x1="20" y1="160" x2="140" y2="160" stroke="#666" stroke-width="1"/>
+  <line x1="20" y1="160" x2="20" y2="20" stroke="#666" stroke-width="1"/>
+  <path d="M 30 140 Q 50 60, 80 80 Q 110 100, 130 50" fill="none" stroke="#4caf50" stroke-width="2.5"/>
+  <line x1="55" y1="85" x2="105" y2="75" stroke="#ff5252" stroke-width="1.5" stroke-dasharray="4"/>
+  <circle cx="80" cy="80" r="4" fill="#4caf50"/>
+</svg>
+
+</div>
+
+Smooth curve — tangent line exists everywhere
+
+</div>
+<div style="text-align: center;">
+
+**Corner (not diff.)**
+
+<div style="height: 200px; display: flex; align-items: center; justify-content: center;">
+
+<svg width="160" height="180" viewBox="0 0 160 180">
+  <line x1="20" y1="160" x2="140" y2="160" stroke="#666" stroke-width="1"/>
+  <line x1="20" y1="160" x2="20" y2="20" stroke="#666" stroke-width="1"/>
+  <path d="M 30 130 L 80 60 L 130 130" fill="none" stroke="#ff9800" stroke-width="2.5"/>
+  <circle cx="80" cy="60" r="4" fill="#ff9800"/>
+  <line x1="50" y1="100" x2="80" y2="60" stroke="#ff5252" stroke-width="1.5" stroke-dasharray="4"/>
+  <line x1="80" y1="60" x2="110" y2="100" stroke="#ff5252" stroke-width="1.5" stroke-dasharray="4"/>
+</svg>
+
+</div>
+
+Corner — two tangent directions, no unique tangent
+
+</div>
+<div style="text-align: center;">
+
+**Cusp (not diff.)**
+
+<div style="height: 200px; display: flex; align-items: center; justify-content: center;">
+
+<svg width="160" height="180" viewBox="0 0 160 180">
+  <line x1="20" y1="160" x2="140" y2="160" stroke="#666" stroke-width="1"/>
+  <line x1="20" y1="160" x2="20" y2="20" stroke="#666" stroke-width="1"/>
+  <path d="M 30 140 Q 60 140, 80 60" fill="none" stroke="#ce93d8" stroke-width="2.5"/>
+  <path d="M 80 60 Q 100 140, 130 140" fill="none" stroke="#ce93d8" stroke-width="2.5"/>
+  <circle cx="80" cy="60" r="4" fill="#ce93d8"/>
+  <line x1="80" y1="60" x2="80" y2="160" stroke="#ff5252" stroke-width="1.5" stroke-dasharray="4"/>
+</svg>
+
+</div>
+
+Cusp — tangent is vertical ($\infty$ slope)
+
+</div>
+</div>
+
+---
+
 ### Limit → Derivative
 
 The derivative is **defined** as a limit:
