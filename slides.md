@@ -16,14 +16,18 @@ background: beach-wave.png
 src: ./pages/Lecture-0-slides.md
 ---
 
----
+<!-- ---
 src: ./pages/Lecture-1-slides.md
 ---
 
----
-src: ./pages/Lecture-2-slides.md
----
+  ---
+  src: ./pages/Lecture-2-slides.md
+  --- -->
 
 ---
 src: ./pages/Neuromatch_Notebooks_Week0.md
+---
+
+---
+src: ./pages/Neuromatch_Notebooks_Week1.md
 ---
