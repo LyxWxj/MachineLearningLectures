@@ -1004,7 +1004,9 @@ The solution changes rapidly near $t=0$ (exponential decay dominates) and slowly
 
 Run Euler twice at different step sizes, then combine:
 
-$$p_{\text{better}} = \frac{2^1 \cdot p_{\Delta t/2} - p_{\Delta t}}{2^1 - 1}$$
+$$p_{\text{better}} = \frac{2^p \cdot p_{\Delta t/2} - p_{\Delta t}}{2^p - 1}$$
+
+where $p$ is the order of the method ($p = 1$ for Euler, so $2^1 = 2$).
 
 This cancels the $O(\Delta t)$ error term, giving $O(\Delta t^2)$ accuracy — for free!
 

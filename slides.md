@@ -31,3 +31,7 @@ src: ./pages/Neuromatch_Notebooks_Week0.md
 ---
 src: ./pages/Neuromatch_Notebooks_Week1.md
 ---
+
+---
+src: ./pages/BayesFamily.md
+---
