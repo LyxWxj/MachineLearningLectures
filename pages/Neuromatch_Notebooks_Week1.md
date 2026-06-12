@@ -672,6 +672,361 @@ $$g(\hat{y}) = X\boldsymbol{\theta} \quad \Leftrightarrow \quad \hat{y} = g^{-1}
 
 ---
 
+### Key Concept: Design Matrix
+
+The design matrix organizes raw data into a format that the model can use.
+
+<v-click>
+
+**Definition**: The design matrix $\mathbf{X}$ is a $T \times d$ matrix where each row is a **feature vector** for one time point, and each column is a feature.
+
+</v-click>
+
+<v-click>
+
+**In neuroscience**: We want to know "how do the stimuli over the past $d$ time steps influence the current spike?" The design matrix arranges the past $d$ stimulus values into a row:
+
+$$\mathbf{X} = \begin{bmatrix} \text{stim}[t_0 - d+1] & \cdots & \text{stim}[t_0 - 1] & \text{stim}[t_0] \\ \text{stim}[t_T - d+1] & \cdots & \text{stim}[t_T - 1] & \text{stim}[t_T] \end{bmatrix}$$
+
+</v-click>
+
+<v-click>
+
+**Zero-padding**: For the earliest time points, we don't have a full $d$ history — pad with zeros:
+
+```python
+padded_stim = np.concatenate([np.zeros(d - 1), stim])
+# padded_stim = [0, 0, ..., 0, stim[0], stim[1], ..., stim[T-1]]
+```
+
+</v-click>
+
+<v-click>
+
+**Sliding window extraction**: For each time point $t$, take a window of length $d$ and reverse it:
+
+```python
+for t in range(T):
+    X[t] = padded_stim[t:t + d][::-1]  # [::-1] reverses so earliest time comes first
+```
+
+</v-click>
+
+---
+
+### Key Concept: Observations
+
+Observations are the target variable $\mathbf{y}$ we want to predict.
+
+<v-click>
+
+**In this experiment**:
+
+| Variable | Meaning | Shape |
+|----------|---------|-------|
+| $\text{stim}[t]$ | Screen luminance (stimulus) at time $t$ | $(T,)$ |
+| $\text{spikes}[t]$ | Spike count (response) at time $t$ | $(T,)$ |
+| $\mathbf{X}[t]$ | Design matrix row (features) at time $t$ | $(d,)$ |
+
+</v-click>
+
+<v-click>
+
+**Key insight**:
+
+- Each row of $\mathbf{X}$ = "what happened over the past $d$ time steps" (input features)
+- Each value of $\mathbf{y}$ = "what happened now" (observation to predict)
+- The model learns: **what input feature patterns lead to what outputs**
+
+</v-click>
+
+<v-click>
+
+**Analogy**:
+
+| Prediction Task | Input $\mathbf{X}$ | Output $\mathbf{y}$ |
+|-----------------|---------------------|----------------------|
+| House price | Area, location, age... | Price |
+| Weather | Past 7 days of temp, humidity... | Tomorrow's temperature |
+| **Neural spike prediction** | **Past 25 time bins of stimulus** | **Current spike count** |
+
+</v-click>
+
+---
+
+### Key Concept: Poisson Distribution
+
+The Poisson distribution is the core tool for modeling **count data**.
+
+<v-click>
+
+**Probability Mass Function (PMF)**:
+
+$$P(Y = k) = \frac{\lambda^k \cdot e^{-\lambda}}{k!}, \quad k = 0, 1, 2, \ldots$$
+
+where $\lambda > 0$ is the **rate parameter** — the average number of events per unit time/space.
+
+</v-click>
+
+<v-click>
+
+**Key properties**:
+
+| Property | Formula | Meaning |
+|----------|---------|---------|
+| Mean | $\mathbb{E}[Y] = \lambda$ | Average count |
+| Variance | $\text{Var}(Y) = \lambda$ | Variance equals mean |
+| Support | $k \in \{0, 1, 2, \ldots\}$ | Non-negative integers |
+
+</v-click>
+
+---
+
+### Poisson Distribution: Intuition and Applications
+
+The Poisson distribution is typically used to model the following types of problems:
+
+<v-click>
+
+**1. Rare event counts**
+
+- Number of phone calls received per day
+- Number of typos on a page
+- Number of customers arriving at a bank per hour
+- **Number of spikes a neuron fires per time bin**
+
+</v-click>
+
+<v-click>
+
+**2. Conditions for Poisson modeling**
+
+The Poisson distribution applies when these conditions hold:
+
+| Condition | Meaning | Neuroscience analogue |
+|-----------|---------|----------------------|
+| Independence | Events are independent of each other | Spikes are approximately independent |
+| Uniformity | Event rate is constant | Rate is approximately constant in short windows |
+| Sparsity | At most one event per instant | At most 1–2 spikes per bin |
+
+</v-click>
+
+---
+
+<v-click>
+
+**3. Why are neural spikes well-modeled by Poisson?**
+
+- Spikes are non-negative integers (0, 1, 2, ...)
+- Spikes are sparse (mostly 0)
+- Spike variance ≈ mean ($\text{Var} \approx \text{mean}$)
+- Spikes are approximately independent (over short timescales)
+
+</v-click>
+
+<v-click>
+
+**4. Shape of the Poisson distribution**
+
+```python
+import numpy as np
+from scipy.stats import poisson
+
+k = np.arange(0, 15)
+for lam in [1, 3, 5, 10]:
+    pmf = poisson.pmf(k, lam)
+    # Small λ → right-skewed, concentrated near 0
+    # Large λ → approximately symmetric (CLT)
+```
+
+</v-click>
+
+---
+
+### LNP Model: Full Derivation from Linear to Poisson
+
+The Linear-Nonlinear-Poisson (LNP) model is one of the most commonly used GLMs in neuroscience.
+
+<v-click>
+
+**Goal**: Given the past $d$ time bins of stimulus $\mathbf{x}_t = [\text{stim}[t-d+1], \ldots, \text{stim}[t]]$, predict the spike count $y_t$ at time $t$.
+
+</v-click>
+
+<v-click>
+
+**Step 1: Linear component**
+
+Compute the weighted sum of stimulus and weights:
+
+$$z_t = \mathbf{x}_t^\top \boldsymbol{\theta} + b = \sum_{j=1}^{d} \theta_j \cdot \text{stim}[t-d+j] + b$$
+
+where $\boldsymbol{\theta}$ is the temporal filter and $b$ is the bias.
+
+**Meaning**: $z_t$ represents "the combined drive from the past $d$ time bins of stimulus."
+
+</v-click>
+---
+
+<v-click>
+
+**Step 2: Nonlinear component**
+
+Map the linear output to a positive firing rate via the exponential function:
+
+$$\lambda_t = \exp(z_t) = \exp(\mathbf{x}_t^\top \boldsymbol{\theta} + b)$$
+
+**Why exp?**
+
+| Problem | Solution |
+|---------|----------|
+| Linear output $z_t$ can be negative | $\exp(z_t) > 0$, guarantees positive rate |
+| Firing rate should increase with drive | $\exp$ is monotonically increasing |
+| Small changes in drive produce multiplicative effects | $\exp$ converts addition to multiplication |
+
+</v-click>
+
+---
+
+### LNP Model: Likelihood and Parameter Estimation
+
+<v-click>
+
+**Step 3: Poisson observation model**
+
+Assume spike counts follow a Poisson distribution:
+
+$$y_t \mid \mathbf{x}_t, \boldsymbol{\theta} \sim \text{Poisson}(\lambda_t)$$
+
+Probability mass function:
+
+$$P(y_t \mid \mathbf{x}_t, \boldsymbol{\theta}) = \frac{\lambda_t^{y_t} \cdot e^{-\lambda_t}}{y_t!}$$
+
+</v-click>
+
+<v-click>
+
+**Step 4: Construct the likelihood function**
+
+Assuming spikes are independent across time, the joint likelihood is:
+
+$$\mathcal{L}(\boldsymbol{\theta}) = \prod_{t=1}^{T} P(y_t \mid \mathbf{x}_t, \boldsymbol{\theta}) = \prod_{t=1}^{T} \frac{\lambda_t^{y_t} \cdot e^{-\lambda_t}}{y_t!}$$
+
+</v-click>
+---
+
+<v-click>
+
+**Step 5: Take the log to simplify**
+
+$$\log \mathcal{L}(\boldsymbol{\theta}) = \sum_{t=1}^{T} \left[ y_t \log \lambda_t - \lambda_t - \log(y_t!) \right]$$
+
+Drop the constant term $\log(y_t!)$ that does not depend on $\boldsymbol{\theta}$:
+
+$$\log \mathcal{L}(\boldsymbol{\theta}) = \sum_{t=1}^{T} \left[ y_t \log \lambda_t - \lambda_t \right]$$
+
+</v-click>
+
+---
+
+### LNP Model: Matrix Form and Optimization
+
+<v-click>
+
+**Step 6: Matrix form**
+
+Substituting $\lambda_t = \exp(\mathbf{x}_t^\top \boldsymbol{\theta})$, express in matrix notation:
+
+$$\log \mathcal{L}(\boldsymbol{\theta}) = \mathbf{y}^\top \log(\boldsymbol{\lambda}) - \mathbf{1}^\top \boldsymbol{\lambda}$$
+
+where $\boldsymbol{\lambda} = \exp(\mathbf{X}\boldsymbol{\theta})$.
+
+</v-click>
+
+<v-click>
+
+**Step 7: Negative log-likelihood (objective function)**
+
+Minimize the negative log-likelihood:
+
+$$-\log \mathcal{L}(\boldsymbol{\theta}) = -\left( \mathbf{y}^\top \log(\boldsymbol{\lambda}) - \mathbf{1}^\top \boldsymbol{\lambda} \right) = \mathbf{1}^\top \boldsymbol{\lambda} - \mathbf{y}^\top \log(\boldsymbol{\lambda})$$
+
+</v-click>
+---
+
+<v-click>
+
+**Step 8: Numerical optimization**
+
+No closed-form solution — use `scipy.optimize.minimize`:
+
+```python
+def fit_lnp(stim, spikes, d=25):
+    y = spikes
+    constant = np.ones_like(y)
+    X = np.column_stack([constant, make_design_matrix(stim)])
+    x0 = np.random.normal(0, .2, d + 1)  # random initialization
+    res = minimize(neg_log_lik_lnp, x0, args=(X, y))
+    return res.x
+```
+
+</v-click>
+
+---
+
+### LNP Model: End-to-End Pipeline
+
+```
+Raw Data
+    │
+    ▼
+┌─────────────────────────────────────────────────────────┐
+│  Design matrix X[t] = [stim[t-24], ..., stim[t]]        │  ← past 25 bins of stimulus
+│  Observation   y[t] = spikes[t]                         │  ← current spike count
+└─────────────────────────────────────────────────────────┘
+    │
+    ▼
+┌─────────────────────────────────────────────────────────┐
+│  Linear:      z_t = X[t] · θ + b                        │  ← weighted sum
+│  Nonlinear:   λ_t = exp(z_t)                            │  ← map to positive
+│  Poisson:     y_t ~ Poisson(λ_t)                        │  ← probabilistic model
+└─────────────────────────────────────────────────────────┘
+    │
+    ▼
+┌─────────────────────────────────────────────────────────┐
+│  Minimize  −[y^T log(λ) − 1^T λ]                       │  ← objective
+│  Solve θ via scipy.optimize.minimize                     │  ← numerical optimization
+└─────────────────────────────────────────────────────────┘
+    │
+    ▼
+  θ → temporal receptive field (TRF)
+```
+
+---
+
+### LG GLM vs LNP GLM: Comparison
+
+| | LG (Linear-Gaussian) | LNP (Poisson) |
+|---|---|---|
+| **Prediction** | $\hat{y} = X\theta$ | $\hat{y} = \exp(X\theta)$ |
+| **Output range** | $(-\infty, +\infty)$ | $(0, +\infty)$ |
+| **Noise assumption** | Gaussian $\epsilon \sim \mathcal{N}(0, \sigma^2)$ | Poisson $y \sim \text{Poisson}(\lambda)$ |
+| **Fitting** | Closed-form $\hat{\theta} = (X^TX)^{-1}X^Ty$ | Numerical optimization (no closed form) |
+| **Use case** | Continuous prediction | Non-negative integer counts |
+| **Neuroscience** | Stimulus filter estimation | Firing rate modeling |
+
+<v-click>
+
+**Key differences**:
+
+- LG can predict **negative spikes** (unreasonable) ❌
+- LNP guarantees predictions are **always positive** via $\exp$ ✅
+- LNP better matches the **statistical properties** of spike data (counts, sparse, variance ≈ mean)
+
+</v-click>
+
+---
+
 ### Linear-Gaussian GLM: Spike Filtering
 
 Model: spike count $y_t$ depends on the stimulus over the past $d$ time steps.
@@ -745,82 +1100,979 @@ def fit_lnp(stim, spikes, d=25):
 
 ---
 
-### Logistic Regression: Binary Classification
+### Why Logistic Regression?
 
-Decode binary decisions (left/right) from neural activity.
+The previous models (LG, LNP) predict **continuous** or **count** outputs. But many neuroscience questions are **binary**:
 
 <v-click>
 
-**Sigmoid function**:
-$\sigma(z) = \frac{1}{1 + e^{-z}}$
-
-Maps any real number to $(0, 1)$ — interpretable as probability.
+| Question | Output type | Model |
+|----------|-------------|-------|
+| Stimulus filtering | Spike count (0, 1, 2, ...) | Poisson GLM |
+| Firing rate | Positive real number | LNP GLM |
+| **Decision decoding** | **Binary (0 or 1)** | **Logistic regression** |
 
 </v-click>
 
 <v-click>
 
-**Model**: $P(y=1 \mid \mathbf{x}) = \sigma(\mathbf{x}^T \boldsymbol{\theta})$
+**The problem**: Linear regression can predict probabilities outside $[0, 1]$. Poisson regression predicts counts, not probabilities.
 
-**Loss**: negative log-likelihood (cross-entropy)
+**The solution**: Logistic regression — a GLM with a **sigmoid link function** and **Bernoulli noise model**.
 
-$$\mathcal{L} = -\sum_i \left[ y_i \log \hat{p}_i + (1-y_i) \log(1-\hat{p}_i) \right]$$
+</v-click>
+
+---
+
+### Logistic Regression: The Sigmoid Link Function
+
+The core idea: map a linear output to a probability using the **sigmoid** (logistic) function.
+
+<v-click>
+
+**The sigmoid function**:
+
+$$\sigma(z) = \frac{1}{1 + e^{-z}}$$
+
+| $z$ | $\sigma(z)$ | Interpretation |
+|-----|-------------|----------------|
+| $z \to -\infty$ | $\to 0$ | Strong evidence for class 0 |
+| $z = 0$ | $= 0.5$ | No evidence either way |
+| $z \to +\infty$ | $\to 1$ | Strong evidence for class 1 |
+
+</v-click>
+---
+
+<v-click>
+
+**Key properties**:
+- Output is always in $(0, 1)$ — interpretable as probability
+- Monotonically increasing — larger $z$ → higher probability of class 1
+- Symmetric: $\sigma(-z) = 1 - \sigma(z)$
+- Derivative has a nice form: $\sigma'(z) = \sigma(z)(1 - \sigma(z))$
 
 </v-click>
 
 <v-click>
 
-**Code** (using scikit-learn):
+**In GLM terms**: the sigmoid is the **inverse link function** $g^{-1}$:
+
+$$\underbrace{\sigma^{-1}(\hat{y})}_{\text{log-odds}} = \mathbf{x}^\top \boldsymbol{\theta} \quad \Leftrightarrow \quad \hat{y} = \sigma(\mathbf{x}^\top \boldsymbol{\theta})$$
+
+The link function $g = \sigma^{-1}$ is the **logit** (log-odds): $g(p) = \log \frac{p}{1-p}$.
+
+</v-click>
+
+---
+
+### Logistic Regression: Bernoulli Likelihood
+
+The output $y$ is binary (0 or 1), so we use the **Bernoulli distribution**.
+
+<v-click>
+
+**Model**:
+
+$$P(y = 1 \mid \mathbf{x}, \boldsymbol{\theta}) = \hat{y} = \sigma(\mathbf{x}^\top \boldsymbol{\theta})$$
+
+</v-click>
+
+<v-click>
+
+**Bernoulli likelihood for one observation**:
+
+$$P(y_i \mid \hat{y}_i) = \hat{y}_i^{\,y_i} (1 - \hat{y}_i)^{1 - y_i}$$
+
+This is a compact way to write:
+- If $y_i = 1$: probability = $\hat{y}_i$
+- If $y_i = 0$: probability = $1 - \hat{y}_i$
+
+</v-click>
+
+<v-click>
+
+**Log-likelihood for all data** (assuming independence):
+
+$$\log \mathcal{L}(\boldsymbol{\theta}) = \sum_{i=1}^N \left[ y_i \log \hat{y}_i + (1 - y_i) \log(1 - \hat{y}_i) \right]$$
+
+This is the **cross-entropy loss** (negated). It penalizes confident wrong predictions heavily.
+
+</v-click>
+
+<v-click>
+
+**Negative log-likelihood** (what we minimize):
+
+$$-\log \mathcal{L} = -\sum_{i=1}^N \left[ y_i \log \sigma(\mathbf{x}_i^\top \boldsymbol{\theta}) + (1 - y_i) \log(1 - \sigma(\mathbf{x}_i^\top \boldsymbol{\theta})) \right]$$
+
+No closed-form solution — use numerical optimization (e.g., gradient descent, Newton's method).
+
+</v-click>
+
+---
+
+### What is Overfitting?
+
+A model that performs perfectly on training data but poorly on new data has **overfit**.
+
+<v-click>
+
+**Definition**: Overfitting occurs when a model learns the **noise** in the training data instead of the underlying pattern.
+
+**Symptoms**:
+- Training accuracy ≈ 100%
+- Test accuracy << 100%
+- Model weights are very large (to fit noise)
+
+</v-click>
+
+<v-click>
+
+**When does it happen?**
+
+When the model has too much **capacity** relative to the amount of data. In neuroscience, this is extremely common:
+
+| Data type | Features ($d$) | Samples ($N$) | Ratio $d/N$ |
+|-----------|---------------|---------------|-------------|
+| Electrophysiology | ~100 neurons | ~50 trials | ~2 |
+| fMRI | ~10,000 voxels | ~200 trials | ~50 |
+| Calcium imaging | ~500 cells | ~100 time points | ~5 |
+
+When $d > N$, overfitting is almost guaranteed.
+
+</v-click>
+
+<v-click>
+
+**Geometric intuition**: In 2D, a single data point can be fit by infinitely many lines. With more features than samples, there are infinitely many weight vectors that achieve zero training error — most of them are meaningless.
+
+</v-click>
+
+---
+
+### Overfitting: Visual Illustration
+
+```
+Training data:  ●  ●      ●  ●
+                |  |      |  |
+                ▼  ▼      ▼  ▼
+
+Underfitting:   ─────────────────     (too simple, high bias)
+                A straight line through noisy data
+
+Good fit:       ──╱╲──╱╲──             (captures the pattern)
+                Smooth curve through data
+
+Overfitting:    ╱╲╱╲╱╲╱╲╱╲╱╲          (memorizes noise)
+                Wiggly curve passing through every point
+```
+
+<v-click>
+
+**The bias-variance tradeoff**:
+
+| | Underfitting | Good fit | Overfitting |
+|---|---|---|---|
+| **Bias** | High | Low | Low |
+| **Variance** | Low | Low | High |
+| **Training error** | High | Low | ≈ 0 |
+| **Test error** | High | Low | High |
+
+</v-click>
+
+<v-click>
+
+**How to detect overfitting**: Cross-validation.
+
+If training accuracy >> cross-validated accuracy, the model is overfitting.
 
 ```python
-from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import cross_val_score
 
-model = LogisticRegression(penalty=None)
-model.fit(X_train, y_train)
-accuracy = model.score(X_test, y_test)
+cv_scores = cross_val_score(model, X, y, cv=8)
+# Compare: model.score(X_train, y_train) vs cv_scores.mean()
 ```
 
 </v-click>
 
 ---
 
-### Regularization: Preventing Overfitting
+### Regularization: The Core Idea
 
-When features $\gg$ samples, the model memorizes noise (**overfitting**).
+Regularization reduces overfitting by **constraining the model's freedom**.
 
 <v-click>
 
-**L2 (Ridge)**: adds $\frac{\beta}{2}\|\boldsymbol{\theta}\|^2$ to the loss. Shrinks all weights toward zero.
+**Intuition**: Instead of asking "find the best $\boldsymbol{\theta}$", we ask "find the best $\boldsymbol{\theta}$ **that is small**".
 
-$$\mathcal{L}_{\text{L2}} = \mathcal{L} + \frac{\beta}{2}\sum_j \theta_j^2$$
+This adds a **penalty** for large weights to the objective function:
+
+$$\text{Objective} = \underbrace{-\log \mathcal{L}(\boldsymbol{\theta})}_{\text{fit the data}} + \underbrace{\Omega(\boldsymbol{\theta})}_{\text{penalty for complexity}}$$
 
 </v-click>
 
 <v-click>
 
-**L1 (Lasso)**: adds $\frac{\beta}{2}\sum_j |\theta_j|$. Drives some weights to **exactly zero** (sparsity).
+**Why does this help?**
 
-$$\mathcal{L}_{\text{L1}} = \mathcal{L} + \frac{\beta}{2}\sum_j |\theta_j|$$
+Large weights allow the model to fit noise. By penalizing large weights:
+- The model is **smoother** — small changes in input → small changes in output
+- The model is **simpler** — fewer effective parameters
+- The model **generalizes** better to unseen data
+
+</v-click>
+---
+
+<v-click>
+
+**Frequency perspective**:
+
+Think of the model as fitting a sum of sine waves. High-frequency components capture noise; low-frequency components capture the true signal.
+
+- **No regularization**: fits all frequencies (including noise)
+- **Regularization**: suppresses high-frequency components (smooths the model)
+
+This is analogous to low-pass filtering in signal processing.
 
 </v-click>
 
 <v-click>
 
-**Hyperparameter $C = 1/\beta$**: controls regularization strength.
+**Bias-variance tradeoff**:
 
-- Small $C$ → strong regularization → simple model
-- Large $C$ → weak regularization → complex model
+Regularization **increases bias** (the model can't fit the true function perfectly) but **decreases variance** (the model is more stable across different training sets). The sweet spot is found via cross-validation.
 
-**Cross-validation** to choose $C$:
+</v-click>
 
-```python
-from sklearn.model_selection import cross_val_score
+---
 
-for C in C_values:
-    model = LogisticRegression(C=C, penalty='l2')
-    scores = cross_val_score(model, X, y, cv=8)
-    print(f"C={C:.4f}, accuracy={np.mean(scores):.3f}")
+### $L_2$ Regularization (Ridge)
+
+Penalizes the **sum of squared** weights.
+
+<v-click>
+
+**Objective**:
+
+$$-\log \mathcal{L}'(\boldsymbol{\theta}) = -\log \mathcal{L}(\boldsymbol{\theta}) + \frac{\beta}{2} \sum_j \theta_j^2 = -\log \mathcal{L}(\boldsymbol{\theta}) + \frac{\beta}{2} \|\boldsymbol{\theta}\|_2^2$$
+
+where $\beta > 0$ is the **regularization strength**.
+
+</v-click>
+
+<v-click>
+
+**Effect**: All weights are **shrunk toward zero**, but none are exactly zero.
+
 ```
+No regularization:    θ = [18.3, -15.7, 12.1, -8.4, ...]   (large values)
+L2 regularization:    θ = [ 0.3,  -0.2,  0.1, -0.1, ...]   (small values)
+```
+
+</v-click>
+
+<v-click>
+
+**Geometric intuition**: The $L_2$ constraint region is a **circle** (in 2D) or **hypersphere** (in higher dimensions). The solution is where the likelihood contour first touches the circle — typically at a point where all coordinates are nonzero but small.
+
+</v-click>
+
+---
+
+### $L_1$ Regularization (Lasso)
+
+Penalizes the **sum of absolute** weights.
+
+<v-click>
+
+**Objective**:
+
+$$-\log \mathcal{L}'(\boldsymbol{\theta}) = -\log \mathcal{L}(\boldsymbol{\theta}) + \frac{\beta}{2} \sum_j |\theta_j| = -\log \mathcal{L}(\boldsymbol{\theta}) + \frac{\beta}{2} \|\boldsymbol{\theta}\|_1$$
+
+</v-click>
+
+---
+layout: center
+---
+
+## W1D4: Dimensionality Reduction
+
+---
+
+### Covariance Matrix
+
+The **covariance matrix** captures how pairs of variables co-vary.
+
+<v-click>
+
+**Definition**: For data matrix $\mathbf{X}$ (each row = one sample, each column = one feature):
+
+$$\hat{\Sigma}_{ij} = \frac{1}{N} \sum_{n=1}^N (x_i^{(n)} - \bar{x}_i)(x_j^{(n)} - \bar{x}_j)$$
+
+In matrix form (after mean-centering): $\hat{\Sigma} = \frac{1}{N}\mathbf{X}^\top\mathbf{X}$
+
+</v-click>
+
+<v-click>
+
+**Properties**:
+- Symmetric: $\hat{\Sigma}_{ij} = \hat{\Sigma}_{ji}$
+- Diagonal = variances of each feature
+- Off-diagonal = covariances between feature pairs
+- Positive semi-definite (eigenvalues ≥ 0)
+
+</v-click>
+
+
+---
+
+### Eigenvalues and Eigenvectors
+
+The **eigenvectors** of the covariance matrix define the directions of maximum variance. The **eigenvalues** tell us how much variance each direction captures.
+
+<v-click>
+
+**Definition**: For matrix $\Sigma$:
+
+$$\Sigma \mathbf{w} = \lambda \mathbf{w}$$
+
+where $\mathbf{w}$ is an eigenvector and $\lambda$ is the corresponding eigenvalue.
+
+</v-click>
+
+<v-click>
+
+**Geometric meaning**:
+- Eigenvectors point in the directions where the data spreads most
+- Eigenvalues measure the amount of spread along each direction
+- Eigenvectors are orthogonal (perpendicular) to each other
+
+</v-click>
+
+
+---
+
+### Principal Component Analysis (PCA)
+
+PCA finds a new coordinate system aligned with the directions of maximum variance.
+
+<v-click>
+
+**Algorithm**:
+1. Mean-center the data: $\mathbf{X} \leftarrow \mathbf{X} - \bar{\mathbf{X}}$
+2. Compute covariance matrix: $\hat{\Sigma} = \frac{1}{N}\mathbf{X}^\top\mathbf{X}$
+3. Find eigenvectors and eigenvalues of $\hat{\Sigma}$
+4. Sort by eigenvalue (descending)
+5. Project data onto top $K$ eigenvectors
+
+</v-click>
+
+<v-click>
+
+**Projection** (scores):
+
+$$\mathbf{S} = \mathbf{X} \mathbf{W}_{1:K}$$
+
+where $\mathbf{W}_{1:K}$ contains the top $K$ eigenvectors as columns.
+
+</v-click>
+---
+
+<v-click>
+
+**Key insight**: PCA is equivalent to finding the **best rank-$K$ approximation** to the data in the least-squares sense (Eckart-Young theorem).
+
+</v-click>
+
+<p align="center">
+  <img src="../../assets/latent_space_plots_pca.png" alt="PCA Latent Space" width="400" style="display:inline; margin:0 10px;" />
+  <img src="../../assets/pca-components.png" alt="PCA Components" width="300" style="display:inline; margin:0 10px;" />
+</p>
+
+---
+
+### Variance Explained: How Many Components?
+
+Each eigenvalue $\lambda_i$ represents the variance captured by the $i$-th principal component.
+
+<v-click>
+
+**Cumulative variance explained**:
+
+$$\text{Variance explained}(K) = \frac{\sum_{i=1}^K \lambda_i}{\sum_{i=1}^N \lambda_i}$$
+
+</v-click>
+
+<v-click>
+
+**Intrinsic vs Extrinsic dimensionality**:
+
+| | Extrinsic | Intrinsic |
+|---|---|---|
+| **Definition** | Number of measured features ($N$) | Number of components needed ($K$) |
+| **Example (MNIST)** | 784 pixels | ~50–100 components for 90% variance |
+
+</v-click>
+
+<v-click>
+
+**Scree plot**: Plot eigenvalues in descending order. The "elbow" indicates where additional components contribute little variance — this suggests the intrinsic dimensionality.
+
+</v-click>
+
+
+---
+
+### PCA Reconstruction: Compressing Data
+
+PCA enables **lossy compression**: store only the top $K$ components instead of all $N$ dimensions.
+
+<v-click>
+
+**Forward (projection)**: $\mathbf{S} = \mathbf{X} \mathbf{W}$
+
+**Inverse (reconstruction)**: $\hat{\mathbf{X}} = \mathbf{S}_{1:K} \mathbf{W}_{1:K}^\top + \bar{\mathbf{X}}$
+
+</v-click>
+
+<v-click>
+
+**Reconstruction quality** depends on $K$:
+
+| $K$ | Variance captured | Quality |
+|-----|-------------------|---------|
+| 1 | Very low | Blob of average intensity |
+| ~20 | Moderate | Blurry digits recognizable |
+| ~100 | High | Nearly indistinguishable from original |
+| 784 | 100% | Perfect reconstruction |
+
+</v-click>
+
+
+---
+
+### PCA for Denoising
+
+PCA can remove noise by projecting onto the low-dimensional subspace that captures the signal.
+
+<v-click>
+
+**Idea**: Noise is spread across all dimensions equally, while signal is concentrated in the top components. By keeping only the top $K$ components, we discard most of the noise.
+
+</v-click>
+
+<v-click>
+
+**Algorithm**:
+1. Find PCA basis from clean data (or noisy data)
+2. Project noisy data onto the PCA basis
+3. Keep only the top $K$ components
+4. Reconstruct: $\hat{\mathbf{X}}_{\text{clean}} = \mathbf{S}_{1:K} \mathbf{W}_{1:K}^\top + \bar{\mathbf{X}}$
+
+</v-click>
+
+<v-click>
+
+**Key insight**: The optimal $K$ depends on the noise level:
+- More noise → fewer components (more aggressive denoising)
+- Less noise → more components (preserve detail)
+
+</v-click>
+
+<v-click>
+
+**Limitation**: PCA denoising assumes signal lies in a linear subspace. Nonlinear methods (e.g., autoencoders) can be more effective for complex signals.
+
+</v-click>
+
+---
+
+### PCA vs t-SNE: Linear vs Nonlinear Visualization
+
+Both methods reduce high-dimensional data to 2D for visualization, but they have fundamentally different goals.
+
+<v-click>
+
+**PCA (linear)**:
+- Preserves **global** structure (large distances)
+- Maximizes variance along orthogonal axes
+- Deterministic, fast, interpretable
+- Result: overlapping clusters for complex data
+
+</v-click>
+
+<v-click>
+
+**t-SNE (nonlinear)**:
+- Preserves **local** structure (neighborhood relationships)
+- Maps similar points to nearby positions
+- Stochastic, slower, not easily interpretable
+- Result: well-separated clusters
+
+</v-click>
+
+
+---
+
+### t-SNE: The Perplexity Parameter
+
+t-SNE has one key hyperparameter: **perplexity**, which roughly controls the effective number of neighbors.
+
+<v-click>
+
+**What perplexity does**:
+- **Low perplexity** (e.g., 2–5): focuses on very local structure, creates many small clusters
+- **Medium perplexity** (e.g., 30): balances local and global structure
+- **High perplexity** (e.g., 50+): emphasizes global structure, may merge distinct clusters
+
+</v-click>
+
+<v-click>
+
+**Guidelines**:
+- There is no "correct" perplexity — explore multiple values
+- Typical range: 5–50
+- Results can change significantly with different perplexity
+- Always report perplexity when presenting t-SNE results
+
+</v-click>
+
+
+---
+layout: center
+---
+
+## W1D5: Deep Learning
+
+<div class="text-center mt-4 mb-4">
+
+🎬 **Video**: [3Blue1Brown Convolution](https://www.bilibili.com/video/BV1Vd4y1e7pj/?spm_id_from=333.337.search-card.all.click&vd_source=4a0efd9e69f1eda05dec65b957c7e492)
+
+</div>
+
+---
+
+### Feedforward Neural Networks
+
+A feedforward network transforms input $\mathbf{r}$ through a series of **layers** to produce output $y$.
+
+<p align="center">
+  <img src="../../assets/one-layer-network.png" alt="One-layer network" width="350" />
+</p>
+
+<v-click>
+
+**Single hidden layer**:
+
+$$\mathbf{h} = \phi(\mathbf{W}^{in} \mathbf{r} + \mathbf{b}^{in}), \quad y = \mathbf{W}^{out} \mathbf{h} + \mathbf{b}^{out}$$
+
+where $\phi$ is a **nonlinear activation function**.
+
+</v-click>
+---
+
+<v-click>
+
+**Why nonlinearity matters**: Without it, stacking linear layers is equivalent to a single linear transformation:
+
+$$y = \mathbf{W}^{out}(\mathbf{W}^{in} \mathbf{r} + \mathbf{b}^{in}) + \mathbf{b}^{out} = (\mathbf{W}^{out}\mathbf{W}^{in})\mathbf{r} + \text{bias}$$
+
+Nonlinear activations allow the network to compute **arbitrary functions** (universal approximation theorem).
+
+</v-click>
+
+<v-click>
+
+**Key concepts**:
+- **Width**: number of units per layer ($M$)
+- **Depth**: number of hidden layers
+- **Parameters**: all weights $\mathbf{W}$ and biases $\mathbf{b}$
+
+</v-click>
+
+---
+
+### Activation Functions
+
+Activation functions introduce nonlinearity into neural networks.
+
+<p align="center">
+  <img src="../../assets/relu.png" alt="ReLU" width="200" style="display:inline; margin:0 10px;" />
+  <img src="../../assets/sigmoid.png" alt="Sigmoid" width="200" style="display:inline; margin:0 10px;" />
+  <img src="../../assets/prelu.png" alt="PReLU" width="200" style="display:inline; margin:0 10px;" />
+</p>
+
+<v-click>
+
+| Function | Formula | Range | Use case |
+|----------|---------|-------|----------|
+| **ReLU** | $\max(0, x)$ | $[0, \infty)$ | Hidden layers (default) |
+| **Sigmoid** | $\frac{1}{1+e^{-x}}$ | $(0, 1)$ | Output for binary probability |
+| **Softmax** | $\frac{e^{x_i}}{\sum_j e^{x_j}}$ | $(0, 1)$, sums to 1 | Output for classification |
+| **PReLU** | $\max(0, x) + \alpha \min(0, x)$ | $(-\infty, \infty)$ | When ReLU "dies" |
+
+</v-click>
+---
+
+<v-click>
+
+**Why ReLU works well**:
+- Gradient is 1 for positive inputs → no vanishing gradient
+- Computationally efficient
+- Sparse activations (many zeros)
+
+</v-click>
+
+<v-click>
+
+**"Dying ReLU" problem**: If a neuron's input is always negative, its gradient is always 0 — it never learns. Solutions: PReLU, Leaky ReLU, better initialization.
+
+</v-click>
+
+---
+
+### Loss Functions
+
+The loss function measures how bad the network's predictions are.
+
+<v-click>
+
+| Loss | Formula | Use case |
+|------|---------|----------|
+| **MSE** | $\frac{1}{N}\sum(y - \tilde{y})^2$ | Regression (continuous output) |
+| **BCE** | $-\sum[\tilde{y}\log y + (1-\tilde{y})\log(1-y)]$ | Binary classification |
+| **NLL** | $-\sum \log p_{\tilde{y}}$ | Multi-class classification |
+
+</v-click>
+
+<v-click>
+
+**Choosing the right loss**:
+- Predicting a continuous value → MSE
+- Predicting a probability (0–1) → BCE
+- Predicting a class label → NLL (with softmax)
+
+</v-click>
+
+<v-click>
+
+**BCE vs MSE for pixel reconstruction**: BCE penalizes confident wrong predictions more heavily (gradient $\sim 1/\hat{y}$), making it better for binary-ish data like images.
+
+</v-click>
+
+<p align="center">
+  <img src="../../assets/bce-mse.png" alt="BCE vs MSE" width="500" />
+</p>
+
+---
+
+### Gradient Descent and Backpropagation
+
+Training a network = finding parameters that minimize the loss.
+
+<v-click>
+
+**Gradient descent** iterates three steps:
+
+1. **Forward pass**: compute output and loss
+2. **Backward pass**: compute gradients $\frac{\partial L}{\partial \theta}$ via **backpropagation**
+3. **Update**: $\theta \leftarrow \theta - \alpha \frac{\partial L}{\partial \theta}$
+
+</v-click>
+
+<v-click>
+
+**Backpropagation** applies the chain rule layer by layer:
+
+$$\frac{\partial L}{\partial \mathbf{W}^{in}} = \frac{\partial L}{\partial \mathbf{h}} \cdot \frac{\partial \mathbf{h}}{\partial \mathbf{W}^{in}}$$
+
+PyTorch computes this automatically with `loss.backward()`.
+
+</v-click>
+
+<v-click>
+
+**SGD vs GD**:
+- **GD**: compute gradient over ALL training data (accurate but slow)
+- **SGD**: compute gradient over a mini-batch (noisy but fast)
+- **Adam**: SGD with adaptive learning rate and momentum (default choice)
+
+</v-click>
+
+---
+
+### Convolution: From Moving Average to Neural Networks
+
+Convolution is a fundamental operation that slides a small **kernel** across data, computing a weighted sum at each position.
+
+<v-click>
+
+**Start simple: 1D moving average**
+
+Given a noisy signal $[3, 5, 2, 8, 1, 4]$, a moving average with window size 3 smooths it:
+
+$$\text{output}[i] = \frac{1}{3}(x[i-1] + x[i] + x[i+1])$$
+
+This is a convolution with kernel $f = [\frac{1}{3}, \frac{1}{3}, \frac{1}{3}]$.
+
+</v-click>
+
+<v-click>
+
+**General 1D convolution**:
+
+$$\text{output}[i] = \sum_{k=-K/2}^{K/2} f[k] \cdot x[i+k]$$
+
+The kernel $f$ is a small array of **learnable weights** that slides across the input.
+
+</v-click>
+
+
+---
+
+### Different Kernels, Different Effects
+
+The **kernel** determines what feature the convolution detects. Same input, different kernels → completely different outputs.
+
+<v-click>
+
+| Kernel | Name | Effect |
+|--------|------|--------|
+| $[1/3, 1/3, 1/3]$ | Moving average | Smooths / low-pass filter |
+| $[-1, 0, 1]$ | Central difference | Detects **edges** (changes) |
+| $[1, -2, 1]$ | Second derivative | Detects **curvature** |
+| $[0, 1, 0]$ | Identity | Returns original signal |
+
+</v-click>
+
+<v-click>
+
+**Example: edge detection**
+
+```
+Input:     [0, 0, 0, 5, 5, 5, 0, 0, 0]    (step function)
+Kernel:    [-1, 0, 1]
+Output:    [0, 0, 5, 5, 0, -5, -5, 0, 0]   (edges at transitions!)
+```
+
+</v-click>
+
+---
+
+### From 1D to 2D: Image Convolutions
+
+The same idea extends to 2D images — the kernel becomes a small matrix.
+
+<v-click>
+
+**2D convolution**:
+
+$$\text{output}(x, y) = \sum_{k_x, k_y} f(k_x, k_y) \cdot I(x+k_x, y+k_y)$$
+
+where $f$ is a $K \times K$ kernel and $I$ is the input image.
+
+</v-click>
+---
+
+<v-click>
+
+**Common 2D kernels**:
+
+| Kernel | Size | Effect |
+|--------|------|--------|
+| $\frac{1}{9}\begin{bmatrix}1&1&1\\1&1&1\\1&1&1\end{bmatrix}$ | 3×3 | Box blur (smooth) |
+| $\begin{bmatrix}0&-1&0\\-1&4&-1\\0&-1&0\end{bmatrix}$ | 3×3 | Edge detection (Laplacian) |
+| $\begin{bmatrix}-1&0&1\\-2&0&2\\-1&0&1\end{bmatrix}$ | 3×3 | Sobel (vertical edges) |
+| $\begin{bmatrix}-1&-2&-1\\0&0&0\\1&2&1\end{bmatrix}$ | 3×3 | Sobel (horizontal edges) |
+| $\begin{bmatrix}0&0&0\\0&1&0\\0&0&0\end{bmatrix}$ | 3×3 | Identity |
+
+</v-click>
+
+---
+
+### Convolution Kernels: Visual Demo
+
+Different kernels produce dramatically different outputs on the same image:
+
+<img src="../../assets/conv_demo_result.png" alt="Convolution Demo" style="max-width: 80%; margin: 10px auto; display: block;" />
+
+
+---
+
+### Convolutional Neural Networks (CNNs)
+
+CNNs extend convolution to **multiple learned kernels** across **multiple layers**.
+
+<v-click>
+
+**Key ideas**:
+- **Local receptive fields**: each unit looks at a small $K \times K$ patch
+- **Multiple channels**: each channel applies a different kernel → detects different features
+
+</v-click>
+
+<v-click>
+
+**Parameters**:
+
+| Parameter | Meaning | Effect |
+|-----------|---------|--------|
+| $K$ (kernel size) | Size of the sliding window | Larger → bigger receptive field |
+| $C_{out}$ (channels) | Number of different kernels | More → richer features |
+| Stride | Step size when sliding | Larger → smaller output |
+| Padding | Zeros around input | Same padding → output = input size |
+
+</v-click>
+
+---
+
+### CNN Architecture
+
+A typical CNN alternates convolution and pooling layers, then ends with fully connected layers.
+
+<p align="center">
+  <img src="../../assets/conv-network.png" alt="CNN Architecture" width="400" style="display:inline; margin:0 10px;" />
+  <img src="../../assets/convnet.png" alt="ConvNet" width="300" style="display:inline; margin:0 10px;" />
+</p>
+
+<v-click>
+
+```
+Input image
+    │
+    ▼
+Conv + ReLU → Pool → Conv + ReLU → Pool → ... → Flatten → FC → Output
+```
+
+</v-click>
+
+<v-click>
+
+**Parameter count comparison** (for 48×64 image, 6 channels, K=7):
+
+| Layer type | Parameters |
+|------------|------------|
+| Fully connected | $48 \times 64 \times 48 \times 64 \approx 9.4M$ |
+| Convolutional | $6 \times 1 \times 7 \times 7 = 294$ |
+
+Weight sharing dramatically reduces parameters!
+
+</v-click>
+
+<p align="center">
+  <img src="../../assets/weight-sharing.png" alt="Weight Sharing" width="600" />
+</p>
+
+<v-click>
+
+**CNNs in neuroscience**: The visual cortex has a similar hierarchical structure:
+- V1: edge detectors (like conv filters)
+- V4: texture/shape detectors
+- IT: object detectors
+
+</v-click>
+
+---
+
+### Encoding vs Decoding Models
+
+Two directions of modeling neural data:
+
+<v-click>
+
+| | Encoding | Decoding |
+|---|---|---|
+| **Direction** | Stimulus → Neural response | Neural response → Stimulus |
+| **Question** | How does the brain represent stimuli? | How much information does the brain contain? |
+| **Input** | External stimulus | Neural activity |
+| **Output** | Predicted neural response | Predicted stimulus/behavior |
+| **Example** | CNN predicting V1 responses | Logistic regression decoding choice |
+
+</v-click>
+
+<v-click>
+
+**Normative encoding model**: Train a deep network on a **behavioral task** (not neural data), then compare its internal representations to neural recordings. If they match, the brain may be solving the same task.
+
+</v-click>
+
+---
+
+### Representational Similarity Analysis (RSA)
+
+RSA compares representations across different systems (brain vs model).
+
+<v-click>
+
+**Step 1: Compute RDM** (Representational Dissimilarity Matrix)
+
+$$\mathbf{M} = 1 - \frac{1}{N}\mathbf{Z}\mathbf{Z}^\top$$
+
+where $\mathbf{Z}$ is the z-scored response matrix. $M_{ss'}$ = dissimilarity between stimuli $s$ and $s'$.
+
+</v-click>
+
+<v-click>
+
+**Step 2: Correlate RDMs**
+
+Compare the RDM from brain data with the RDM from each model layer. Higher correlation → more similar representation.
+
+</v-click>
+
+<v-click>
+
+**Why RSA?**
+- Works across different dimensionalities (brain: ~20,000 neurons; model: 10 units)
+- Doesn't require one-to-one mapping between neurons and units
+- Captures the **structure** of representations, not just single-neuron tuning
+
+</v-click>
+
+---
+
+### Autoencoders
+
+Autoencoders learn **compressed representations** by reconstructing their own input.
+
+<p align="center">
+  <img src="../../assets/ae-ann-1h.png" alt="Autoencoder Architecture" width="450" />
+</p>
+
+<v-click>
+
+**Architecture**:
+
+```
+Input (784) → Encoder → Bottleneck (K) → Decoder → Output (784)
+```
+
+- **Encoder**: compresses high-dimensional input to low-dimensional latent space
+- **Decoder**: reconstructs input from latent representation
+- **Loss**: MSE or BCE between input and reconstruction
+
+</v-click>
+---
+
+<v-click>
+
+**Bottleneck effect**: Forcing information through a small bottleneck ($K \ll N$) makes the network learn the most important features — a form of **nonlinear PCA**.
+
+</v-click>
+
+<v-click>
+
+**Latent space visualization**: When $K=2$, we can plot each input as a point $(z_1, z_2)$ colored by its class. Well-separated clusters indicate good representations.
+
+</v-click>
+
+<v-click>
+
+**Improving autoencoders**:
+- Add more hidden layers (deeper network)
+- Use spherical latent space (NormalizeLayer)
+- Better weight initialization (Kaiming)
+- Choose appropriate activation functions (PReLU for small bottlenecks)
 
 </v-click>
 
@@ -828,29 +2080,19 @@ for C in C_values:
 
 ### Summary
 
-<div class="grid grid-cols-3 gap-6">
+<div class="grid grid-cols-2 gap-6">
 <div class="p-4 bg-gray-800/50 rounded-lg">
 
-### W1D1: Model Types
+### W1D1–W1D2: Foundations
 
-- **What**: describe data (histograms, ISI)
-- **How**: simulate mechanisms (LIF)
-- **Why**: explain purpose (entropy)
+- **Model types**: descriptive, mechanistic, teleological
+- **Model fitting**: MSE, MLE, bootstrapping
+- **Polynomial regression**: design matrix + OLS
 
 </div>
 <div class="p-4 bg-gray-800/50 rounded-lg">
 
-### W1D2: Model Fitting
-
-- **MSE**: minimize squared error
-- **MLE**: maximize likelihood
-- **Bootstrap**: quantify uncertainty
-- **Polynomial**: design matrix + OLS
-
-</div>
-<div class="p-4 bg-gray-800/50 rounded-lg">
-
-### W1D3: GLMs
+### W1D3: Generalized Linear Models
 
 - **LG GLM**: stimulus filtering
 - **Poisson GLM**: spike rate modeling
@@ -860,189 +2102,41 @@ for C in C_values:
 </div>
 </div>
 
-<v-click>
+<div class="grid grid-cols-2 gap-6 mt-4">
+<div class="p-4 bg-gray-800/50 rounded-lg">
 
-$$\hat{\boldsymbol{\theta}} = (X^T X)^{-1} X^T \mathbf{y}$$
+### W1D4: Dimensionality Reduction
 
-This single formula underlies linear regression, LG GLM, and polynomial regression. The GLM extends it with link functions and different noise models.
-
-</v-click>
-
----
-layout: center
----
-
-## Challenge Problem: Optimal Integration
-
----
-
-### The Problem
-
-Given the ODE and initial condition:
-
-$$\frac{dp}{dt} = -\frac{1}{5}\,p(t) + \sin(t), \qquad p(0) = 1$$
-
-**Goal**: compute $p(10)$ as accurately as possible.
-
-**Constraint**: you have a budget of **exactly 40 function evaluations** — each call to $f(t, p) = -\frac{1}{5}p + \sin(t)$ costs 1 evaluation. You must use all 40.
-
-<v-click>
-
-**Scoring**: your score is $-\log_{10}(\text{error})$. Higher is better.
-
-| Score | Error       | Grade     |
-| ----- | ----------- | --------- |
-| 1     | 0.1         | Poor      |
-| 3     | 0.001       | Good      |
-| 5     | 0.00001     | Excellent |
-| 7+    | $< 10^{-7}$ | Perfect   |
-
-</v-click>
-
----
-
-### Part A: Exact Solution (Analytical)
-
-First, derive the exact value of $p(10)$ so you can measure your error.
-
-<v-click>
-
-**Method**: this is a first-order linear ODE. Use the integrating factor $e^{t/5}$:
-
-$$\frac{d}{dt}\!\left[e^{t/5}\,p\right] = e^{t/5}\sin(t)$$
-
-</v-click>
-
-<v-click>
-
-Integrate both sides and apply $p(0)=1$:
-
-$$p(t) = \frac{1}{17}\!\left(\cos t + 4\sin t\right) + \frac{16}{17}\,e^{-t/5}$$
-
-</v-click>
-
-<v-click>
-
-**Verify**: $p(0) = \frac{1}{17}(1 + 0) + \frac{16}{17} = 1$ ✓
-
-$$\boxed{\;p(10) = \frac{1}{17}\!\left(\cos 10 + 4\sin 10\right) + \frac{16}{17}\,e^{-2}\;}$$
-
-</v-click>
-
-<v-click>
-
-**Numerically**: $p(10) \approx -0.05264 + 0.12618 = 0.07355$
-
-</v-click>
-
----
-
-**Code to compute it**:
-
-```python
-import numpy as np
-def p_exact(t):
-    return (np.cos(t) + 4*np.sin(t)) / 17 + 16/17 * np.exp(-t/5)
-print(f"p(10) = {p_exact(10):.10f}")  # 0.073546...
-```
-
----
-
-### Part B: Uniform Euler (Baseline)
-
-Use standard Euler with uniform step size. With 40 evaluations budget and Euler's 1 evaluation per step:
-
-$$\Delta t = \frac{10}{40} = 0.25$$
-
-<v-click>
-
-**Step-by-step trace** (first 3 steps):
-
-| Step | $t$ | $p(t)$ | $f(t,p) = -p/5 + \sin t$ | $p + \Delta t \cdot f$ |
-| ---- | --- | ------ | ------------------------ | ---------------------- |
-| 0    | 0.00| 1.0000 | $-0.200 + 0.000 = -0.200$ | $1.000 + 0.25(-0.200) = 0.950$ |
-| 1    | 0.25| 0.9500 | $-0.190 + 0.247 = +0.057$ | $0.950 + 0.25(0.057) = 0.964$ |
-| 2    | 0.50| 0.9643 | $-0.193 + 0.479 = +0.286$ | $0.964 + 0.25(0.286) = 1.036$ |
-
-Each step: compute slope at current point → extend linearly by $\Delta t$ → that's the new value.
-
-</v-click>
-
-<v-click>
-
-With uniform Euler ($\Delta t = 0.25$, 40 evaluations), error $\approx 0.0039$. Score $\approx 2.4$. **Can you do better?**
-
-</v-click>
-
----
-
-### Part C: Your Strategy (40 Evaluations)
-
-You have 40 evaluations. Design your own integration strategy. Here are ideas to explore:
-
-<div class="grid grid-cols-2 gap-8">
-<div>
-
-**Idea 1: Non-uniform steps**
-
-The solution changes rapidly near $t=0$ (exponential decay dominates) and slowly near $t=10$ (transient died out). Use smaller $\Delta t$ early, larger later.
-
-<v-click>
-
-```python
-# Geometric step sequence: dt_i = dt_0 * r^i
-# Choose dt_0 and r so that sum(dt_i) = 10
-# and sum(evaluations) = 40
-```
-
-</v-click>
+- **PCA**: eigenvectors of covariance matrix
+- **Variance explained**: intrinsic dimensionality
+- **Reconstruction**: low-rank approximation
+- **Denoising**: signal subspace projection
+- **t-SNE**: nonlinear visualization
 
 </div>
-<div>
+<div class="p-4 bg-gray-800/50 rounded-lg">
 
-**Idea 2: Richardson extrapolation**
+### W1D5: Deep Learning
 
-Run Euler twice at different step sizes, then combine:
-
-$$p_{\text{better}} = \frac{2^p \cdot p_{\Delta t/2} - p_{\Delta t}}{2^p - 1}$$
-
-where $p$ is the order of the method ($p = 1$ for Euler, so $2^1 = 2$).
-
-This cancels the $O(\Delta t)$ error term, giving $O(\Delta t^2)$ accuracy — for free!
-
-<v-click>
-
-Cost: 40 evaluations split into 20 coarse + 20 fine, but you only get the final value.
-
-</v-click>
+- **Feedforward networks**: layers, activations, loss
+- **CNNs**: convolution, pooling, weight sharing
+- **Encoding/Decoding**: stimulus↔response
+- **RSA**: comparing representations
+- **Autoencoders**: compression, latent space
 
 </div>
 </div>
-
 ---
 
-**Idea 3: RK2 with non-uniform steps**
+<div class="grid grid-cols-1 gap-6 mt-4">
+<div class="p-4 bg-gray-800/50 rounded-lg">
 
-RK2 uses 2 evaluations per step → 20 steps with non-uniform spacing. Combine with adaptive spacing for maximum effect.
+### Key Formulas
 
-**Idea 4: Multistep (Adams-Bashforth)**
+$$\hat{\boldsymbol{\theta}} = (X^T X)^{-1} X^T \mathbf{y} \quad \text{(OLS)}$$
+$$\mathbf{S} = \mathbf{X}\mathbf{W}, \quad \hat{\mathbf{X}} = \mathbf{S}_{1:K}\mathbf{W}_{1:K}^\top \quad \text{(PCA)}$$
+$$\mathbf{h} = \phi(\mathbf{W}^{in}\mathbf{r} + \mathbf{b}^{in}), \quad y = \mathbf{W}^{out}\mathbf{h} + \mathbf{b}^{out} \quad \text{(Neural net)}$$
+$$\mathbf{M} = 1 - \frac{1}{N}\mathbf{Z}\mathbf{Z}^\top \quad \text{(RSA)}$$
 
-After a few startup steps, use past values to predict the next — 1 evaluation per step but higher-order accuracy:
-
-$$p_{n+1} = p_n + \Delta t\!\left(\frac{3}{2}f_n - \frac{1}{2}f_{n-1}\right) \quad \text{(AB2, order 2, 1 eval/step)}$$
-
----
-
-### Hints & Extensions
-
-**Hints**:
-
-1. The solution has two timescales: fast exponential decay ($\tau = 5$) and slow oscillation ($T = 2\pi$). Put steps where the action is.
-2. For Richardson extrapolation: run Euler with 20 steps ($\Delta t = 0.5$) and 20 steps ($\Delta t$ halved to 0.25 gives 40 steps — but you only have 40 total. Instead, run 20 coarse + 20 fine, but the fine uses the coarse as a starting point after $t=5$.)
-3. For Adams-Bashforth: you need a "startup" method (Euler or RK2) for the first step, then AB2 for the rest — 1 eval/step after startup.
-
-**Extensions** (if you have time):
-
-- **Adaptive step size**: after each step, estimate the local error (e.g., take one full step vs two half steps). If error is large, shrink $\Delta t$; if small, grow it. Budget 40 evaluations but choose step sizes *on the fly*.
-- **Compare to RK4**: with 40 evaluations, RK4 gets only 10 steps ($\Delta t = 1$). Is it still more accurate than 40 Euler steps with optimal spacing?
-- **Neural application**: the same ODE structure $\dot{p} = -p/\tau + I(t)$ is a synaptic current model with time constant $\tau = 5$ms and sinusoidal input. What does $p(t)$ represent biologically?
+</div>
+</div>
