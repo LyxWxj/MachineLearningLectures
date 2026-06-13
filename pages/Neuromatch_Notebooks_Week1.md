@@ -1485,8 +1485,8 @@ where $\mathbf{W}_{1:K}$ contains the top $K$ eigenvectors as columns.
 </v-click>
 
 <p align="center">
-  <img src="../../assets/latent_space_plots_pca.png" alt="PCA Latent Space" width="400" style="display:inline; margin:0 10px;" />
-  <img src="../../assets/pca-components.png" alt="PCA Components" width="300" style="display:inline; margin:0 10px;" />
+  <img src="./assets/latent_space_plots_pca.png" alt="PCA Latent Space" width="400" style="display:inline; margin:0 10px;" />
+  <img src="./assets/pca-components.png" alt="PCA Components" width="300" style="display:inline; margin:0 10px;" />
 </p>
 
 ---
