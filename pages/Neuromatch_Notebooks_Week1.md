@@ -1485,8 +1485,8 @@ where $\mathbf{W}_{1:K}$ contains the top $K$ eigenvectors as columns.
 </v-click>
 
 <p align="center">
-  <img src="latent_space_plots_pca.png" alt="PCA Latent Space" width="400" style="display:inline; margin:0 10px;" />
-  <img src="pca-components.png" alt="PCA Components" width="300" style="display:inline; margin:0 10px;" />
+  <img src="/latent_space_plots_pca.png" width="400" style="display:inline; margin:0 10px;" />
+  <img src="/pca-components.png" width="300" style="display:inline; margin:0 10px;" />
 </p>
 
 ---
@@ -1657,7 +1657,7 @@ layout: center
 A feedforward network transforms input $\mathbf{r}$ through a series of **layers** to produce output $y$.
 
 <p align="center">
-  <img src="one-layer-network.png" alt="One-layer network" width="350" />
+  <img src="/one-layer-network.png" width="350" />
 </p>
 
 <v-click>
@@ -1697,9 +1697,9 @@ Nonlinear activations allow the network to compute **arbitrary functions** (univ
 Activation functions introduce nonlinearity into neural networks.
 
 <p align="center">
-  <img src="relu.png" alt="ReLU" width="200" style="display:inline; margin:0 10px;" />
-  <img src="sigmoid.png" alt="Sigmoid" width="200" style="display:inline; margin:0 10px;" />
-  <img src="prelu.png" alt="PReLU" width="200" style="display:inline; margin:0 10px;" />
+  <img src="/relu.png" width="200" style="display:inline; margin:0 10px;" />
+  <img src="/sigmoid.png" width="200" style="display:inline; margin:0 10px;" />
+  <img src="/prelu.png" width="200" style="display:inline; margin:0 10px;" />
 </p>
 
 <v-click>
@@ -1759,9 +1759,10 @@ The loss function measures how bad the network's predictions are.
 **BCE vs MSE for pixel reconstruction**: BCE penalizes confident wrong predictions more heavily (gradient $\sim 1/\hat{y}$), making it better for binary-ish data like images.
 
 </v-click>
+---
 
 <p align="center">
-  <img src="bce-mse.png" alt="BCE vs MSE" width="500" />
+  <img src="/bce-mse.png" width="500" />
 </p>
 
 ---
@@ -1796,6 +1797,89 @@ PyTorch computes this automatically with `loss.backward()`.
 - **GD**: compute gradient over ALL training data (accurate but slow)
 - **SGD**: compute gradient over a mini-batch (noisy but fast)
 - **Adam**: SGD with adaptive learning rate and momentum (default choice)
+
+</v-click>
+
+---
+
+### Stochastic Gradient Descent (SGD)
+
+SGD approximates the true gradient using a **random mini-batch** of data.
+
+<v-click>
+
+**Algorithm**:
+1. Sample a mini-batch of $B$ examples from training data
+2. Compute gradient on this mini-batch: $\mathbf{g} = \frac{1}{B}\sum_{i=1}^B \nabla_\theta L(y_i, f(x_i; \theta))$
+3. Update: $\theta \leftarrow \theta - \alpha \mathbf{g}$
+4. Repeat until convergence
+
+</v-click>
+
+<v-click>
+
+**Why SGD works**:
+- Mini-batch gradient is an **unbiased estimate** of the full gradient
+- Much faster per iteration (e.g., $B=32$ vs $N=60000$)
+- Noise helps escape shallow local minima
+
+</v-click>
+
+<v-click>
+
+**Momentum**: accumulates past gradients to smooth updates:
+
+$$\mathbf{v} \leftarrow \beta \mathbf{v} + \mathbf{g}, \quad \theta \leftarrow \theta - \alpha \mathbf{v}$$
+
+- $\beta$ (typically 0.9): how much past gradients influence current update
+- Helps accelerate in consistent gradient directions
+- Dampens oscillations in noisy dimensions
+
+</v-click>
+
+---
+
+### Adam: Adaptive Moment Estimation
+
+Adam combines momentum with **adaptive learning rates** per parameter.
+
+<v-click>
+
+**Key idea**: Parameters that receive large gradients get smaller updates (and vice versa). This is achieved by tracking:
+- First moment (mean): $\mathbf{m} \leftarrow \beta_1 \mathbf{m} + (1-\beta_1)\mathbf{g}$
+- Second moment (variance): $\mathbf{v} \leftarrow \beta_2 \mathbf{v} + (1-\beta_2)\mathbf{g}^2$
+
+</v-click>
+
+<v-click>
+
+**Update rule** (with bias correction):
+
+$$\theta \leftarrow \theta - \alpha \frac{\hat{\mathbf{m}}}{\sqrt{\hat{\mathbf{v}}} + \epsilon}$$
+
+where $\hat{\mathbf{m}} = \frac{\mathbf{m}}{1-\beta_1^t}$, $\hat{\mathbf{v}} = \frac{\mathbf{v}}{1-\beta_2^t}$ (bias correction for early steps).
+
+</v-click>
+
+<v-click>
+
+**Default hyperparameters** (rarely need tuning):
+- $\alpha = 0.001$ (learning rate)
+- $\beta_1 = 0.9$ (first moment decay)
+- $\beta_2 = 0.999$ (second moment decay)
+- $\epsilon = 10^{-8}$ (numerical stability)
+
+</v-click>
+
+<v-click>
+
+**When to use what**:
+
+| Optimizer | Pros | Cons | Use case |
+|-----------|------|------|----------|
+| **SGD** | Simple, good generalization | Slow, sensitive to LR | When you can tune LR carefully |
+| **SGD+Momentum** | Faster convergence | Still needs LR tuning | Computer vision, large models |
+| **Adam** | Fast, robust, default choice | May generalize worse | Most tasks, quick prototyping |
 
 </v-click>
 
@@ -1894,7 +1978,7 @@ where $f$ is a $K \times K$ kernel and $I$ is the input image.
 
 Different kernels produce dramatically different outputs on the same image:
 
-<img src="conv_demo_result.png" alt="Convolution Demo" style="max-width: 80%; margin: 10px auto; display: block;" />
+<img src="/conv_demo_result.png" alt="Convolution Demo" style="max-width: 80%; margin: 10px auto; display: block;" />
 
 
 ---
@@ -1931,8 +2015,8 @@ CNNs extend convolution to **multiple learned kernels** across **multiple layers
 A typical CNN alternates convolution and pooling layers, then ends with fully connected layers.
 
 <p align="center">
-  <img src="conv-network.png" alt="CNN Architecture" width="400" style="display:inline; margin:0 10px;" />
-  <img src="convnet.png" alt="ConvNet" width="300" style="display:inline; margin:0 10px;" />
+  <img src="/conv-network.png" alt="CNN Architecture" width="400" style="display:inline; margin:0 10px;" />
+  <img src="/convnet.png" alt="ConvNet" width="300" style="display:inline; margin:0 10px;" />
 </p>
 
 <v-click>
@@ -1960,7 +2044,7 @@ Weight sharing dramatically reduces parameters!
 </v-click>
 
 <p align="center">
-  <img src="weight-sharing.png" alt="Weight Sharing" width="600" />
+  <img src="/weight-sharing.png" alt="Weight Sharing" width="600" />
 </p>
 
 <v-click>
@@ -2036,7 +2120,7 @@ Compare the RDM from brain data with the RDM from each model layer. Higher corre
 Autoencoders learn **compressed representations** by reconstructing their own input.
 
 <p align="center">
-  <img src="ae-ann-1h.png" alt="Autoencoder Architecture" width="450" />
+  <img src="/ae-ann-1h.png" alt="Autoencoder Architecture" width="450" />
 </p>
 
 <v-click>
