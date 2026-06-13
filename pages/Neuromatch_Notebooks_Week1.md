@@ -1657,7 +1657,7 @@ layout: center
 A feedforward network transforms input $\mathbf{r}$ through a series of **layers** to produce output $y$.
 
 <p align="center">
-  <img src="../../assets/one-layer-network.png" alt="One-layer network" width="350" />
+  <img src="./assets/one-layer-network.png" alt="One-layer network" width="350" />
 </p>
 
 <v-click>
@@ -1697,9 +1697,9 @@ Nonlinear activations allow the network to compute **arbitrary functions** (univ
 Activation functions introduce nonlinearity into neural networks.
 
 <p align="center">
-  <img src="../../assets/relu.png" alt="ReLU" width="200" style="display:inline; margin:0 10px;" />
-  <img src="../../assets/sigmoid.png" alt="Sigmoid" width="200" style="display:inline; margin:0 10px;" />
-  <img src="../../assets/prelu.png" alt="PReLU" width="200" style="display:inline; margin:0 10px;" />
+  <img src="./assets/relu.png" alt="ReLU" width="200" style="display:inline; margin:0 10px;" />
+  <img src="./assets/sigmoid.png" alt="Sigmoid" width="200" style="display:inline; margin:0 10px;" />
+  <img src="./assets/prelu.png" alt="PReLU" width="200" style="display:inline; margin:0 10px;" />
 </p>
 
 <v-click>
@@ -1761,7 +1761,7 @@ The loss function measures how bad the network's predictions are.
 </v-click>
 
 <p align="center">
-  <img src="../../assets/bce-mse.png" alt="BCE vs MSE" width="500" />
+  <img src="./assets/bce-mse.png" alt="BCE vs MSE" width="500" />
 </p>
 
 ---
@@ -1894,7 +1894,7 @@ where $f$ is a $K \times K$ kernel and $I$ is the input image.
 
 Different kernels produce dramatically different outputs on the same image:
 
-<img src="../../assets/conv_demo_result.png" alt="Convolution Demo" style="max-width: 80%; margin: 10px auto; display: block;" />
+<img src="./assets/conv_demo_result.png" alt="Convolution Demo" style="max-width: 80%; margin: 10px auto; display: block;" />
 
 
 ---
@@ -1931,8 +1931,8 @@ CNNs extend convolution to **multiple learned kernels** across **multiple layers
 A typical CNN alternates convolution and pooling layers, then ends with fully connected layers.
 
 <p align="center">
-  <img src="../../assets/conv-network.png" alt="CNN Architecture" width="400" style="display:inline; margin:0 10px;" />
-  <img src="../../assets/convnet.png" alt="ConvNet" width="300" style="display:inline; margin:0 10px;" />
+  <img src="./assets/conv-network.png" alt="CNN Architecture" width="400" style="display:inline; margin:0 10px;" />
+  <img src="./assets/convnet.png" alt="ConvNet" width="300" style="display:inline; margin:0 10px;" />
 </p>
 
 <v-click>
@@ -1960,7 +1960,7 @@ Weight sharing dramatically reduces parameters!
 </v-click>
 
 <p align="center">
-  <img src="../../assets/weight-sharing.png" alt="Weight Sharing" width="600" />
+  <img src="./assets/weight-sharing.png" alt="Weight Sharing" width="600" />
 </p>
 
 <v-click>
@@ -2036,7 +2036,7 @@ Compare the RDM from brain data with the RDM from each model layer. Higher corre
 Autoencoders learn **compressed representations** by reconstructing their own input.
 
 <p align="center">
-  <img src="../../assets/ae-ann-1h.png" alt="Autoencoder Architecture" width="450" />
+  <img src="./assets/ae-ann-1h.png" alt="Autoencoder Architecture" width="450" />
 </p>
 
 <v-click>
