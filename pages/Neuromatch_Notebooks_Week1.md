@@ -1399,27 +1399,205 @@ layout: center
 
 ---
 
-### Covariance Matrix
+### Covariance: What Does It Mean?
 
-The **covariance matrix** captures how pairs of variables co-vary.
+Given two variables $x$ and $y$, **covariance** measures whether they tend to move together:
+
+$$\text{Cov}(x, y) = \frac{1}{N} \sum_{i=1}^N (x_i - \bar{x})(y_i - \bar{y})$$
 
 <v-click>
 
-**Definition**: For data matrix $\mathbf{X}$ (each row = one sample, each column = one feature):
+**Intuition**: each term $(x_i - \bar{x})(y_i - \bar{y})$ asks:
 
-$$\hat{\Sigma}_{ij} = \frac{1}{N} \sum_{n=1}^N (x_i^{(n)} - \bar{x}_i)(x_j^{(n)} - \bar{x}_j)$$
+- Both above mean? → **positive** contribution (they rise together)
+- Both below mean? → also **positive** (they fall together)
+- One above, one below? → **negative** (they move opposite)
 
-In matrix form (after mean-centering): $\hat{\Sigma} = \frac{1}{N}\mathbf{X}^\top\mathbf{X}$
+</v-click>
+
+<v-click>
+
+| Covariance | Meaning | Example |
+|------------|---------|---------|
+| $\text{Cov} > 0$ | positive — rise/fall together | height & weight |
+| $\text{Cov} = 0$ | no linear relationship | shoe size & IQ |
+| $\text{Cov} < 0$ | negative — move opposite | speed & travel time |
+
+</v-click>
+
+---
+
+### Covariance: Visual Intuition
+
+<div class="grid grid-cols-2 gap-6">
+<div>
+
+<img src="/cov_scatter.png" width="380" style="display:block; margin:0 auto;" />
+
+</div>
+<div class="flex flex-col justify-center">
+
+Each scatter shows 200 samples from a 2D Gaussian with different covariance.
+
+<v-click>
+
+**Orange arrows** = eigenvectors (directions of maximum spread).
+
+- Positive covariance → cloud tilts **/** (↗)
+- Negative covariance → cloud tilts **\\** (↘)
+- Zero covariance → axes-aligned cloud
+
+</v-click>
+
+</div>
+</div>
+
+---
+
+### From Covariance to Covariance Matrix
+
+For $d$ features, the **covariance matrix** captures all pairwise covariances:
+
+$$\Sigma = \begin{bmatrix} \text{Var}(x_1) & \text{Cov}(x_1, x_2) & \cdots & \text{Cov}(x_1, x_d) \\ \text{Cov}(x_2, x_1) & \text{Var}(x_2) & \cdots & \text{Cov}(x_2, x_d) \\ \vdots & \vdots & \ddots & \vdots \\ \text{Cov}(x_d, x_1) & \text{Cov}(x_d, x_2) & \cdots & \text{Var}(x_d) \end{bmatrix}$$
+
+<v-click>
+
+**Matrix form** (after mean-centering $\mathbf{X}$):
+
+$$\hat{\Sigma} = \frac{1}{N}\mathbf{X}^\top\mathbf{X}$$
+
+Each entry $\hat{\Sigma}_{ij}$ tells you how feature $i$ and feature $j$ co-vary across all samples.
 
 </v-click>
 
 <v-click>
 
 **Properties**:
-- Symmetric: $\hat{\Sigma}_{ij} = \hat{\Sigma}_{ji}$
-- Diagonal = variances of each feature
-- Off-diagonal = covariances between feature pairs
-- Positive semi-definite (eigenvalues ≥ 0)
+- **Symmetric**: $\Sigma_{ij} = \Sigma_{ji}$ (covariance is commutative)
+- **Diagonal** = variances: $\Sigma_{ii} = \text{Var}(x_i) \geq 0$
+- **Positive semi-definite**: all eigenvalues $\lambda_i \geq 0$
+
+</v-click>
+
+---
+
+### Covariance Matrix as Heatmap
+
+Visualizing the covariance matrix reveals the correlation structure at a glance:
+
+<img src="/cov_heatmap.png" width="700" style="display:block; margin:0 auto;" />
+
+<v-click>
+
+**Reading the heatmap**:
+- **Red cells** = positive covariance (variables move together)
+- **Blue cells** = negative covariance (variables move opposite)
+- **White cells** = zero covariance (independent)
+- **Diagonal** is always 1.0 (variance of each variable, after normalization)
+
+</v-click>
+
+---
+
+### Geometric Meaning: The Covariance Ellipse
+
+The covariance matrix defines a **confidence ellipse** that shows the spread of the data:
+
+<img src="/cov_ellipse.png" width="600" style="display:block; margin:0 auto;" />
+
+<v-click>
+
+**Key insight**: The eigenvectors of $\Sigma$ are the **axes** of the ellipse; the eigenvalues are the **squared lengths** of those axes.
+
+- **Long axis** = direction of maximum variance (1st eigenvector)
+- **Short axis** = direction of minimum variance (2nd eigenvector)
+- **Tilt** of the ellipse = sign and magnitude of the off-diagonal covariance
+
+</v-click>
+
+---
+
+### Geometric Meaning (continued)
+
+The covariance matrix is a **linear transformation** that maps a unit circle into the data's spread:
+
+<v-click>
+
+$$\text{Unit circle} \xrightarrow{\;\Sigma\;} \text{Data ellipse}$$
+
+</v-click>
+
+<v-click>
+
+**Eigendecomposition** makes this explicit:
+
+$$\Sigma = V \Lambda V^\top$$
+
+where $V = [\mathbf{v}_1 \mid \mathbf{v}_2]$ (eigenvectors) and $\Lambda = \text{diag}(\lambda_1, \lambda_2)$ (eigenvalues).
+
+</v-click>
+
+<v-click>
+
+**Physical analogy**: think of $\Sigma$ as a **stress tensor** in mechanics:
+- Eigenvalues = principal stresses (how much pressure along each axis)
+- Eigenvectors = principal directions (which way the material stretches)
+- The ellipse is the "strain ellipsoid" — how a unit sphere deforms under that stress
+
+</v-click>
+
+---
+
+### Covariance vs Correlation
+
+Covariance has units ($\text{units}_x \times \text{units}_y$), making it hard to compare across variables. **Correlation** normalizes it:
+$r_{xy} = \frac{\text{Cov}(x, y)}{\sigma_x \cdot \sigma_y} \in [-1, 1]$
+
+<img src="/cov_vs_corr.png" width="500" style="display:block; margin:0 auto;" />
+
+<v-click>
+
+**Left**: same correlation ($r = 0.8$), but scaling $x$ by 3× changes the covariance from ~0.7 to ~2.0. Correlation is **scale-invariant**; covariance is not.
+
+**Right**: correlation $r$ is always in $[-1, 1]$, making it easy to interpret regardless of the original units.
+
+</v-click>
+
+---
+
+### Covariance Matrix — Summary
+
+<div class="grid grid-cols-2 gap-6">
+<div class="p-4 bg-gray-800/50 rounded-lg">
+
+### Formula
+
+$$\Sigma_{ij} = \frac{1}{N}\sum_n (x_i^{(n)} - \bar{x}_i)(x_j^{(n)} - \bar{x}_j)$$
+
+$$\hat{\Sigma} = \frac{1}{N}\mathbf{X}^\top\mathbf{X}$$
+
+</div>
+<div class="p-4 bg-gray-800/50 rounded-lg">
+
+### Key Properties
+
+- Symmetric ($\Sigma = \Sigma^\top$)
+- Diagonal = variances
+- Off-diagonal = covariances
+- Positive semi-definite ($\lambda_i \geq 0$)
+- Eigenvectors → principal directions
+- Eigenvalues → amount of variance
+
+</div>
+</div>
+
+<v-click>
+
+<div class="mt-4 p-4 bg-blue-900/20 rounded-lg text-center">
+
+**Why it matters**: The covariance matrix is the foundation of PCA. Its eigenvectors give the directions of maximum variance — the "natural axes" of the data.
+
+</div>
 
 </v-click>
 
@@ -1637,6 +1815,64 @@ t-SNE has one key hyperparameter: **perplexity**, which roughly controls the eff
 
 </v-click>
 
+---
+
+### t-SNE: How Does It Work?
+
+The algorithm has three key steps:
+
+<v-click>
+
+**Step 1 — High-dimensional similarities**: For each pair of points $(x_i, x_j)$, compute a Gaussian-based probability:
+
+$$p_{j|i} = \frac{\exp(-\|x_i - x_j\|^2 / 2\sigma_i^2)}{\sum_{k \neq i} \exp(-\|x_i - x_k\|^2 / 2\sigma_i^2)}$$
+
+"Given point $i$, what's the probability of picking $j$ as its neighbor?"
+
+</v-click>
+
+<v-click>
+
+**Step 2 — Low-dimensional similarities**: In the 2D map, use a **t-distribution** (heavy-tailed) instead of Gaussian:
+
+$$q_{ij} = \frac{(1 + \|y_i - y_j\|^2)^{-1}}{\sum_{k \neq l} (1 + \|y_k - y_l\|^2)^{-1}}$$
+
+</v-click>
+
+<v-click>
+
+**Step 3 — Optimize**: Minimize the KL divergence between $P$ and $Q$:
+
+$$\text{KL}(P \| Q) = \sum_{i \neq j} p_{ij} \log \frac{p_{ij}}{q_{ij}}$$
+
+KL divergence penalizes **false negatives** heavily (high-D neighbors that got separated in low-D), so nearby points stay together.
+
+</v-click>
+
+---
+
+### t-SNE: Algorithm Visualization
+
+<div class="grid grid-cols-2 gap-6">
+<div>
+
+<img src="/tsne_steps.png" width="420" style="display:block; margin:0 auto;" />
+
+</div>
+<div class="flex flex-col justify-center">
+
+<v-click>
+
+**Why t-distribution instead of Gaussian?**
+
+The t-distribution has **heavier tails** — it assigns more probability to medium-distance points.
+
+This solves the **crowding problem**: in high-D, there are many "medium-distance" neighbors. A Gaussian would squeeze them all to the center. The t-distribution lets them **spread out** into distinct clusters.
+
+</v-click>
+
+</div>
+</div>
 
 ---
 layout: center
@@ -2082,17 +2318,100 @@ Two directions of modeling neural data:
 
 ---
 
-### Representational Similarity Analysis (RSA)
+### RSA: What is the Response Matrix?
 
-RSA compares representations across different systems (brain vs model).
+Before computing anything, we need to organize neural data into a **response matrix** $\mathbf{R}$.
 
 <v-click>
 
-**Step 1: Compute RDM** (Representational Dissimilarity Matrix)
+**Setup**: Record $N$ neurons while presenting $S$ different stimuli (e.g., images). Each stimulus is repeated multiple trials, then average across trials.
+
+$$\mathbf{R} = \begin{bmatrix} r_{1,1} & r_{1,2} & \cdots & r_{1,S} \\ r_{2,1} & r_{2,2} & \cdots & r_{2,S} \\ \vdots & \vdots & \ddots & \vdots \\ r_{N,1} & r_{N,2} & \cdots & r_{N,S} \end{bmatrix}$$
+
+- **Rows** = neurons (what each neuron responds to)
+- **Columns** = stimuli (how each stimulus is represented)
+- $r_{n,s}$ = average spike count of neuron $n$ to stimulus $s$
+
+</v-click>
+
+---
+
+### RSA: Why Z-score?
+
+Different neurons have wildly different **baseline firing rates**. A high-rate neuron (50 spikes/s) dominates the distance calculation over a low-rate neuron (2 spikes/s), even if the low-rate neuron carries more stimulus information.
+
+<v-click>
+
+**Z-scoring** removes this problem by centering and scaling each neuron independently:
+
+$$Z_{n,s} = \frac{R_{n,s} - \bar{r}_n}{\sigma_n}$$
+
+where $\bar{r}_n$ = mean response of neuron $n$ across all stimuli, $\sigma_n$ = standard deviation.
+
+</v-click>
+
+<v-click>
+
+**What z-score does**:
+- **Centers** each neuron to mean 0 (removes baseline rate differences)
+- **Scales** each neuron to std 1 (all neurons contribute equally)
+- **Preserves** the pattern of which stimuli a neuron responds to more/less
+
+</v-click>
+
+---
+
+### RSA: Z-score Visualization
+
+<img src="/zscore_intuition.png" width="700" style="display:block; margin:0 auto;" />
+
+<v-click>
+
+**Key observation**: Neuron 1 (high-rate) and Neuron 2 (low-rate) look very different in raw counts, but after z-scoring, their **response patterns** (which stimuli drive them more) become comparable.
+
+Neuron 4 (constant, $\sigma = 0$) carries no stimulus information — z-scoring makes this obvious (flat line at 0).
+
+</v-click>
+
+---
+
+### RSA: From Z-score to RDM
+
+The **Representational Dissimilarity Matrix (RDM)** summarizes how similar stimuli look to the brain:
 
 $$\mathbf{M} = 1 - \frac{1}{N}\mathbf{Z}\mathbf{Z}^\top$$
 
-where $\mathbf{Z}$ is the z-scored response matrix. $M_{ss'}$ = dissimilarity between stimuli $s$ and $s'$.
+<v-click>
+
+**What this formula does**:
+- $\mathbf{Z}\mathbf{Z}^\top$ = cosine-like similarity between stimuli (each entry = how similarly the $N$ neurons respond to stimuli $s$ and $s'$)
+- $1 - \text{similarity}$ = dissimilarity
+- $M_{ss'}$ = how **different** stimuli $s$ and $s'$ appear to the brain
+
+</v-click>
+
+<v-click>
+
+**Interpreting the RDM**:
+- Small $M_{ss'}$ → stimuli $s$ and $s'$ evoke similar neural patterns (brain thinks they're similar)
+- Large $M_{ss'}$ → stimuli evoke very different patterns (brain thinks they're different)
+
+</v-click>
+
+---
+
+### RSA: Full Pipeline Visualization
+
+<img src="/rsa_zscore.png" width="850" style="display:block; margin:0 auto;" />
+
+<v-click>
+
+**RSA workflow**:
+1. Collect neural responses → **raw matrix** $R$ (neurons × stimuli)
+2. Z-score each neuron → **standardized matrix** $Z$
+3. Compute $M = 1 - \frac{1}{N}ZZ^\top$ → **RDM** (stimuli × stimuli)
+4. Repeat steps 1–3 for each layer of a deep network
+5. Correlate the brain's RDM with each layer's RDM → which layer matches best?
 
 </v-click>
 
