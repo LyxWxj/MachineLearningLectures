@@ -2363,8 +2363,6 @@ where $\bar{r}_n$ = mean response of neuron $n$ across all stimuli, $\sigma_n$ =
 
 ### RSA: Z-score Visualization
 
-<img src="/zscore_intuition.png" width="700" style="display:block; margin:0 auto;" />
-
 <v-click>
 
 **Key observation**: Neuron 1 (high-rate) and Neuron 2 (low-rate) look very different in raw counts, but after z-scoring, their **response patterns** (which stimuli drive them more) become comparable.

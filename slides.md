@@ -36,4 +36,12 @@ src: ./pages/BayesFamily.md
 src: ./pages/Neuromatch_Notebooks_Week1.md
 ---
 
+---
+src: ./pages/Neuromatch_Notebooks_Week2.md
+---
+
+---
+src: ./pages/Neuromatch_Markov_Kalman.md
+---
+
 
