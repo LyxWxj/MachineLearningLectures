@@ -1,7 +1,13 @@
-node_modules
+# mdbook build output
+zh/book/
+en/book/
+
+# OS files
 .DS_Store
-dist
-*.local
-.vite-inspect
-.remote-assets
-components.d.ts
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo

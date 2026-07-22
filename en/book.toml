@@ -1,0 +1,20 @@
+[book]
+title = "Computational Neuroscience & Machine Learning"
+authors = ["Neuromatch Academy"]
+language = "en"
+src = "src"
+
+[build]
+build-dir = "book"
+
+[output.html]
+default-theme = "light"
+preferred-dark-theme = "ayu"
+mathjax-support = true
+
+[preprocessor.mermaid]
+command = "mdbook-mermaid"
+
+[output.html.playground]
+editable = true
+line-numbers = true

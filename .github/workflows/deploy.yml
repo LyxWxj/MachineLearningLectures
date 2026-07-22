@@ -17,22 +17,45 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo registry
+        uses: actions/cache@v4
         with:
-          node-version: 'lts/*'
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            ~/.cargo/bin
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
-      - name: Setup @antfu/ni
-        run: npm i -g @antfu/ni
+      - name: Install mdbook and preprocessors
+        run: |
+          cargo install mdbook
+          cargo install mdbook-katex
+          cargo install mdbook-mermaid
 
-      - name: Install dependencies
-        run: nci
+      - name: Build zh
+        run: cd zh && mdbook build
 
-      - name: Build
-        run: nr build --base /${{github.event.repository.name}}/
+      - name: Build en
+        run: cd en && mdbook build
+
+      - name: Combine output
+        run: |
+          mkdir -p dist
+          cp -r zh/book dist/zh
+          cp -r en/book dist/en
+          cat > dist/index.html << 'EOF'
+          <!DOCTYPE html>
+          <html>
+          <head><meta charset="utf-8"><meta http-equiv="refresh" content="0; url=zh/"><title>Redirecting...</title></head>
+          <body><p>Redirecting to <a href="zh/">中文版</a> | <a href="en/">English</a></p></body>
+          </html>
+          EOF
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
