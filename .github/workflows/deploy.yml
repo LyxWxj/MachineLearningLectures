@@ -34,8 +34,8 @@ jobs:
 
       - name: Install mdbook and preprocessors
         run: |
-          cargo install --force mdbook
-          cargo install --force mdbook-mermaid
+          which mdbook || cargo install mdbook
+          which mdbook-mermaid || cargo install mdbook-mermaid
 
       - name: Build zh
         run: cd zh && mdbook build
