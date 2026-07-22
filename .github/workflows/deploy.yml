@@ -35,6 +35,7 @@ jobs:
       - name: Install mdbook and preprocessors
         run: |
           which mdbook || cargo install mdbook
+          which mdbook-katex-fork || cargo install mdbook-katex-fork
           which mdbook-mermaid || cargo install mdbook-mermaid
 
       - name: Build zh

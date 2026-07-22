@@ -10,8 +10,10 @@ build-dir = "book"
 [output.html]
 default-theme = "light"
 preferred-dark-theme = "ayu"
-mathjax-support = true
 theme = "theme"
+
+[preprocessor.katex]
+command = "mdbook-katex-fork"
 
 [preprocessor.mermaid]
 command = "mdbook-mermaid"
