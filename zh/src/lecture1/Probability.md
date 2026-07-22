@@ -45,7 +45,9 @@ $P(a \leq X \leq b) = \int_a^b p(x)\, dx$
 
 $X \sim \mathcal{U}(a, b)$ — 在 $[a, b]$ 区间内所有值具有相等的概率：
 
-$$p(x) = \frac{1}{b - a} \quad \text{for } x \in [a, b]$$
+$$
+p(x) = \frac{1}{b - a} \quad \text{for } x \in [a, b]
+$$
 
 **NumPy 采样**：
 
@@ -70,13 +72,17 @@ x[step+1] = x[step] + (np.random.uniform() - 0.5) * step_size
 
 $n$ 次独立的二元试验 (binary trials)，每次成功概率为 $p$：
 
-$$P(X = k) = \binom{n}{k} p^k (1-p)^{n-k}$$
+$$
+P(X = k) = \binom{n}{k} p^k (1-p)^{n-k}
+$$
 
 其中 $\binom{n}{k} = \frac{n!}{k!(n-k)!}$ 计算从 $n$ 次试验中选择 $k$ 次成功的方式数。
 
 **示例**：大鼠在 T 型迷宫中，10 次试验，$p = 0.5$（随机选择）。左转 7 次的概率是多少？
 
-$$P(k=7 \mid n=10, p=0.5) = \binom{10}{7}(0.5)^7(0.5)^3 = 120 \times 0.000977 = 0.117$$
+$$
+P(k=7 \mid n=10, p=0.5) = \binom{10}{7}(0.5)^7(0.5)^3 = 120 \times 0.000977 = 0.117
+$$
 
 **采样**：
 
@@ -92,11 +98,15 @@ samples = np.random.binomial(n=10, p=0.5, size=1000)
 
 对固定时间间隔内事件数量建模，平均速率为 $\lambda$：
 
-$$P(X = k) = \frac{\lambda^k e^{-\lambda}}{k!}$$
+$$
+P(X = k) = \frac{\lambda^k e^{-\lambda}}{k!}
+$$
 
 **示例**：一个神经元以平均速率 $\lambda = 4$ 次脉冲/秒发放。在一秒内恰好发放 7 次脉冲的概率是多少？
 
-$$P(k=7 \mid \lambda=4) = \frac{4^7 e^{-4}}{7!} = \frac{16384 \times 0.0183}{5040} \approx 0.060$$
+$$
+P(k=7 \mid \lambda=4) = \frac{4^7 e^{-4}}{7!} = \frac{16384 \times 0.0183}{5040} \approx 0.060
+$$
 
 **采样**：
 
@@ -114,7 +124,9 @@ spike_counts = np.random.poisson(lam=4, size=100)
 
 最重要的连续分布：
 
-$$X \sim \mathcal{N}(\mu, \sigma^2) \quad \Rightarrow \quad p(x) = \frac{1}{sigma\sqrt{2\pi}} \exp\!\left(-\frac{(x - \mu)^2}{2\sigma^2}\right)$$
+$$
+X \sim \mathcal{N}(\mu, \sigma^2) \quad \Rightarrow \quad p(x) = \frac{1}{sigma\sqrt{2\pi}} \exp\!\left(-\frac{(x - \mu)^2}{2\sigma^2}\right)
+$$
 
 | 参数 | 符号 | 含义 |
 | --------- | ------ | ------- |
@@ -184,15 +196,21 @@ np.std(samples)     # sample std → converges to σ
 
 **条件概率 (Conditional probability)** — 在 $B$ 发生条件下 $A$ 发生的概率：
 
-$$P(A \mid B) = \frac{P(A \cap B)}{P(B)}$$
+$$
+P(A \mid B) = \frac{P(A \cap B)}{P(B)}
+$$
 
 **联合概率 (Joint probability)** — $A$ 和 $B$ 同时发生：
 
-$$P(A \cap B) = P(A \mid B) \cdot P(B) = P(B \mid A) \cdot P(A)$$
+$$
+P(A \cap B) = P(A \mid B) \cdot P(B) = P(B \mid A) \cdot P(A)
+$$
 
 **边际概率 (Marginal probability)** — 无论 $B$ 是否发生，$A$ 的概率：
 
-$$P(A) = P(A \mid B_1)P(B_1) + P(A \mid B_2)P(B_2) + \cdots = \sum_i P(A \mid B_i)P(B_i)$$
+$$
+P(A) = P(A \mid B_1)P(B_1) + P(A \mid B_2)P(B_2) + \cdots = \sum_i P(A \mid B_i)P(B_i)
+$$
 
 对于连续情况：$P(A) = \int P(A \mid y)\, p(y)\, dy$
 
@@ -204,17 +222,23 @@ $$P(A) = P(A \mid B_1)P(B_1) + P(A \mid B_2)P(B_2) + \cdots = \sum_i P(A \mid B_
 
 **独立 (Independence)** → 联合概率 = 乘积：
 
-$$P(h_+ \cap v_+) = P(h_+) \cdot P(v_+) = 0.4 \times 0.3 = 0.12$$
+$$
+P(h_+ \cap v_+) = P(h_+) \cdot P(v_+) = 0.4 \times 0.3 = 0.12
+$$
 
 **不独立** → 使用条件概率：
 
 已知 $P(h_+ \mid v_+) = 0.1$，则：
 
-$$P(h_+ \cap v_+) = P(h_+ \mid v_+) \cdot P(v_+) = 0.1 \times 0.3 = 0.03$$
+$$
+P(h_+ \cap v_+) = P(h_+ \mid v_+) \cdot P(v_+) = 0.1 \times 0.3 = 0.03
+$$
 
 **边际恢复 (Marginal recovery)**（验证）：
 
-$$P(v_+) = P(v_+ \mid h_+)P(h_+) + P(v_+ \mid h_0)P(h_0)$$
+$$
+P(v_+) = P(v_+ \mid h_+)P(h_+) + P(v_+ \mid h_0)P(h_0)
+$$
 
 你需要 $P(v_+ \mid h_+)$ 和 $P(v_+ \mid h_0)$ — 从联合概率和边际概率计算得出。
 
@@ -222,7 +246,9 @@ $$P(v_+) = P(v_+ \mid h_+)P(h_+) + P(v_+ \mid h_0)P(h_0)$$
 
 ### 贝叶斯定理 (Bayes' Theorem)
 
-$$\boxed{\;P(Y \mid X) = \frac{P(X \mid Y) \cdot P(Y)}{P(X)}\;}$$
+$$
+\boxed{\;P(Y \mid X) = \frac{P(X \mid Y) \cdot P(Y)}{P(X)}\;}
+$$
 
 ### 先验 $P(Y)$ (Prior)
 
@@ -238,7 +264,9 @@ $$\boxed{\;P(Y \mid X) = \frac{P(X \mid Y) \cdot P(Y)}{P(X)}\;}$$
 
 **医学检测示例**：疾病率 1%，检测灵敏度 95%，假阳性率 10%。
 
-$$P(\text{disease} \mid +) = \frac{0.95 \times 0.01}{0.95 \times 0.01 + 0.10 \times 0.99} = 8.8\%$$
+$$
+P(\text{disease} \mid +) = \frac{0.95 \times 0.01}{0.95 \times 0.01 + 0.10 \times 0.99} = 8.8\%
+$$
 
 先验（罕见疾病）在证据较弱（一次检测）时占主导地位。
 
@@ -270,11 +298,15 @@ $\log L = 1000 \times \log(0.01) = -4605$ — 一个可处理的数值。
 
 给定数据 $\mathbf{x} = (x_1, \ldots, x_n)$，参数 $(\mu, \sigma)$ 的**似然**为：
 
-$$L(\mu, \sigma) = \prod_{i=1}^n p(x_i \mid \mu, \sigma)$$
+$$
+L(\mu, \sigma) = \prod_{i=1}^n p(x_i \mid \mu, \sigma)
+$$
 
 **对数似然 (Log-likelihood)**（对乘积取对数）：
 
-$$\log L = \log \prod_{i=1}^n p(x_i \mid \mu, \sigma) = \sum_{i=1}^n \log\, p(x_i \mid \mu, \sigma)$$
+$$
+\log L = \log \prod_{i=1}^n p(x_i \mid \mu, \sigma) = \sum_{i=1}^n \log\, p(x_i \mid \mu, \sigma)
+$$
 
 **代码**：
 
@@ -295,11 +327,15 @@ print(compute_log_likelihood(x, 5, 1))     # good guess → less negative
 
 找到使对数似然最大化的参数：
 
-$$\hat{\theta}_{\text{MLE}} = \arg\max_{\theta} \log L(\theta)$$
+$$
+\hat{\theta}_{\text{MLE}} = \arg\max_{\theta} \log L(\theta)
+$$
 
 **高斯分布的解析解**（令导数为 0）：
 
-$$\hat{\mu} = \frac{1}{n}\sum_{i=1}^n x_i, \qquad \hat{\sigma}^2 = \frac{1}{n}\sum_{i=1}^n (x_i - \hat{\mu})^2$$
+$$
+\hat{\mu} = \frac{1}{n}\sum_{i=1}^n x_i, \qquad \hat{\sigma}^2 = \frac{1}{n}\sum_{i=1}^n (x_i - \hat{\mu})^2
+$$
 
 **数值解**（当无闭式解时）：
 
@@ -341,7 +377,9 @@ for i, mu in enumerate(mean_vals):
 
 ### 先验、似然、后验 (Prior, Likelihood, Posterior)
 
-$$\underbrace{P(\theta \mid D)}_{\text{后验}} = \frac{\overbrace{P(D \mid \theta)}^{\text{似然}} \cdot \underbrace{P(\theta)}_{\text{先验}}}{P(D)}$$
+$$
+\underbrace{P(\theta \mid D)}_{\text{后验}} = \frac{\overbrace{P(D \mid \theta)}^{\text{似然}} \cdot \underbrace{P(\theta)}_{\text{先验}}}{P(D)}
+$$
 
 **共轭先验 (Conjugate priors)**：当先验 × 似然 = 与先验相同的分布族时，更新只是算术运算。
 
@@ -409,7 +447,9 @@ var_bayes = np.var(x_with_prior)
 
 如果一个随机过程的未来仅取决于现在，而不取决于过去，则该过程具有**马尔可夫性质 (Markov property)**：
 
-$$P(X_{t+1} \mid X_t, X_{t-1}, \ldots, X_0) = P(X_{t+1} \mid X_t)$$
+$$
+P(X_{t+1} \mid X_t, X_{t-1}, \ldots, X_0) = P(X_{t+1} \mid X_t)
+$$
 
 **类比**：醉汉的下一步只取决于他现在的位置，而不取决于他如何到达那里。整个历史都是无关紧要的。
 
@@ -426,7 +466,9 @@ $$P(X_{t+1} \mid X_t, X_{t-1}, \ldots, X_0) = P(X_{t+1} \mid X_t)$$
 
 对于具有 $n$ 个状态的系统，**转移矩阵 (transition matrix)** $T$ 是一个 $n \times n$ 矩阵，其中：
 
-$$T_{ij} = P(\text{next state} = j \mid \text{current state} = i)$$
+$$
+T_{ij} = P(\text{next state} = j \mid \text{current state} = i)
+$$
 
 **性质**：
 
@@ -435,7 +477,9 @@ $$T_{ij} = P(\text{next state} = j \mid \text{current state} = i)$$
 - $T$ 是一个**随机矩阵 (stochastic matrix)**（行随机矩阵）
 **示例**：大鼠在 3 区域迷宫中（暗区 = 1，筑巢区 = 2，亮区 = 3）
 
-$$T = \begin{bmatrix} 0.2 & 0.6 & 0.2 \\ 0.6 & 0.3 & 0.1 \\ 0.8 & 0.2 & 0.0 \end{bmatrix}$$
+$$
+T = \begin{bmatrix} 0.2 & 0.6 & 0.2 \\ 0.6 & 0.3 & 0.1 \\ 0.8 & 0.2 & 0.0 \end{bmatrix}
+$$
 
 阅读第 1 行：" 如果大鼠在区域 1（暗区），有 20% 的概率停留，60% 的概率移动到筑巢区，20% 的概率移动到亮区。"
 
@@ -458,13 +502,17 @@ $$T = \begin{bmatrix} 0.2 & 0.6 & 0.2 \\ 0.6 & 0.3 & 0.1 \\ 0.8 & 0.2 & 0.0 \end
 
 **一步**：如果当前状态已知（例如在区域 2），表示为行向量 $\mathbf{p}_0 = [0, 1, 0]$：
 
-$$\mathbf{p}_1 = \mathbf{p}_0 \cdot T = [0, 1, 0] \cdot T = [0.6,\; 0.3,\; 0.1]$$
+$$
+\mathbf{p}_1 = \mathbf{p}_0 \cdot T = [0, 1, 0] \cdot T = [0.6,\; 0.3,\; 0.1]
+$$
 
 1 步后：60% 概率在暗区，30% 在筑巢区，10% 在亮区。
 
 **两步**：再次应用 $T$：
 
-$$\mathbf{p}_2 = \mathbf{p}_1 \cdot T = \mathbf{p}_0 \cdot T^2$$
+$$
+\mathbf{p}_2 = \mathbf{p}_1 \cdot T = \mathbf{p}_0 \cdot T^2
+$$
 
 **$k$ 步**：$\mathbf{p}_k = \mathbf{p}_0 \cdot T^k$
 
@@ -487,7 +535,9 @@ print(f"P(area 2 after 4 steps) = {p4[1]:.4f}")  # 0.4311
 
 当 $k \to \infty$ 时，$\mathbf{p}_k$ 收敛到**稳态 (steady state)** $\boldsymbol{\pi}$，与起始位置无关：
 
-$$\boldsymbol{\pi} = \boldsymbol{\pi} \cdot T$$
+$$
+\boldsymbol{\pi} = \boldsymbol{\pi} \cdot T
+$$
 
 > **直觉**
 > 经过多次转移后，系统 " 遗忘 " 了它的起始位置。稳态是在每个区域中花费时间的长期比例。
@@ -536,4 +586,6 @@ print(p_avg)  # ≈ [[0.447, 0.421, 0.132]]
 - **贝叶斯 (Bayesian)**：Beta 先验 + 二项数据
 - **马尔可夫 (Markov)**：$\mathbf{p} \cdot T^k$
 
-$$\boxed{\;P(Y \mid X) = \frac{P(X \mid Y) \cdot P(Y)}{P(X)}\;}$$
+$$
+\boxed{\;P(Y \mid X) = \frac{P(X \mid Y) \cdot P(Y)}{P(X)}\;}
+$$

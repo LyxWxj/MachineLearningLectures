@@ -36,7 +36,9 @@
 
 **前向欧拉积分 (Forward Euler integration)**（数值解 (numerical solution)）：
 
-$$x(t_i) = x(t_{i-1}) + \dot{x}(t_{i-1}) \cdot dt$$
+$$
+x(t_i) = x(t_{i-1}) + \dot{x}(t_{i-1}) \cdot dt
+$$
 
 对于 $\dot{x} = ax$ 具体形式：$x[k] = x[k-1] + a \cdot x[k-1] \cdot dt$
 
@@ -48,7 +50,9 @@ $$x(t_i) = x(t_{i-1}) + \dot{x}(t_{i-1}) \cdot dt$$
 
 当 $a$ 为复数时（$a = \text{real} + i \cdot \text{imag}$），系统产生振荡：
 
-$$x(t) = x_0 e^{(\text{real} + i \cdot \text{imag})t} = x_0 e^{\text{real} \cdot t} \cdot [\cos(\text{imag} \cdot t) + i \sin(\text{imag} \cdot t)]$$
+$$
+x(t) = x_0 e^{(\text{real} + i \cdot \text{imag})t} = x_0 e^{\text{real} \cdot t} \cdot [\cos(\text{imag} \cdot t) + i \sin(\text{imag} \cdot t)]
+$$
 
 **关键洞察 (Key insight)**：
 
@@ -67,7 +71,9 @@ $$x(t) = x_0 e^{(\text{real} + i \cdot \text{imag})t} = x_0 e^{\text{real} \cdot
 
 扩展到二维：$\dot{\mathbf{x}} = \mathbf{A}\mathbf{x}$
 
-$$\begin{bmatrix} \dot{x}_1 \\ \dot{x}_2 \end{bmatrix} = \begin{bmatrix} a_{11} & a_{12} \\ a_{21} & a_{22} \end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \end{bmatrix}$$
+$$
+\begin{bmatrix} \dot{x}_1 \\ \dot{x}_2 \end{bmatrix} = \begin{bmatrix} a_{11} & a_{12} \\ a_{21} & a_{22} \end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \end{bmatrix}
+$$
 
 **数值求解**：使用 `scipy.integrate.solve_ivp`（而非手动欧拉法）
 
@@ -105,7 +111,9 @@ $$\begin{bmatrix} \dot{x}_1 \\ \dot{x}_2 \end{bmatrix} = \begin{bmatrix} a_{11} 
 
 **状态转移矩阵 (State transition matrix)**：
 
-$$\begin{bmatrix} C \\ O \end{bmatrix}_{k+1} = \begin{bmatrix} 1-\mu_{c2o} & \mu_{o2c} \\ \mu_{c2o} & 1-\mu_{o2c} \end{bmatrix} \begin{bmatrix} C \\ O \end{bmatrix}_k$$
+$$
+\begin{bmatrix} C \\ O \end{bmatrix}_{k+1} = \begin{bmatrix} 1-\mu_{c2o} & \mu_{o2c} \\ \mu_{c2o} & 1-\mu_{o2c} \end{bmatrix} \begin{bmatrix} C \\ O \end{bmatrix}_k
+$$
 
 - 每列之和 = 1（概率守恒）
 - 矩阵元素含义：
@@ -162,7 +170,9 @@ def random_walk_simulator(N, T, mu=0, sigma=1):
 
 **Ornstein-Uhlenbeck (OU) 过程 / 漂移扩散模型 (Drift-Diffusion Model)**：
 
-$$x_{k+1} = x_\infty + \lambda(x_k - x_\infty) + \sigma \eta$$
+$$
+x_{k+1} = x_\infty + \lambda(x_k - x_\infty) + \sigma \eta
+$$
 
 其中 $\eta \sim \mathcal{N}(0,1)$（标准正态分布）
 
@@ -173,7 +183,9 @@ $$x_{k+1} = x_\infty + \lambda(x_k - x_\infty) + \sigma \eta$$
 
 **平衡方差 (Equilibrium variance)**（关键结果）：
 
-$$\text{Var}_{eq} = \frac{\sigma^2}{1 - \lambda^2}$$
+$$
+\text{Var}_{eq} = \frac{\sigma^2}{1 - \lambda^2}
+$$
 
 **性质**：
 
@@ -276,13 +288,17 @@ x1 = x1[:, np.newaxis]**[0, 1]  # 添加列：常数项和线性项
 
 **核心膜电位方程（阈下动力学）**：
 
-$$\tau_m \frac{dV}{dt} = -(V - E_L) + \frac{I}{g_L}$$
+$$
+\tau_m \frac{dV}{dt} = -(V - E_L) + \frac{I}{g_L}
+$$
 
 其中 $\tau_m = C_m / g_L$ 是膜时间常数，$g_L$ 是漏电导，$E_L$ 是静息电位
 
 **脉冲与复位规则 (Spike-and-reset rule)**：
 
-$$\text{if } V(t_{sp}) \geq V_{th}: \quad V(t) = V_{reset} \text{ for } t \in (t_{sp}, t_{sp} + \tau_{ref}]$$
+$$
+\text{if } V(t_{sp}) \geq V_{th}: \quad V(t) = V_{reset} \text{ for } t \in (t_{sp}, t_{sp} + \tau_{ref}]
+$$
 
 **默认参数**：
 
@@ -321,13 +337,17 @@ for it in range(Lt - 1):
 
 **高斯白噪声 (GWN)**：
 
-$$I_{gwn} = \mu + \sigma \cdot \frac{\xi(t)}{\sqrt{dt/1000}}$$
+$$
+I_{gwn} = \mu + \sigma \cdot \frac{\xi(t)}{\sqrt{dt/1000}}
+$$
 
 其中 $\xi(t) \sim \mathcal{N}(0,1)$，除以 $\sqrt{dt/1000}$ 将离散时间噪声转换为正确的连续时间缩放（单位转换为秒）
 
 **Ornstein-Uhlenbeck (OU) 过程（有色噪声）**：
 
-$$\tau_\eta \frac{d\eta}{dt} = -\eta(t) + \sigma_\eta \sqrt{2\tau_\eta} \xi(t)$$
+$$
+\tau_\eta \frac{d\eta}{dt} = -\eta(t) + \sigma_\eta \sqrt{2\tau_\eta} \xi(t)
+$$
 
 **性质**：
 
@@ -348,7 +368,9 @@ I_ou[it+1] = I_ou[it] + (dt/tau_ou)*(mu - I_ou[it]) + sqrt(2*dt/tau_ou)*sig*nois
 
 **脉冲间隔变异系数 (CV of ISI)**：
 
-$$\text{CV}_{\text{ISI}} = \frac{\text{std}(\text{ISI})}{\text{mean}(\text{ISI})}$$
+$$
+\text{CV}_{\text{ISI}} = \frac{\text{std}(\text{ISI})}{\text{mean}(\text{ISI})}
+$$
 
 | CV 值 | 含义                     |
 | ----- | ------------------------ |
@@ -368,13 +390,17 @@ $$\text{CV}_{\text{ISI}} = \frac{\text{std}(\text{ISI})}{\text{mean}(\text{ISI})
 
 **相关输入模型**：
 
-$$\frac{I_i}{g_L} = \mu_i + \sigma_i (\sqrt{1-c}\xi_i + \sqrt{c}\xi_c)$$
+$$
+\frac{I_i}{g_L} = \mu_i + \sigma_i (\sqrt{1-c}\xi_i + \sqrt{c}\xi_c)
+$$
 
 其中 $c \in [0,1]$ 控制公共输入的比例，$\xi_i$ 是独立噪声，$\xi_c$ 是共享的共同噪声
 
 **样本相关系数 (Pearson)**：
 
-$$r_{ij} = \frac{\text{cov}(I_i, I_j)}{\sqrt{\text{var}(I_i)} \sqrt{\text{var}(I_j)}}$$
+$$
+r_{ij} = \frac{\text{cov}(I_i, I_j)}{\sqrt{\text{var}(I_i)} \sqrt{\text{var}(I_j)}}
+$$
 
 其中 $\text{cov}(I_i, I_j) = \sum_{k=1}^{L}(I_i^k - \bar{I_i})(I_j^k - \bar{I_j})$
 
@@ -395,9 +421,13 @@ poisson_train = 1.0 * (u_rand < rate * (dt / 1000))
 
 **Campbell 定理（泊松输入的突触电流均值和方差）**：
 
-$$\mu_{\rm syn} = \lambda J \int P(t) dt$$
+$$
+\mu_{\rm syn} = \lambda J \int P(t) dt
+$$
 
-$$\sigma_{\rm syn} = \lambda J \int P(t)^2 dt$$
+$$
+\sigma_{\rm syn} = \lambda J \int P(t)^2 dt
+$$
 
 其中 $\lambda$ 是泊松率，$J$ 是 PSP 幅度，$P(t)$ 是突触后电流核
 
@@ -414,25 +444,33 @@ $$\sigma_{\rm syn} = \lambda J \int P(t)^2 dt$$
 
 **突触电导动力学**：
 
-$$\frac{dg_{\rm syn}(t)}{dt} = \bar{g}_{\rm syn} \sum_k \delta(t-t_k) - \frac{g_{\rm syn}(t)}{\tau_{\rm syn}}$$
+$$
+\frac{dg_{\rm syn}(t)}{dt} = \bar{g}_{\rm syn} \sum_k \delta(t-t_k) - \frac{g_{\rm syn}(t)}{\tau_{\rm syn}}
+$$
 
 - $\bar{g}_{\rm syn}$：每个脉冲引起的最大电导变化（突触权重）
 - $\tau_{\rm syn}$：突触时间常数（控制衰减速度）
 
 **欧姆定律（电导转电流）**：
 
-$$I_{\rm syn}(t) = g_{\rm syn}(t)(V(t) - E_{\rm syn})$$
+$$
+I_{\rm syn}(t) = g_{\rm syn}(t)(V(t) - E_{\rm syn})
+$$
 
 - $E_E = 0$ mV（兴奋性反转电位，去极化）
 - $E_I = -80$ mV（抑制性反转电位，超极化）
 
 **总突触电流**：
 
-$$I_{\rm syn} = -g_E(t)(V - E_E) - g_I(t)(V - E_I)$$
+$$
+I_{\rm syn} = -g_E(t)(V - E_E) - g_I(t)(V - E_I)
+$$
 
 **电导 LIF 膜电位方程**：
 
-$$\tau_m \frac{dV}{dt} = -(V - E_L) - \frac{g_E(t)}{g_L}(V - E_E) - \frac{g_I(t)}{g_L}(V - E_I) + \frac{I_{\rm inj}}{g_L}$$
+$$
+\tau_m \frac{dV}{dt} = -(V - E_L) - \frac{g_E(t)}{g_L}(V - E_E) - \frac{g_I(t)}{g_L}(V - E_I) + \frac{I_{\rm inj}}{g_L}
+$$
 
 **欧拉更新电导 (run_LIF_cond)**：
 
@@ -460,11 +498,17 @@ gI[it+1] = gI[it] - (dt/tau_syn_I)*gI[it] + gI_bar * spike_train_in[it+1]
 
 **三个动态变量模型**：
 
-$$\frac{du_E}{dt} = -\frac{u_E}{\tau_f} + U_0(1-u_E^-)\delta(t-t_{sp})$$
+$$
+\frac{du_E}{dt} = -\frac{u_E}{\tau_f} + U_0(1-u_E^-)\delta(t-t_{sp})
+$$
 
-$$\frac{dR_E}{dt} = \frac{1-R_E}{\tau_d} - u_E^+ R_E^- \delta(t-t_{sp})$$
+$$
+\frac{dR_E}{dt} = \frac{1-R_E}{\tau_d} - u_E^+ R_E^- \delta(t-t_{sp})
+$$
 
-$$\frac{dg_E}{dt} = -\frac{g_E}{\tau_E} + \bar{g}_E u_E^+ R_E^- \delta(t-t_{sp})$$
+$$
+\frac{dg_E}{dt} = -\frac{g_E}{\tau_E} + \bar{g}_E u_E^+ R_E^- \delta(t-t_{sp})
+$$
 
 **变量含义**：
 
@@ -529,7 +573,9 @@ for it in range(Lt - 1):
 
 **STDP 权重变化规则（双相指数衰减）**：
 
-$$\Delta W = \begin{cases} A_+ e^{(t_{pre}-t_{post})/\tau_+} & \text{if } t_{post} > t_{pre} \text{ (LTP)} \\ -A_- e^{-(t_{pre}-t_{post})/\tau_-} & \text{if } t_{post} < t_{pre} \text{ (LTD)} \end{cases}$$
+$$
+\Delta W = \begin{cases} A_+ e^{(t_{pre}-t_{post})/\tau_+} & \text{if } t_{post} > t_{pre} \text{ (LTP)} \\ -A_- e^{-(t_{pre}-t_{post})/\tau_-} & \text{if } t_{post} < t_{pre} \text{ (LTD)} \end{cases}
+$$
 
 其中 $\Delta t = t_{pre} - t_{post}$。为简化，设 $\tau_+ = \tau_- = \tau_{\rm stdp}$
 
@@ -543,13 +589,17 @@ $$\Delta W = \begin{cases} A_+ e^{(t_{pre}-t_{post})/\tau_+} & \text{if } t_{pos
 
 对于每个突触前神经元 $i$：
 
-$$\tau_+ \frac{dP}{dt} = -P$$
+$$
+\tau_+ \frac{dP}{dt} = -P
+$$
 
 突触前脉冲到达时：$P(t) = P(t) + A_+$
 
 对于每个突触后神经元：
 
-$$\tau_- \frac{dM}{dt} = -M$$
+$$
+\tau_- \frac{dM}{dt} = -M
+$$
 
 突触后脉冲到达时：$M(t) = M(t) - A_-$
 
@@ -567,21 +617,27 @@ P[:,it+1] = P[:,it] + dP
 
 当突触前神经元 $i$ 发放时（LTD）：
 
-$$\bar{g}_i = \bar{g}_i + M(t) \cdot \bar{g}_{max}$$
+$$
+\bar{g}_i = \bar{g}_i + M(t) \cdot \bar{g}_{max}
+$$
 
 - $M$ 为负，所以权重减小
 - 钳制：若 $\bar{g}_i < 0$，设 $\bar{g}_i = 0$
 
 当突触后神经元发放时（LTP）：
 
-$$\bar{g}_i = \bar{g}_i + P_i(t) \cdot \bar{g}_{max} \quad \forall i$$
+$$
+\bar{g}_i = \bar{g}_i + P_i(t) \cdot \bar{g}_{max} \quad \forall i
+$$
 
 - $P$ 为正，所以权重增大
 - 钳制：若 $\bar{g}_i > \bar{g}_{max}$，设 $\bar{g}_i = \bar{g}_{max}$
 
 **带 STDP 突触的 LIF 膜电位方程**：
 
-$$\tau_m \frac{dV}{dt} = -(V - E_L) - g_E(t)(V - E_E)$$
+$$
+\tau_m \frac{dV}{dt} = -(V - E_L) - g_E(t)(V - E_E)
+$$
 
 其中 $g_E(t) = \sum_i g_i(t)$，每个 $g_i(t)$ 使用动态更新的 $\bar{g}_i$
 
@@ -609,11 +665,15 @@ $$\tau_m \frac{dV}{dt} = -(V - E_L) - g_E(t)(V - E_E)$$
 
 **前馈放电频率动力学 (Eq. 1)**：
 
-$$\tau \frac{dr}{dt} = -r + F(I_{\rm ext})$$
+$$
+\tau \frac{dr}{dt} = -r + F(I_{\rm ext})
+$$
 
 **Sigmoid 传递函数 / F-I 曲线 (Eq. 2)**：
 
-$$F(x; a, \theta) = \frac{1}{1 + e^{-a(x-\theta)}} - \frac{1}{1 + e^{a\theta}}$$
+$$
+F(x; a, \theta) = \frac{1}{1 + e^{-a(x-\theta)}} - \frac{1}{1 + e^{a\theta}}
+$$
 
 - $a$ = 增益 (gain)，$\theta$ = 阈值 (threshold)
 - 第二项确保 $F(0; a, \theta) = 0$
@@ -628,13 +688,17 @@ def F(x, a, theta):
 
 **递归网络动力学 (Eq. 3)**：
 
-$$\tau \frac{dr}{dt} = -r + F(w \cdot r + I_{\rm ext})$$
+$$
+\tau \frac{dr}{dt} = -r + F(w \cdot r + I_{\rm ext})
+$$
 
 其中 $w$ 是递归突触权重（E 到 E）
 
 **$w = 0$ 时的解析解**：
 
-$$r(t) = r(0) + [F(I_{\rm ext}; a, \theta) - r(0)](1 - e^{-t/\tau})$$
+$$
+r(t) = r(0) + [F(I_{\rm ext}; a, \theta) - r(0)](1 - e^{-t/\tau})
+$$
 
 ---
 
@@ -642,15 +706,21 @@ $$r(t) = r(0) + [F(I_{\rm ext}; a, \theta) - r(0)](1 - e^{-t/\tau})$$
 
 **不动点条件 (Eq. 4)**：$\frac{dr}{dt} = 0$ 时的 $r$ 值
 
-$$-r^* + F(w \cdot r^* + I_{\rm ext}; a, \theta) = 0$$
+$$
+-r^* + F(w \cdot r^* + I_{\rm ext}; a, \theta) = 0
+$$
 
 **Sigmoid 传递函数的导数 (Eq. 5)**：
 
-$$\frac{dF}{dx} = a \cdot e^{-a(x-\theta)} \cdot (1 + e^{-a(x-\theta)})^{-2}$$
+$$
+\frac{dF}{dx} = a \cdot e^{-a(x-\theta)} \cdot (1 + e^{-a(x-\theta)})^{-2}
+$$
 
 **特征值（稳定性分析）(Eq. 4 in Bonus)**：
 
-$$\lambda = \frac{-1 + w \cdot F'(w \cdot r^* + I_{\rm ext}; a, \theta)}{\tau}$$
+$$
+\lambda = \frac{-1 + w \cdot F'(w \cdot r^* + I_{\rm ext}; a, \theta)}{\tau}
+$$
 
 | $\lambda$     | 稳定性         |
 | ------------- | -------------- |
@@ -673,7 +743,9 @@ def eig_single(fp, tau, a, theta, w, I_ext, **other_pars):
 
 **OU 过程**：
 
-$$\tau_\eta \frac{d\eta}{dt} = -\eta(t) + \sigma_\eta \sqrt{2\tau_\eta} \xi(t)$$
+$$
+\tau_\eta \frac{d\eta}{dt} = -\eta(t) + \sigma_\eta \sqrt{2\tau_\eta} \xi(t)
+$$
 
 **欧拉更新**：
 
@@ -689,9 +761,13 @@ I_ou[it+1] = I_ou[it] + dt/tau_ou * (0 - I_ou[it]) + sqrt(2*dt/tau_ou) * sig * n
 
 **两个耦合群（兴奋 + 抑制）(Eq. 1)**：
 
-$$\tau_E \frac{dr_E}{dt} = -r_E + F_E(w_{EE}r_E - w_{EI}r_I + I_E^{\rm ext}; a_E, \theta_E)$$
+$$
+\tau_E \frac{dr_E}{dt} = -r_E + F_E(w_{EE}r_E - w_{EI}r_I + I_E^{\rm ext}; a_E, \theta_E)
+$$
 
-$$\tau_I \frac{dr_I}{dt} = -r_I + F_I(w_{IE}r_E - w_{II}r_I + I_I^{\rm ext}; a_I, \theta_I)$$
+$$
+\tau_I \frac{dr_I}{dt} = -r_I + F_I(w_{IE}r_E - w_{II}r_I + I_I^{\rm ext}; a_I, \theta_I)
+$$
 
 **欧拉更新**：
 
@@ -723,21 +799,31 @@ r_I[k+1] = r_I[k] + (dt/τ_I)*(-r_I[k] + F(w_IE*r_E[k] - w_II*r_I[k] + I_ext_I, 
 
 **E 零线 ($\frac{dr_E}{dt} = 0$, Eq. 2)**：
 
-$$-r_E + F_E(w_{EE}r_E - w_{EI}r_I + I_E^{\rm ext}; a_E, \theta_E) = 0$$
+$$
+-r_E + F_E(w_{EE}r_E - w_{EI}r_I + I_E^{\rm ext}; a_E, \theta_E) = 0
+$$
 
 **I 零线 ($\frac{dr_I}{dt} = 0$, Eq. 3)**：
 
-$$-r_I + F_I(w_{IE}r_E - w_{II}r_I + I_I^{\rm ext}; a_I, \theta_I) = 0$$
+$$
+-r_I + F_I(w_{IE}r_E - w_{II}r_I + I_I^{\rm ext}; a_I, \theta_I) = 0
+$$
 
 **零线显式表达 (Eqs. 4-5)**：
 
-$$\text{E 零线：} \quad r_I = \frac{1}{w_{EI}}[w_{EE}r_E - F_E^{-1}(r_E; a_E, \theta_E) + I_E^{\rm ext}]$$
+$$
+\text{E 零线：} \quad r_I = \frac{1}{w_{EI}}[w_{EE}r_E - F_E^{-1}(r_E; a_E, \theta_E) + I_E^{\rm ext}]
+$$
 
-$$\text{I 零线：} \quad r_E = \frac{1}{w_{IE}}[w_{II}r_I + F_I^{-1}(r_I; a_I, \theta_I) - I_I^{\rm ext}]$$
+$$
+\text{I 零线：} \quad r_E = \frac{1}{w_{IE}}[w_{II}r_I + F_I^{-1}(r_I; a_I, \theta_I) - I_I^{\rm ext}]
+$$
 
 **逆传递函数 (Eq. 6)**：
 
-$$F^{-1}(x; a, \theta) = -\frac{1}{a} \ln\left[\frac{1}{x + \frac{1}{1+e^{a\theta}}} - 1\right] + \theta$$
+$$
+F^{-1}(x; a, \theta) = -\frac{1}{a} \ln\left[\frac{1}{x + \frac{1}{1+e^{a\theta}}} - 1\right] + \theta
+$$
 
 **零线的性质**：
 
@@ -771,27 +857,43 @@ def EIderivs(rE, rI, tau_E, a_E, theta_E, wEE, wEI, I_ext_E,
 
 **系统重写**：
 
-$$\frac{dr_E}{dt} = G_E(r_E, r_I) = \frac{1}{\tau_E}[-r_E + F_E(w_{EE}r_E - w_{EI}r_I + I_E^{\rm ext}; a, \theta)]$$
+$$
+\frac{dr_E}{dt} = G_E(r_E, r_I) = \frac{1}{\tau_E}[-r_E + F_E(w_{EE}r_E - w_{EI}r_I + I_E^{\rm ext}; a, \theta)]
+$$
 
-$$\frac{dr_I}{dt} = G_I(r_E, r_I) = \frac{1}{\tau_I}[-r_I + F_I(w_{IE}r_E - w_{II}r_I + I_I^{\rm ext}; a, \theta)]$$
+$$
+\frac{dr_I}{dt} = G_I(r_E, r_I) = \frac{1}{\tau_I}[-r_I + F_I(w_{IE}r_E - w_{II}r_I + I_I^{\rm ext}; a, \theta)]
+$$
 
 **雅可比矩阵 (Jacobian, Eq. 7)**：
 
-$$J = \begin{bmatrix} \frac{\partial G_E}{\partial r_E} & \frac{\partial G_E}{\partial r_I} \\ \frac{\partial G_I}{\partial r_E} & \frac{\partial G_I}{\partial r_I} \end{bmatrix}$$
+$$
+J = \begin{bmatrix} \frac{\partial G_E}{\partial r_E} & \frac{\partial G_E}{\partial r_I} \\ \frac{\partial G_I}{\partial r_E} & \frac{\partial G_I}{\partial r_I} \end{bmatrix}
+$$
 
 **雅可比矩阵元素 (Eqs. 8-11)**：
 
-$$J[0,0] = \frac{\partial G_E}{\partial r_E} = \frac{1}{\tau_E}[-1 + w_{EE} F_E'(w_{EE}r_E^* - w_{EI}r_I^* + I_E^{\rm ext})]$$
+$$
+J[0,0] = \frac{\partial G_E}{\partial r_E} = \frac{1}{\tau_E}[-1 + w_{EE} F_E'(w_{EE}r_E^* - w_{EI}r_I^* + I_E^{\rm ext})]
+$$
 
-$$J[0,1] = \frac{\partial G_E}{\partial r_I} = \frac{1}{\tau_E}[-w_{EI} F_E'(w_{EE}r_E^* - w_{EI}r_I^* + I_E^{\rm ext})]$$
+$$
+J[0,1] = \frac{\partial G_E}{\partial r_I} = \frac{1}{\tau_E}[-w_{EI} F_E'(w_{EE}r_E^* - w_{EI}r_I^* + I_E^{\rm ext})]
+$$
 
-$$J[1,0] = \frac{\partial G_I}{\partial r_E} = \frac{1}{\tau_I}[w_{IE} F_I'(w_{IE}r_E^* - w_{II}r_I^* + I_I^{\rm ext})]$$
+$$
+J[1,0] = \frac{\partial G_I}{\partial r_E} = \frac{1}{\tau_I}[w_{IE} F_I'(w_{IE}r_E^* - w_{II}r_I^* + I_I^{\rm ext})]
+$$
 
-$$J[1,1] = \frac{\partial G_I}{\partial r_I} = \frac{1}{\tau_I}[-1 - w_{II} F_I'(w_{IE}r_E^* - w_{II}r_I^* + I_I^{\rm ext})]$$
+$$
+J[1,1] = \frac{\partial G_I}{\partial r_I} = \frac{1}{\tau_I}[-1 - w_{II} F_I'(w_{IE}r_E^* - w_{II}r_I^* + I_I^{\rm ext})]
+$$
 
 **矩阵符号表示**：
 
-$$J = T^{-1}(FW - I)$$
+$$
+J = T^{-1}(FW - I)
+$$
 
 其中：
 
@@ -826,11 +928,15 @@ def get_eig_Jacobian(fp, tau_E, a_E, theta_E, wEE, wEI, I_ext_E,
 
 **E 零线斜率 (Eq. 12)**：
 
-$$\left(\frac{dr_I}{dr_E}\right)_{\text{E零线}} = \frac{F_E' w_{EE} - 1}{F_E' w_{EI}}$$
+$$
+\left(\frac{dr_I}{dr_E}\right)_{\text{E零线}} = \frac{F_E' w_{EE} - 1}{F_E' w_{EI}}
+$$
 
 **I 零线斜率 (Eq. 13)**：
 
-$$\left(\frac{dr_I}{dr_E}\right)_{\text{I零线}} = \frac{F_I' w_{IE}}{F_I' w_{II} + 1}$$
+$$
+\left(\frac{dr_I}{dr_E}\right)_{\text{I零线}} = \frac{F_I' w_{IE}}{F_I' w_{II} + 1}
+$$
 
 **性质**：
 
@@ -869,7 +975,9 @@ $$\left(\frac{dr_I}{dr_E}\right)_{\text{I零线}} = \frac{F_I' w_{IE}}{F_I' w_{I
 
 **基于 $\frac{\partial G_E}{\partial r_E}$ 的两种模式**：
 
-$$\frac{\partial G_E}{\partial r_E} = \frac{1}{\tau_E}[-1 + w_{EE} F_E'] = \frac{1}{\tau_E}(F_E' w_{EE} - 1)$$
+$$
+\frac{\partial G_E}{\partial r_E} = \frac{1}{\tau_E}[-1 + w_{EE} F_E'] = \frac{1}{\tau_E}(F_E' w_{EE} - 1)
+$$
 
 | 模式                 | 条件                  | E 零线斜率 | 行为                           |
 | -------------------- | --------------------- | ---------- | ------------------------------ |
@@ -956,31 +1064,57 @@ def my_inject(pars, t_start, t_lag=10.):
 
 ### 关键公式汇总 (Key Formulas)
 
-$$\tau_m \frac{dV}{dt} = -(V-E_L) + \frac{I}{g_L} \quad \text{(LIF neuron)}$$
+$$
+\tau_m \frac{dV}{dt} = -(V-E_L) + \frac{I}{g_L} \quad \text{(LIF neuron)}
+$$
 
-$$\tau_m \frac{dV}{dt} = -(V-E_L) - \frac{g_E}{g_L}(V-E_E) - \frac{g_I}{g_L}(V-E_I) + \frac{I_{\rm inj}}{g_L} \quad \text{(Conductance-based LIF)}$$
+$$
+\tau_m \frac{dV}{dt} = -(V-E_L) - \frac{g_E}{g_L}(V-E_E) - \frac{g_I}{g_L}(V-E_I) + \frac{I_{\rm inj}}{g_L} \quad \text{(Conductance-based LIF)}
+$$
 
-$$x_{k+1} = x_\infty + \lambda(x_k - x_\infty) + \sigma\eta \quad \text{(OU process)}$$
+$$
+x_{k+1} = x_\infty + \lambda(x_k - x_\infty) + \sigma\eta \quad \text{(OU process)}
+$$
 
-$$\text{Var}_{eq} = \frac{\sigma^2}{1-\lambda^2} \quad \text{(OU equilibrium variance)}$$
+$$
+\text{Var}_{eq} = \frac{\sigma^2}{1-\lambda^2} \quad \text{(OU equilibrium variance)}
+$$
 
-$$\tau \frac{dr}{dt} = -r + F(w \cdot r + I_{\rm ext}) \quad \text{(Firing rate model)}$$
+$$
+\tau \frac{dr}{dt} = -r + F(w \cdot r + I_{\rm ext}) \quad \text{(Firing rate model)}
+$$
 
-$$F(x; a, \theta) = \frac{1}{1+e^{-a(x-\theta)}} - \frac{1}{1+e^{a\theta}} \quad \text{(Sigmoid transfer function)}$$
+$$
+F(x; a, \theta) = \frac{1}{1+e^{-a(x-\theta)}} - \frac{1}{1+e^{a\theta}} \quad \text{(Sigmoid transfer function)}
+$$
 
-$$\tau_E \frac{dr_E}{dt} = -r_E + F_E(w_{EE}r_E - w_{EI}r_I + I_E^{\rm ext}) \quad \text{(Wilson-Cowan E)}$$
+$$
+\tau_E \frac{dr_E}{dt} = -r_E + F_E(w_{EE}r_E - w_{EI}r_I + I_E^{\rm ext}) \quad \text{(Wilson-Cowan E)}
+$$
 
-$$\tau_I \frac{dr_I}{dt} = -r_I + F_I(w_{IE}r_E - w_{II}r_I + I_I^{\rm ext}) \quad \text{(Wilson-Cowan I)}$$
+$$
+\tau_I \frac{dr_I}{dt} = -r_I + F_I(w_{IE}r_E - w_{II}r_I + I_I^{\rm ext}) \quad \text{(Wilson-Cowan I)}
+$$
 
-$$\lambda = \frac{-1 + w \cdot F'(w \cdot r^* + I_{\rm ext})}{\tau} \quad \text{(Eigenvalue/stability)}$$
+$$
+\lambda = \frac{-1 + w \cdot F'(w \cdot r^* + I_{\rm ext})}{\tau} \quad \text{(Eigenvalue/stability)}
+$$
 
-$$J = T^{-1}(FW - I) \quad \text{(Jacobian matrix)}$$
+$$
+J = T^{-1}(FW - I) \quad \text{(Jacobian matrix)}
+$$
 
-$$\frac{dr_I}{dr_E}\bigg|_{\text{E零线}} = \frac{F_E' w_{EE} - 1}{F_E' w_{EI}} \quad \text{(E nullcline slope)}$$
+$$
+\frac{dr_I}{dr_E}\bigg|_{\text{E零线}} = \frac{F_E' w_{EE} - 1}{F_E' w_{EI}} \quad \text{(E nullcline slope)}
+$$
 
-$$\frac{dr_I}{dr_E}\bigg|_{\text{I零线}} = \frac{F_I' w_{IE}}{F_I' w_{II} + 1} \quad \text{(I nullcline slope)}$$
+$$
+\frac{dr_I}{dr_E}\bigg|_{\text{I零线}} = \frac{F_I' w_{IE}}{F_I' w_{II} + 1} \quad \text{(I nullcline slope)}
+$$
 
-$$\Delta W = \begin{cases} A_+ e^{\Delta t/\tau_+} & \Delta t < 0 \text{ (LTP)} \\ -A_- e^{-\Delta t/\tau_-} & \Delta t > 0 \text{ (LTD)} \end{cases} \quad \text{(STDP rule)}$$
+$$
+\Delta W = \begin{cases} A_+ e^{\Delta t/\tau_+} & \Delta t < 0 \text{ (LTP)} \\ -A_- e^{-\Delta t/\tau_-} & \Delta t > 0 \text{ (LTD)} \end{cases} \quad \text{(STDP rule)}
+$$
 
 ---
 

@@ -128,11 +128,15 @@ The simplest model fitting problem: find the slope $\theta$ that best fits $y = 
 
 **Mean Squared Error** (objective function):
 
-$$\text{MSE}(\theta) = \frac{1}{N}\sum_{i=1}^N (y_i - \theta x_i)^2$$
+$$
+\text{MSE}(\theta) = \frac{1}{N}\sum_{i=1}^N (y_i - \theta x_i)^2
+$$
 
 **Analytic solution** (set derivative to zero):
 
-$$\hat{\theta} = \frac{\mathbf{x}^T \mathbf{y}}{\mathbf{x}^T \mathbf{x}} = \frac{\sum x_i y_i}{\sum x_i^2}$$
+$$
+\hat{\theta} = \frac{\mathbf{x}^T \mathbf{y}}{\mathbf{x}^T \mathbf{x}} = \frac{\sum x_i y_i}{\sum x_i^2}
+$$
 
 **Code**:
 
@@ -156,7 +160,9 @@ Red line = $\hat{\theta}$ from the normal equation. It minimizes the sum of squa
 
 Each scatter point is one $(x_i, y_i)$ pair. Collect all points into vectors:
 
-$$\mathbf{x} = \begin{bmatrix} x_1 \\ x_2 \\ \vdots \\ x_N \end{bmatrix}, \quad \mathbf{y} = \begin{bmatrix} y_1 \\ y_2 \\ \vdots \\ y_N \end{bmatrix}$$
+$$
+\mathbf{x} = \begin{bmatrix} x_1 \\ x_2 \\ \vdots \\ x_N \end{bmatrix}, \quad \mathbf{y} = \begin{bmatrix} y_1 \\ y_2 \\ \vdots \\ y_N \end{bmatrix}
+$$
 
 **Example** (5 data points):
 
@@ -193,11 +199,15 @@ Same problem, probabilistic perspective: assume $y_i \sim \mathcal{N}(\theta x_i
 
 **Likelihood**:
 
-$$L(\theta) = \prod_{i=1}^N \frac{1}{\sqrt{2\pi\sigma^2}} \exp\!\left(-\frac{(y_i - \theta x_i)^2}{2\sigma^2}\right)$$
+$$
+L(\theta) = \prod_{i=1}^N \frac{1}{\sqrt{2\pi\sigma^2}} \exp\!\left(-\frac{(y_i - \theta x_i)^2}{2\sigma^2}\right)
+$$
 
 **Log-likelihood**:
 
-$$\log L(\theta) = -\frac{N}{2}\log(2\pi\sigma^2) - \frac{1}{2\sigma^2}\sum_{i=1}^N (y_i - \theta x_i)^2$$
+$$
+\log L(\theta) = -\frac{N}{2}\log(2\pi\sigma^2) - \frac{1}{2\sigma^2}\sum_{i=1}^N (y_i - \theta x_i)^2
+$$
 
 **Key result**: maximizing log-likelihood $\Leftrightarrow$ minimizing MSE. They give the same $\hat{\theta}$!
 
@@ -217,11 +227,15 @@ def likelihood(theta, x, y):
 
 **Probabilistic view**: noise is part of the model. Treat $y$ as a **random variable**:
 
-$$y \sim \mathcal{N}(\theta x,\; \sigma^2)$$
+$$
+y \sim \mathcal{N}(\theta x,\; \sigma^2)
+$$
 
 This means: for a given $x$ and $\theta$, the response $y$ is not deterministic — it follows a Gaussian distribution centered at $\theta x$.
 
-$$p(y \mid x, \theta) = \frac{1}{\sqrt{2\pi\sigma^2}} \exp\!\left(-\frac{(y - \theta x)^2}{2\sigma^2}\right)$$
+$$
+p(y \mid x, \theta) = \frac{1}{\sqrt{2\pi\sigma^2}} \exp\!\left(-\frac{(y - \theta x)^2}{2\sigma^2}\right)
+$$
 
 **Why this matters**: instead of just finding one "best" $\hat{\theta}$, we can now:
 
@@ -258,11 +272,15 @@ y = theta_true * x + noise             # y ~ N(1.2x, 1)
 
 Given one data point $(x, y)$, the **likelihood** of parameter $\hat{\theta}$ is:
 
-$$\mathcal{L}(\hat{\theta} \mid x, y) = p(y \mid x, \hat{\theta}) = \frac{1}{\sqrt{2\pi}} \exp\!\left(-\frac{(y - \hat{\theta} x)^2}{2}\right)$$
+$$
+\mathcal{L}(\hat{\theta} \mid x, y) = p(y \mid x, \hat{\theta}) = \frac{1}{\sqrt{2\pi}} \exp\!\left(-\frac{(y - \hat{\theta} x)^2}{2}\right)
+$$
 
 **Example**: $x = 2.1$, $y = 3.7$, test $\hat{\theta} = 1.0$:
 
-$$\mathcal{L}(1.0 \mid 2.1, 3.7) = \frac{1}{\sqrt{2\pi}} \exp\!\left(-\frac{(3.7 - 1.0 \times 2.1)^2}{2}\right) = \frac{1}{\sqrt{2\pi}} e^{-1.28} \approx 0.11$$
+$$
+\mathcal{L}(1.0 \mid 2.1, 3.7) = \frac{1}{\sqrt{2\pi}} \exp\!\left(-\frac{(3.7 - 1.0 \times 2.1)^2}{2}\right) = \frac{1}{\sqrt{2\pi}} e^{-1.28} \approx 0.11
+$$
 
 **Code**:
 
@@ -280,7 +298,9 @@ likelihood(1.0, 2.1, 3.7)  # ≈ 0.113
 
 We have $N$ data points. Assuming noise is **independent** across observations:
 
-$$\mathcal{L}(\hat{\theta} \mid \mathbf{x}, \mathbf{y}) = \prod_{i=1}^N p(y_i \mid x_i, \hat{\theta}) = \prod_{i=1}^N \frac{1}{\sqrt{2\pi}} \exp\!\left(-\frac{(y_i - \hat{\theta} x_i)^2}{2}\right)$$
+$$
+\mathcal{L}(\hat{\theta} \mid \mathbf{x}, \mathbf{y}) = \prod_{i=1}^N p(y_i \mid x_i, \hat{\theta}) = \prod_{i=1}^N \frac{1}{\sqrt{2\pi}} \exp\!\left(-\frac{(y_i - \hat{\theta} x_i)^2}{2}\right)
+$$
 
 **Problem**: multiplying $N$ small probabilities → **numerical underflow**.
 
@@ -288,7 +308,9 @@ Example: $N = 30$, each likelihood $\approx 0.3$ → product $\approx 0.3^{30} \
 
 **Solution**: take the log
 
-$$\log \mathcal{L}(\hat{\theta}) = \sum_{i=1}^N \log p(y_i \mid x_i, \hat{\theta}) = -\frac{N}{2}\log(2\pi) - \frac{1}{2}\sum_{i=1}^N (y_i - \hat{\theta} x_i)^2$$
+$$
+\log \mathcal{L}(\hat{\theta}) = \sum_{i=1}^N \log p(y_i \mid x_i, \hat{\theta}) = -\frac{N}{2}\log(2\pi) - \frac{1}{2}\sum_{i=1}^N (y_i - \hat{\theta} x_i)^2
+$$
 
 **Key property**: $\log$ is monotonically increasing, so $\arg\max \mathcal{L} = \arg\max \log \mathcal{L}$. The $\hat{\theta}$ that maximizes the likelihood also maximizes the log-likelihood.
 
@@ -319,13 +341,19 @@ for th in theta_hats:
 
 Maximize the log-likelihood by taking the derivative and setting to zero:
 
-$$\log \mathcal{L}(\theta) = -\frac{N}{2}\log(2\pi) - \frac{1}{2}\sum_{i=1}^N (y_i - \theta x_i)^2$$
+$$
+\log \mathcal{L}(\theta) = -\frac{N}{2}\log(2\pi) - \frac{1}{2}\sum_{i=1}^N (y_i - \theta x_i)^2
+$$
 
-$$\frac{\partial \log \mathcal{L}}{\partial \theta} = \sum_{i=1}^N (y_i - \theta x_i) x_i = 0$$
+$$
+\frac{\partial \log \mathcal{L}}{\partial \theta} = \sum_{i=1}^N (y_i - \theta x_i) x_i = 0
+$$
 
 Expand: $\sum x_i y_i - \theta \sum x_i^2 = 0$
 
-$$\boxed{\;\hat{\theta}_{\text{MLE}} = \frac{\sum x_i y_i}{\sum x_i^2} = \frac{\mathbf{x}^T \mathbf{y}}{\mathbf{x}^T \mathbf{x}}\;}$$
+$$
+\boxed{\;\hat{\theta}_{\text{MLE}} = \frac{\sum x_i y_i}{\sum x_i^2} = \frac{\mathbf{x}^T \mathbf{y}}{\mathbf{x}^T \mathbf{x}}\;}
+$$
 
 **This is the same formula as MSE!** Minimizing MSE and maximizing likelihood give identical $\hat{\theta}$ when the noise is Gaussian with constant variance.
 
@@ -386,11 +414,15 @@ Generalize to multiple features: $\mathbf{y} = X\boldsymbol{\theta} + \boldsymbo
 
 **OLS estimator**:
 
-$$\hat{\boldsymbol{\theta}} = (X^T X)^{-1} X^T \mathbf{y}$$
+$$
+\hat{\boldsymbol{\theta}} = (X^T X)^{-1} X^T \mathbf{y}
+$$
 
 **Polynomial regression**: features are powers of $x$
 
-$$X = \begin{bmatrix} 1 & x_1 & x_1^2 \\ 1 & x_2 & x_2^2 \\ \vdots & \vdots & \vdots \end{bmatrix}$$
+$$
+X = \begin{bmatrix} 1 & x_1 & x_1^2 \\ 1 & x_2 & x_2^2 \\ \vdots & \vdots & \vdots \end{bmatrix}
+$$
 
 ```python
 def make_design_matrix(x, order):
@@ -418,7 +450,9 @@ Linear regression: $\hat{y} = X\boldsymbol{\theta}$ — output is unbounded.
 
 **Solution**: apply a **link function** $g$ to transform the linear output:
 
-$$g(\hat{y}) = X\boldsymbol{\theta} \quad \Leftrightarrow \quad \hat{y} = g^{-1}(X\boldsymbol{\theta})$$
+$$
+g(\hat{y}) = X\boldsymbol{\theta} \quad \Leftrightarrow \quad \hat{y} = g^{-1}(X\boldsymbol{\theta})
+$$
 
 | Model           | Link function $g$   | Inverse $g^{-1}$ | Output type         |
 | --------------- | ------------------- | ---------------- | ------------------- |
@@ -436,7 +470,9 @@ The design matrix organizes raw data into a format that the model can use.
 
 **In neuroscience**: We want to know "how do the stimuli over the past $d$ time steps influence the current spike?" The design matrix arranges the past $d$ stimulus values into a row:
 
-$$\mathbf{X} = \begin{bmatrix} \text{stim}[t_0 - d+1] & \cdots & \text{stim}[t_0 - 1] & \text{stim}[t_0] \\ \text{stim}[t_T - d+1] & \cdots & \text{stim}[t_T - 1] & \text{stim}[t_T] \end{bmatrix}$$
+$$
+\mathbf{X} = \begin{bmatrix} \text{stim}[t_0 - d+1] & \cdots & \text{stim}[t_0 - 1] & \text{stim}[t_0] \\ \text{stim}[t_T - d+1] & \cdots & \text{stim}[t_T - 1] & \text{stim}[t_T] \end{bmatrix}
+$$
 
 **Zero-padding**: For the earliest time points, we don't have a full $d$ history — pad with zeros:
 
@@ -487,7 +523,9 @@ The Poisson distribution is the core tool for modeling **count data**.
 
 **Probability Mass Function (PMF)**:
 
-$$P(Y = k) = \frac{\lambda^k \cdot e^{-\lambda}}{k!}, \quad k = 0, 1, 2, \ldots$$
+$$
+P(Y = k) = \frac{\lambda^k \cdot e^{-\lambda}}{k!}, \quad k = 0, 1, 2, \ldots
+$$
 
 where $\lambda > 0$ is the **rate parameter** — the average number of events per unit time/space.
 
@@ -552,7 +590,9 @@ The Linear-Nonlinear-Poisson (LNP) model is one of the most commonly used GLMs i
 
 Compute the weighted sum of stimulus and weights:
 
-$$z_t = \mathbf{x}_t^\top \boldsymbol{\theta} + b = \sum_{j=1}^{d} \theta_j \cdot \text{stim}[t-d+j] + b$$
+$$
+z_t = \mathbf{x}_t^\top \boldsymbol{\theta} + b = \sum_{j=1}^{d} \theta_j \cdot \text{stim}[t-d+j] + b
+$$
 
 where $\boldsymbol{\theta}$ is the temporal filter and $b$ is the bias.
 
@@ -564,7 +604,9 @@ where $\boldsymbol{\theta}$ is the temporal filter and $b$ is the bias.
 
 Map the linear output to a positive firing rate via the exponential function:
 
-$$\lambda_t = \exp(z_t) = \exp(\mathbf{x}_t^\top \boldsymbol{\theta} + b)$$
+$$
+\lambda_t = \exp(z_t) = \exp(\mathbf{x}_t^\top \boldsymbol{\theta} + b)
+$$
 
 **Why exp?**
 
@@ -582,27 +624,37 @@ $$\lambda_t = \exp(z_t) = \exp(\mathbf{x}_t^\top \boldsymbol{\theta} + b)$$
 
 Assume spike counts follow a Poisson distribution:
 
-$$y_t \mid \mathbf{x}_t, \boldsymbol{\theta} \sim \text{Poisson}(\lambda_t)$$
+$$
+y_t \mid \mathbf{x}_t, \boldsymbol{\theta} \sim \text{Poisson}(\lambda_t)
+$$
 
 Probability mass function:
 
-$$P(y_t \mid \mathbf{x}_t, \boldsymbol{\theta}) = \frac{\lambda_t^{y_t} \cdot e^{-\lambda_t}}{y_t!}$$
+$$
+P(y_t \mid \mathbf{x}_t, \boldsymbol{\theta}) = \frac{\lambda_t^{y_t} \cdot e^{-\lambda_t}}{y_t!}
+$$
 
 **Step 4: Construct the likelihood function**
 
 Assuming spikes are independent across time, the joint likelihood is:
 
-$$\mathcal{L}(\boldsymbol{\theta}) = \prod_{t=1}^{T} P(y_t \mid \mathbf{x}_t, \boldsymbol{\theta}) = \prod_{t=1}^{T} \frac{\lambda_t^{y_t} \cdot e^{-\lambda_t}}{y_t!}$$
+$$
+\mathcal{L}(\boldsymbol{\theta}) = \prod_{t=1}^{T} P(y_t \mid \mathbf{x}_t, \boldsymbol{\theta}) = \prod_{t=1}^{T} \frac{\lambda_t^{y_t} \cdot e^{-\lambda_t}}{y_t!}
+$$
 
 ---
 
 **Step 5: Take the log to simplify**
 
-$$\log \mathcal{L}(\boldsymbol{\theta}) = \sum_{t=1}^{T} \left[ y_t \log \lambda_t - \lambda_t - \log(y_t!) \right]$$
+$$
+\log \mathcal{L}(\boldsymbol{\theta}) = \sum_{t=1}^{T} \left[ y_t \log \lambda_t - \lambda_t - \log(y_t!) \right]
+$$
 
 Drop the constant term $\log(y_t!)$ that does not depend on $\boldsymbol{\theta}$:
 
-$$\log \mathcal{L}(\boldsymbol{\theta}) = \sum_{t=1}^{T} \left[ y_t \log \lambda_t - \lambda_t \right]$$
+$$
+\log \mathcal{L}(\boldsymbol{\theta}) = \sum_{t=1}^{T} \left[ y_t \log \lambda_t - \lambda_t \right]
+$$
 
 ---
 
@@ -612,7 +664,9 @@ $$\log \mathcal{L}(\boldsymbol{\theta}) = \sum_{t=1}^{T} \left[ y_t \log \lambda
 
 Substituting $\lambda_t = \exp(\mathbf{x}_t^\top \boldsymbol{\theta})$, express in matrix notation:
 
-$$\log \mathcal{L}(\boldsymbol{\theta}) = \mathbf{y}^\top \log(\boldsymbol{\lambda}) - \mathbf{1}^\top \boldsymbol{\lambda}$$
+$$
+\log \mathcal{L}(\boldsymbol{\theta}) = \mathbf{y}^\top \log(\boldsymbol{\lambda}) - \mathbf{1}^\top \boldsymbol{\lambda}
+$$
 
 where $\boldsymbol{\lambda} = \exp(\mathbf{X}\boldsymbol{\theta})$.
 
@@ -620,7 +674,9 @@ where $\boldsymbol{\lambda} = \exp(\mathbf{X}\boldsymbol{\theta})$.
 
 Minimize the negative log-likelihood:
 
-$$-\log \mathcal{L}(\boldsymbol{\theta}) = -\left( \mathbf{y}^\top \log(\boldsymbol{\lambda}) - \mathbf{1}^\top \boldsymbol{\lambda} \right) = \mathbf{1}^\top \boldsymbol{\lambda} - \mathbf{y}^\top \log(\boldsymbol{\lambda})$$
+$$
+-\log \mathcal{L}(\boldsymbol{\theta}) = -\left( \mathbf{y}^\top \log(\boldsymbol{\lambda}) - \mathbf{1}^\top \boldsymbol{\lambda} \right) = \mathbf{1}^\top \boldsymbol{\lambda} - \mathbf{y}^\top \log(\boldsymbol{\lambda})
+$$
 
 ---
 
@@ -722,7 +778,9 @@ The $\exp$ ensures $\lambda_t > 0$.
 
 **Log-likelihood**:
 
-$$\log L(\boldsymbol{\theta}) = \sum_t \left[ y_t \log \lambda_t - \lambda_t \right] = \sum_t \left[ y_t (\mathbf{x}_t^T \boldsymbol{\theta}) - \exp(\mathbf{x}_t^T \boldsymbol{\theta}) \right]$$
+$$
+\log L(\boldsymbol{\theta}) = \sum_t \left[ y_t \log \lambda_t - \lambda_t \right] = \sum_t \left[ y_t (\mathbf{x}_t^T \boldsymbol{\theta}) - \exp(\mathbf{x}_t^T \boldsymbol{\theta}) \right]
+$$
 
 **No closed-form solution** — use numerical optimization:
 
@@ -762,7 +820,9 @@ The core idea: map a linear output to a probability using the **sigmoid** (logis
 
 **The sigmoid function**:
 
-$$\sigma(z) = \frac{1}{1 + e^{-z}}$$
+$$
+\sigma(z) = \frac{1}{1 + e^{-z}}
+$$
 
 | $z$             | $\sigma(z)$ | Interpretation              |
 | --------------- | ----------- | --------------------------- |
@@ -780,7 +840,9 @@ $$\sigma(z) = \frac{1}{1 + e^{-z}}$$
 - Derivative has a nice form: $\sigma'(z) = \sigma(z)(1 - \sigma(z))$
 **In GLM terms**: the sigmoid is the **inverse link function** $g^{-1}$:
 
-$$\underbrace{\sigma^{-1}(\hat{y})}_{\text{log-odds}} = \mathbf{x}^\top \boldsymbol{\theta} \quad \Leftrightarrow \quad \hat{y} = \sigma(\mathbf{x}^\top \boldsymbol{\theta})$$
+$$
+\underbrace{\sigma^{-1}(\hat{y})}_{\text{log-odds}} = \mathbf{x}^\top \boldsymbol{\theta} \quad \Leftrightarrow \quad \hat{y} = \sigma(\mathbf{x}^\top \boldsymbol{\theta})
+$$
 
 The link function $g = \sigma^{-1}$ is the **logit** (log-odds): $g(p) = \log \frac{p}{1-p}$.
 
@@ -792,11 +854,15 @@ The output $y$ is binary (0 or 1), so we use the **Bernoulli distribution**.
 
 **Model**:
 
-$$P(y = 1 \mid \mathbf{x}, \boldsymbol{\theta}) = \hat{y} = \sigma(\mathbf{x}^\top \boldsymbol{\theta})$$
+$$
+P(y = 1 \mid \mathbf{x}, \boldsymbol{\theta}) = \hat{y} = \sigma(\mathbf{x}^\top \boldsymbol{\theta})
+$$
 
 **Bernoulli likelihood for one observation**:
 
-$$P(y_i \mid \hat{y}_i) = \hat{y}_i^{\,y_i} (1 - \hat{y}_i)^{1 - y_i}$$
+$$
+P(y_i \mid \hat{y}_i) = \hat{y}_i^{\,y_i} (1 - \hat{y}_i)^{1 - y_i}
+$$
 
 This is a compact way to write:
 
@@ -804,13 +870,17 @@ This is a compact way to write:
 - If $y_i = 0$: probability = $1 - \hat{y}_i$
 **Log-likelihood for all data** (assuming independence):
 
-$$\log \mathcal{L}(\boldsymbol{\theta}) = \sum_{i=1}^N \left[ y_i \log \hat{y}_i + (1 - y_i) \log(1 - \hat{y}_i) \right]$$
+$$
+\log \mathcal{L}(\boldsymbol{\theta}) = \sum_{i=1}^N \left[ y_i \log \hat{y}_i + (1 - y_i) \log(1 - \hat{y}_i) \right]
+$$
 
 This is the **cross-entropy loss** (negated). It penalizes confident wrong predictions heavily.
 
 **Negative log-likelihood** (what we minimize):
 
-$$-\log \mathcal{L} = -\sum_{i=1}^N \left[ y_i \log \sigma(\mathbf{x}_i^\top \boldsymbol{\theta}) + (1 - y_i) \log(1 - \sigma(\mathbf{x}_i^\top \boldsymbol{\theta})) \right]$$
+$$
+-\log \mathcal{L} = -\sum_{i=1}^N \left[ y_i \log \sigma(\mathbf{x}_i^\top \boldsymbol{\theta}) + (1 - y_i) \log(1 - \sigma(\mathbf{x}_i^\top \boldsymbol{\theta})) \right]
+$$
 
 No closed-form solution — use numerical optimization (e.g., gradient descent, Newton's method).
 
@@ -885,7 +955,9 @@ Regularization reduces overfitting by **constraining the model's freedom**.
 > Instead of asking "find the best $\boldsymbol{\theta}$", we ask "find the best $\boldsymbol{\theta}$ **that is small**".
 This adds a **penalty** for large weights to the objective function:
 
-$$\text{Objective} = \underbrace{-\log \mathcal{L}(\boldsymbol{\theta})}_{\text{fit the data}} + \underbrace{\Omega(\boldsymbol{\theta})}_{\text{penalty for complexity}}$$
+$$
+\text{Objective} = \underbrace{-\log \mathcal{L}(\boldsymbol{\theta})}_{\text{fit the data}} + \underbrace{\Omega(\boldsymbol{\theta})}_{\text{penalty for complexity}}
+$$
 
 **Why does this help?**
 
@@ -915,7 +987,9 @@ Penalizes the **sum of squared** weights.
 
 **Objective**:
 
-$$-\log \mathcal{L}'(\boldsymbol{\theta}) = -\log \mathcal{L}(\boldsymbol{\theta}) + \frac{\beta}{2} \sum_j \theta_j^2 = -\log \mathcal{L}(\boldsymbol{\theta}) + \frac{\beta}{2} \|\boldsymbol{\theta}\|_2^2$$
+$$
+-\log \mathcal{L}'(\boldsymbol{\theta}) = -\log \mathcal{L}(\boldsymbol{\theta}) + \frac{\beta}{2} \sum_j \theta_j^2 = -\log \mathcal{L}(\boldsymbol{\theta}) + \frac{\beta}{2} \|\boldsymbol{\theta}\|_2^2
+$$
 
 where $\beta > 0$ is the **regularization strength**.
 
@@ -936,7 +1010,9 @@ Penalizes the **sum of absolute** weights.
 
 **Objective**:
 
-$$-\log \mathcal{L}'(\boldsymbol{\theta}) = -\log \mathcal{L}(\boldsymbol{\theta}) + \frac{\beta}{2} \sum_j |\theta_j| = -\log \mathcal{L}(\boldsymbol{\theta}) + \frac{\beta}{2} \|\boldsymbol{\theta}\|_1$$
+$$
+-\log \mathcal{L}'(\boldsymbol{\theta}) = -\log \mathcal{L}(\boldsymbol{\theta}) + \frac{\beta}{2} \sum_j |\theta_j| = -\log \mathcal{L}(\boldsymbol{\theta}) + \frac{\beta}{2} \|\boldsymbol{\theta}\|_1
+$$
 
 ---
 
@@ -948,7 +1024,9 @@ $$-\log \mathcal{L}'(\boldsymbol{\theta}) = -\log \mathcal{L}(\boldsymbol{\theta
 
 Given two variables $x$ and $y$, **covariance** measures whether they tend to move together:
 
-$$\text{Cov}(x, y) = \frac{1}{N} \sum_{i=1}^N (x_i - \bar{x})(y_i - \bar{y})$$
+$$
+\text{Cov}(x, y) = \frac{1}{N} \sum_{i=1}^N (x_i - \bar{x})(y_i - \bar{y})
+$$
 
 > **Intuition**
 > each term $(x_i - \bar{x})(y_i - \bar{y})$ asks:
@@ -982,11 +1060,15 @@ Each scatter shows 200 samples from a 2D Gaussian with different covariance.
 
 For $d$ features, the **covariance matrix** captures all pairwise covariances:
 
-$$\Sigma = \begin{bmatrix} \text{Var}(x_1) & \text{Cov}(x_1, x_2) & \cdots & \text{Cov}(x_1, x_d) \\ \text{Cov}(x_2, x_1) & \text{Var}(x_2) & \cdots & \text{Cov}(x_2, x_d) \\ \vdots & \vdots & \ddots & \vdots \\ \text{Cov}(x_d, x_1) & \text{Cov}(x_d, x_2) & \cdots & \text{Var}(x_d) \end{bmatrix}$$
+$$
+\Sigma = \begin{bmatrix} \text{Var}(x_1) & \text{Cov}(x_1, x_2) & \cdots & \text{Cov}(x_1, x_d) \\ \text{Cov}(x_2, x_1) & \text{Var}(x_2) & \cdots & \text{Cov}(x_2, x_d) \\ \vdots & \vdots & \ddots & \vdots \\ \text{Cov}(x_d, x_1) & \text{Cov}(x_d, x_2) & \cdots & \text{Var}(x_d) \end{bmatrix}
+$$
 
 **Matrix form** (after mean-centering $\mathbf{X}$):
 
-$$\hat{\Sigma} = \frac{1}{N}\mathbf{X}^\top\mathbf{X}$$
+$$
+\hat{\Sigma} = \frac{1}{N}\mathbf{X}^\top\mathbf{X}
+$$
 
 Each entry $\hat{\Sigma}_{ij}$ tells you how feature $i$ and feature $j$ co-vary across all samples.
 
@@ -1031,11 +1113,15 @@ The covariance matrix defines a **confidence ellipse** that shows the spread of 
 
 The covariance matrix is a **linear transformation** that maps a unit circle into the data's spread:
 
-$$\text{Unit circle} \xrightarrow{\;\Sigma\;} \text{Data ellipse}$$
+$$
+\text{Unit circle} \xrightarrow{\;\Sigma\;} \text{Data ellipse}
+$$
 
 **Eigendecomposition** makes this explicit:
 
-$$\Sigma = V \Lambda V^\top$$
+$$
+\Sigma = V \Lambda V^\top
+$$
 
 where $V = [\mathbf{v}_1 \mid \mathbf{v}_2]$ (eigenvectors) and $\Lambda = \text{diag}(\lambda_1, \lambda_2)$ (eigenvalues).
 
@@ -1065,9 +1151,13 @@ $r_{xy} = \frac{\text{Cov}(x, y)}{\sigma_x \cdot \sigma_y} \in [-1, 1]$
 
 ### Formula
 
-$$\Sigma_{ij} = \frac{1}{N}\sum_n (x_i^{(n)} - \bar{x}_i)(x_j^{(n)} - \bar{x}_j)$$
+$$
+\Sigma_{ij} = \frac{1}{N}\sum_n (x_i^{(n)} - \bar{x}_i)(x_j^{(n)} - \bar{x}_j)
+$$
 
-$$\hat{\Sigma} = \frac{1}{N}\mathbf{X}^\top\mathbf{X}$$
+$$
+\hat{\Sigma} = \frac{1}{N}\mathbf{X}^\top\mathbf{X}
+$$
 
 ### Key Properties
 
@@ -1087,7 +1177,9 @@ The **eigenvectors** of the covariance matrix define the directions of maximum v
 
 **Definition**: For matrix $\Sigma$:
 
-$$\Sigma \mathbf{w} = \lambda \mathbf{w}$$
+$$
+\Sigma \mathbf{w} = \lambda \mathbf{w}
+$$
 
 where $\mathbf{w}$ is an eigenvector and $\lambda$ is the corresponding eigenvalue.
 
@@ -1112,7 +1204,9 @@ PCA finds a new coordinate system aligned with the directions of maximum varianc
 5. Project data onto top $K$ eigenvectors
 **Projection** (scores):
 
-$$\mathbf{S} = \mathbf{X} \mathbf{W}_{1:K}$$
+$$
+\mathbf{S} = \mathbf{X} \mathbf{W}_{1:K}
+$$
 
 where $\mathbf{W}_{1:K}$ contains the top $K$ eigenvectors as columns.
 
@@ -1132,7 +1226,9 @@ Each eigenvalue $\lambda_i$ represents the variance captured by the $i$-th princ
 
 **Cumulative variance explained**:
 
-$$\text{Variance explained}(K) = \frac{\sum_{i=1}^K \lambda_i}{\sum_{i=1}^N \lambda_i}$$
+$$
+\text{Variance explained}(K) = \frac{\sum_{i=1}^K \lambda_i}{\sum_{i=1}^N \lambda_i}
+$$
 
 **Intrinsic vs Extrinsic dimensionality**:
 
@@ -1224,17 +1320,23 @@ The algorithm has three key steps:
 
 **Step 1 — High-dimensional similarities**: For each pair of points $(x_i, x_j)$, compute a Gaussian-based probability:
 
-$$p_{j|i} = \frac{\exp(-\|x_i - x_j\|^2 / 2\sigma_i^2)}{\sum_{k \neq i} \exp(-\|x_i - x_k\|^2 / 2\sigma_i^2)}$$
+$$
+p_{j|i} = \frac{\exp(-\|x_i - x_j\|^2 / 2\sigma_i^2)}{\sum_{k \neq i} \exp(-\|x_i - x_k\|^2 / 2\sigma_i^2)}
+$$
 
 "Given point $i$, what's the probability of picking $j$ as its neighbor?"
 
 **Step 2 — Low-dimensional similarities**: In the 2D map, use a **t-distribution** (heavy-tailed) instead of Gaussian:
 
-$$q_{ij} = \frac{(1 + \|y_i - y_j\|^2)^{-1}}{\sum_{k \neq l} (1 + \|y_k - y_l\|^2)^{-1}}$$
+$$
+q_{ij} = \frac{(1 + \|y_i - y_j\|^2)^{-1}}{\sum_{k \neq l} (1 + \|y_k - y_l\|^2)^{-1}}
+$$
 
 **Step 3 — Optimize**: Minimize the KL divergence between $P$ and $Q$:
 
-$$\text{KL}(P \| Q) = \sum_{i \neq j} p_{ij} \log \frac{p_{ij}}{q_{ij}}$$
+$$
+\text{KL}(P \| Q) = \sum_{i \neq j} p_{ij} \log \frac{p_{ij}}{q_{ij}}
+$$
 
 KL divergence penalizes **false negatives** heavily (high-D neighbors that got separated in low-D), so nearby points stay together.
 
@@ -1266,7 +1368,9 @@ A feedforward network transforms input $\mathbf{r}$ through a series of **layers
 
 **Single hidden layer**:
 
-$$\mathbf{h} = \phi(\mathbf{W}^{in} \mathbf{r} + \mathbf{b}^{in}), \quad y = \mathbf{W}^{out} \mathbf{h} + \mathbf{b}^{out}$$
+$$
+\mathbf{h} = \phi(\mathbf{W}^{in} \mathbf{r} + \mathbf{b}^{in}), \quad y = \mathbf{W}^{out} \mathbf{h} + \mathbf{b}^{out}
+$$
 
 where $\phi$ is a **nonlinear activation function**.
 
@@ -1274,7 +1378,9 @@ where $\phi$ is a **nonlinear activation function**.
 
 **Why nonlinearity matters**: Without it, stacking linear layers is equivalent to a single linear transformation:
 
-$$y = \mathbf{W}^{out}(\mathbf{W}^{in} \mathbf{r} + \mathbf{b}^{in}) + \mathbf{b}^{out} = (\mathbf{W}^{out}\mathbf{W}^{in})\mathbf{r} + \text{bias}$$
+$$
+y = \mathbf{W}^{out}(\mathbf{W}^{in} \mathbf{r} + \mathbf{b}^{in}) + \mathbf{b}^{out} = (\mathbf{W}^{out}\mathbf{W}^{in})\mathbf{r} + \text{bias}
+$$
 
 Nonlinear activations allow the network to compute **arbitrary functions** (universal approximation theorem).
 
@@ -1348,7 +1454,9 @@ Training a network = finding parameters that minimize the loss.
 3. **Update**: $\theta \leftarrow \theta - \alpha \frac{\partial L}{\partial \theta}$
 **Backpropagation** applies the chain rule layer by layer:
 
-$$\frac{\partial L}{\partial \mathbf{W}^{in}} = \frac{\partial L}{\partial \mathbf{h}} \cdot \frac{\partial \mathbf{h}}{\partial \mathbf{W}^{in}}$$
+$$
+\frac{\partial L}{\partial \mathbf{W}^{in}} = \frac{\partial L}{\partial \mathbf{h}} \cdot \frac{\partial \mathbf{h}}{\partial \mathbf{W}^{in}}
+$$
 
 PyTorch computes this automatically with `loss.backward()`.
 
@@ -1376,7 +1484,9 @@ SGD approximates the true gradient using a **random mini-batch** of data.
 - Noise helps escape shallow local minima
 **Momentum**: accumulates past gradients to smooth updates:
 
-$$\mathbf{v} \leftarrow \beta \mathbf{v} + \mathbf{g}, \quad \theta \leftarrow \theta - \alpha \mathbf{v}$$
+$$
+\mathbf{v} \leftarrow \beta \mathbf{v} + \mathbf{g}, \quad \theta \leftarrow \theta - \alpha \mathbf{v}
+$$
 
 - $\beta$ (typically 0.9): how much past gradients influence current update
 - Helps accelerate in consistent gradient directions
@@ -1394,7 +1504,9 @@ Adam combines momentum with **adaptive learning rates** per parameter.
 - Second moment (variance): $\mathbf{v} \leftarrow \beta_2 \mathbf{v} + (1-\beta_2)\mathbf{g}^2$
 **Update rule** (with bias correction):
 
-$$\theta \leftarrow \theta - \alpha \frac{\hat{\mathbf{m}}}{\sqrt{\hat{\mathbf{v}}} + \epsilon}$$
+$$
+\theta \leftarrow \theta - \alpha \frac{\hat{\mathbf{m}}}{\sqrt{\hat{\mathbf{v}}} + \epsilon}
+$$
 
 where $\hat{\mathbf{m}} = \frac{\mathbf{m}}{1-\beta_1^t}$, $\hat{\mathbf{v}} = \frac{\mathbf{v}}{1-\beta_2^t}$ (bias correction for early steps).
 
@@ -1422,13 +1534,17 @@ Convolution is a fundamental operation that slides a small **kernel** across dat
 
 Given a noisy signal $[3, 5, 2, 8, 1, 4]$, a moving average with window size 3 smooths it:
 
-$$\text{output}[i] = \frac{1}{3}(x[i-1] + x[i] + x[i+1])$$
+$$
+\text{output}[i] = \frac{1}{3}(x[i-1] + x[i] + x[i+1])
+$$
 
 This is a convolution with kernel $f = [\frac{1}{3}, \frac{1}{3}, \frac{1}{3}]$.
 
 **General 1D convolution**:
 
-$$\text{output}[i] = \sum_{k=-K/2}^{K/2} f[k] \cdot x[i+k]$$
+$$
+\text{output}[i] = \sum_{k=-K/2}^{K/2} f[k] \cdot x[i+k]
+$$
 
 The kernel $f$ is a small array of **learnable weights** that slides across the input.
 
@@ -1461,7 +1577,9 @@ The same idea extends to 2D images — the kernel becomes a small matrix.
 
 **2D convolution**:
 
-$$\text{output}(x, y) = \sum_{k_x, k_y} f(k_x, k_y) \cdot I(x+k_x, y+k_y)$$
+$$
+\text{output}(x, y) = \sum_{k_x, k_y} f(k_x, k_y) \cdot I(x+k_x, y+k_y)
+$$
 
 where $f$ is a $K \times K$ kernel and $I$ is the input image.
 
@@ -1562,7 +1680,9 @@ Before computing anything, we need to organize neural data into a **response mat
 
 **Setup**: Record $N$ neurons while presenting $S$ different stimuli (e.g., images). Each stimulus is repeated multiple trials, then average across trials.
 
-$$\mathbf{R} = \begin{bmatrix} r_{1,1} & r_{1,2} & \cdots & r_{1,S} \\ r_{2,1} & r_{2,2} & \cdots & r_{2,S} \\ \vdots & \vdots & \ddots & \vdots \\ r_{N,1} & r_{N,2} & \cdots & r_{N,S} \end{bmatrix}$$
+$$
+\mathbf{R} = \begin{bmatrix} r_{1,1} & r_{1,2} & \cdots & r_{1,S} \\ r_{2,1} & r_{2,2} & \cdots & r_{2,S} \\ \vdots & \vdots & \ddots & \vdots \\ r_{N,1} & r_{N,2} & \cdots & r_{N,S} \end{bmatrix}
+$$
 
 - **Rows** = neurons (what each neuron responds to)
 - **Columns** = stimuli (how each stimulus is represented)
@@ -1576,7 +1696,9 @@ Different neurons have wildly different **baseline firing rates**. A high-rate n
 
 **Z-scoring** removes this problem by centering and scaling each neuron independently:
 
-$$Z_{n,s} = \frac{R_{n,s} - \bar{r}_n}{\sigma_n}$$
+$$
+Z_{n,s} = \frac{R_{n,s} - \bar{r}_n}{\sigma_n}
+$$
 
 where $\bar{r}_n$ = mean response of neuron $n$ across all stimuli, $\sigma_n$ = standard deviation.
 
@@ -1600,7 +1722,9 @@ Neuron 4 (constant, $\sigma = 0$) carries no stimulus information — z-scoring 
 
 The **Representational Dissimilarity Matrix (RDM)** summarizes how similar stimuli look to the brain:
 
-$$\mathbf{M} = 1 - \frac{1}{N}\mathbf{Z}\mathbf{Z}^\top$$
+$$
+\mathbf{M} = 1 - \frac{1}{N}\mathbf{Z}\mathbf{Z}^\top
+$$
 
 **What this formula does**:
 
@@ -1697,10 +1821,18 @@ Input (784) → Encoder → Bottleneck (K) → Decoder → Output (784)
 
 ### Key Formulas
 
-$$\hat{\boldsymbol{\theta}} = (X^T X)^{-1} X^T \mathbf{y} \quad \text{(OLS)}$$
+$$
+\hat{\boldsymbol{\theta}} = (X^T X)^{-1} X^T \mathbf{y} \quad \text{(OLS)}
+$$
 
-$$\mathbf{S} = \mathbf{X}\mathbf{W}, \quad \hat{\mathbf{X}} = \mathbf{S}_{1:K}\mathbf{W}_{1:K}^\top \quad \text{(PCA)}$$
+$$
+\mathbf{S} = \mathbf{X}\mathbf{W}, \quad \hat{\mathbf{X}} = \mathbf{S}_{1:K}\mathbf{W}_{1:K}^\top \quad \text{(PCA)}
+$$
 
-$$\mathbf{h} = \phi(\mathbf{W}^{in}\mathbf{r} + \mathbf{b}^{in}), \quad y = \mathbf{W}^{out}\mathbf{h} + \mathbf{b}^{out} \quad \text{(Neural net)}$$
+$$
+\mathbf{h} = \phi(\mathbf{W}^{in}\mathbf{r} + \mathbf{b}^{in}), \quad y = \mathbf{W}^{out}\mathbf{h} + \mathbf{b}^{out} \quad \text{(Neural net)}
+$$
 
-$$\mathbf{M} = 1 - \frac{1}{N}\mathbf{Z}\mathbf{Z}^\top \quad \text{(RSA)}$$
+$$
+\mathbf{M} = 1 - \frac{1}{N}\mathbf{Z}\mathbf{Z}^\top \quad \text{(RSA)}
+$$

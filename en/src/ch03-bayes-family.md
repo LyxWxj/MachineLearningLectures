@@ -12,15 +12,21 @@ Bayes' Theorem · Prior & Posterior · Naive Bayes · Bayesian Networks · Bayes
 
 Start from the relationship between joint and conditional probability:
 
-$$P(A, B) = P(A \mid B) \cdot P(B)$$
+$$
+P(A, B) = P(A \mid B) \cdot P(B)
+$$
 
 Swap the roles of $A$ and $B$:
 
-$$P(B, A) = P(B \mid A) \cdot P(A)$$
+$$
+P(B, A) = P(B \mid A) \cdot P(A)
+$$
 
 **Key insight**: $A$ and $B$ occurring together is the same event as $B$ and $A$ occurring together — order doesn't matter:
 
-$$P(A, B) = P(B, A)$$
+$$
+P(A, B) = P(B, A)
+$$
 
 Therefore:
 
@@ -28,7 +34,9 @@ $P(A \mid B) \cdot P(B) = P(B \mid A) \cdot P(A)$
 
 Divide both sides by $P(B)$:
 
-$$\boxed{\;P(A \mid B) = \frac{P(B \mid A) \cdot P(A)}{P(B)}\;}$$
+$$
+\boxed{\;P(A \mid B) = \frac{P(B \mid A) \cdot P(A)}{P(B)}\;}
+$$
 
 ---
 
@@ -36,7 +44,9 @@ This is **Bayes' theorem** — it lets us "flip" the conditioning direction.
 
 **In hypothesis-evidence language** ($H$ = hypothesis, $D$ = data):
 
-$$\underbrace{P(H \mid D)}_{\text{posterior}} = \frac{\overbrace{P(D \mid H)}^{\text{likelihood}} \cdot \underbrace{P(H)}_{\text{prior}}}{\underbrace{P(D)}_{\text{evidence}}}$$
+$$
+\underbrace{P(H \mid D)}_{\text{posterior}} = \frac{\overbrace{P(D \mid H)}^{\text{likelihood}} \cdot \underbrace{P(H)}_{\text{prior}}}{\underbrace{P(D)}_{\text{evidence}}}
+$$
 
 **What is $\theta$?** In parameter estimation, $\theta$ is a specific instance of $H$ — each possible parameter value is a hypothesis. For example, "$\theta = 0.7$" is the hypothesis "the coin's heads probability is 0.7". So $P(\theta)$ and $P(H)$ mean the same thing — the prior over parameters.
 
@@ -62,11 +72,15 @@ Updated belief **after** seeing data
 
 "Ground is wet — chance of rain?"
 
-$$P(\text{rain} \mid \text{wet}) = \frac{P(\text{wet} \mid \text{rain}) \cdot P(\text{rain})}{P(\text{wet})} = \frac{0.95 \times 0.20}{0.27} = 0.704$$
+$$
+P(\text{rain} \mid \text{wet}) = \frac{P(\text{wet} \mid \text{rain}) \cdot P(\text{rain})}{P(\text{wet})} = \frac{0.95 \times 0.20}{0.27} = 0.704
+$$
 
 **Evidence** $P(\text{wet})$ via the law of total probability:
 
-$$P(\text{wet}) = P(\text{wet} \mid \text{rain})P(\text{rain}) + P(\text{wet} \mid \text{sunny})P(\text{sunny}) = 0.95 \times 0.20 + 0.10 \times 0.80 = 0.27$$
+$$
+P(\text{wet}) = P(\text{wet} \mid \text{rain})P(\text{rain}) + P(\text{wet} \mid \text{sunny})P(\text{sunny}) = 0.95 \times 0.20 + 0.10 \times 0.80 = 0.27
+$$
 
 ---
 
@@ -76,13 +90,17 @@ The evidence $P(D) = \sum_H P(D \mid H) P(H)$ is a normalizing constant ensuring
 
 **In practice**, we often only care about relative posterior:
 
-$$P(H \mid D) \propto P(D \mid H) \cdot P(H)$$
+$$
+P(H \mid D) \propto P(D \mid H) \cdot P(H)
+$$
 
 "Posterior ∝ Likelihood × Prior"
 
 **Comparing two hypotheses**:
 
-$$\frac{P(H_1 \mid D)}{P(H_2 \mid D)} = \frac{P(D \mid H_1)}{P(D \mid H_2)} \cdot \frac{P(H_1)}{P(H_2)}$$
+$$
+\frac{P(H_1 \mid D)}{P(H_2 \mid D)} = \frac{P(D \mid H_1)}{P(D \mid H_2)} \cdot \frac{P(H_1)}{P(H_2)}
+$$
 
 **Posterior odds = Likelihood ratio × Prior odds**
 
@@ -104,7 +122,9 @@ The prior $P(H)$ encodes knowledge **before** seeing data.
 
 **Beta distribution** — the standard prior for probability parameters $\theta \in [0, 1]$:
 
-$$\text{Beta}(\theta; \alpha, \beta) = \frac{1}{B(\alpha, \beta)} \theta^{\alpha-1} (1-\theta)^{\beta-1}$$
+$$
+\text{Beta}(\theta; \alpha, \beta) = \frac{1}{B(\alpha, \beta)} \theta^{\alpha-1} (1-\theta)^{\beta-1}
+$$
 
 - $\alpha$: prior weight for "success"
 - $\beta$: prior weight for "failure"
@@ -115,7 +135,9 @@ $$\text{Beta}(\theta; \alpha, \beta) = \frac{1}{B(\alpha, \beta)} \theta^{\alpha
 
 **The problem**: Bayes' theorem requires computing the evidence:
 
-$$P(D) = \int P(D \mid \theta) P(\theta) \, d\theta$$
+$$
+P(D) = \int P(D \mid \theta) P(\theta) \, d\theta
+$$
 
 This integral is usually intractable — no closed-form solution.
 
@@ -154,14 +176,20 @@ Data: $x_1, \ldots, x_n \sim \mathcal{N}(\mu, \sigma^2)$
 
 Posterior: $\mu \mid \mathbf{x} \sim \mathcal{N}(\mu_{\text{post}}, \sigma_{\text{post}}^2)$
 
-$$\frac{1}{\sigma_{\text{post}}^2} = \frac{1}{\sigma_0^2} + \frac{n}{\sigma^2}$$
+$$
+\frac{1}{\sigma_{\text{post}}^2} = \frac{1}{\sigma_0^2} + \frac{n}{\sigma^2}
+$$
 
-$$\mu_{\text{post}} = \sigma_{\text{post}}^2 \left(\frac{\mu_0}{\sigma_0^2} + \frac{n\bar{x}}{\sigma^2}\right)$$
+$$
+\mu_{\text{post}} = \sigma_{\text{post}}^2 \left(\frac{\mu_0}{\sigma_0^2} + \frac{n\bar{x}}{\sigma^2}\right)
+$$
 
 > **Intuition**
 > posterior precision = prior precision + data precision. More data → less prior influence.
 
-$$\mu_{\text{post}} = w_{\text{prior}} \cdot \mu_0 + w_{\text{data}} \cdot \bar{x}$$
+$$
+\mu_{\text{post}} = w_{\text{prior}} \cdot \mu_0 + w_{\text{data}} \cdot \bar{x}
+$$
 
 Weights are proportional to precisions (inverse variances).
 
@@ -178,11 +206,15 @@ Weights are proportional to precisions (inverse variances).
 
 **MAP derivation**:
 
-$$\hat{\theta}_{\text{MAP}} = \arg\max P(\theta \mid D) = \arg\max \left[\log P(D \mid \theta) + \log P(\theta)\right]$$
+$$
+\hat{\theta}_{\text{MAP}} = \arg\max P(\theta \mid D) = \arg\max \left[\log P(D \mid \theta) + \log P(\theta)\right]
+$$
 
 **With Gaussian prior** $\theta \sim \mathcal{N}(0, \tau^2)$:
 
-$$\log P(\theta) = -\frac{\theta^2}{2\tau^2} + \text{const}$$
+$$
+\log P(\theta) = -\frac{\theta^2}{2\tau^2} + \text{const}
+$$
 
 MAP = MLE + L2 regularization, where $\lambda = \frac{\sigma^2}{\tau^2}$
 
@@ -202,7 +234,9 @@ $\hat{\mu}_{\text{MLE}} = \frac{130 + 125 + 135 + 128 + 132}{5} = 130$
 
 Using the Gaussian-Gaussian conjugacy formula:
 
-$$\hat{\mu}_{\text{MAP}} = \frac{\sigma^2 \cdot \mu_0 + n \cdot \sigma_0^2 \cdot \bar{x}}{\sigma^2 + n \cdot \sigma_0^2} = \frac{225 \times 100 + 5 \times 225 \times 130}{225 + 5 \times 225} = \frac{22500 + 146250}{1350} = 124.4$$
+$$
+\hat{\mu}_{\text{MAP}} = \frac{\sigma^2 \cdot \mu_0 + n \cdot \sigma_0^2 \cdot \bar{x}}{\sigma^2 + n \cdot \sigma_0^2} = \frac{225 \times 100 + 5 \times 225 \times 130}{225 + 5 \times 225} = \frac{22500 + 146250}{1350} = 124.4
+$$
 
 **Comparison**:
 
@@ -228,21 +262,29 @@ $$\hat{\mu}_{\text{MAP}} = \frac{\sigma^2 \cdot \mu_0 + n \cdot \sigma_0^2 \cdot
 
 **Bayes' theorem**:
 
-$$P(y \mid \mathbf{x}) = \frac{P(\mathbf{x} \mid y) \cdot P(y)}{P(\mathbf{x})} \propto P(\mathbf{x} \mid y) \cdot P(y)$$
+$$
+P(y \mid \mathbf{x}) = \frac{P(\mathbf{x} \mid y) \cdot P(y)}{P(\mathbf{x})} \propto P(\mathbf{x} \mid y) \cdot P(y)
+$$
 
 **The "naive" assumption**: given class $y$, all features are **conditionally independent**:
 
-$$P(x_1, \ldots, x_n \mid y) = \prod_{i=1}^n P(x_i \mid y)$$
+$$
+P(x_1, \ldots, x_n \mid y) = \prod_{i=1}^n P(x_i \mid y)
+$$
 
 **Why "naive"?** This assumption is almost never true in practice (features are usually correlated), yet it works surprisingly well.
 
 **Prediction rule**:
 
-$$\hat{y} = \arg\max_y P(y) \prod_{i=1}^n P(x_i \mid y)$$
+$$
+\hat{y} = \arg\max_y P(y) \prod_{i=1}^n P(x_i \mid y)
+$$
 
 In log space (to avoid underflow):
 
-$$\hat{y} = \arg\max_y \left[\log P(y) + \sum_{i=1}^n \log P(x_i \mid y)\right]$$
+$$
+\hat{y} = \arg\max_y \left[\log P(y) + \sum_{i=1}^n \log P(x_i \mid y)\right]
+$$
 
 ---
 
@@ -256,7 +298,9 @@ $$\hat{y} = \arg\max_y \left[\log P(y) + \sum_{i=1}^n \log P(x_i \mid y)\right]$
 
 **Gaussian Naive Bayes**:
 
-$$P(x_i \mid y) = \frac{1}{\sqrt{2\pi\sigma_{iy}^2}} \exp\!\left(-\frac{(x_i - \mu_{iy})^2}{2\sigma_{iy}^2}\right)$$
+$$
+P(x_i \mid y) = \frac{1}{\sqrt{2\pi\sigma_{iy}^2}} \exp\!\left(-\frac{(x_i - \mu_{iy})^2}{2\sigma_{iy}^2}\right)
+$$
 
 Each feature has its own mean and variance per class.
 
@@ -276,7 +320,9 @@ $P(\text{spam} \mid \text{free}, \text{money}) \propto P(\text{spam}) \prod_{i} 
 Pick the class with higher probability.
 **Laplace smoothing**: prevents $P(w_i \mid y) = 0$ (a single unseen word zeroes out everything):
 
-$$P(w_i \mid y) = \frac{\text{count}(w_i, y) + \alpha}{\text{count}(y) + \alpha \cdot |V|}$$
+$$
+P(w_i \mid y) = \frac{\text{count}(w_i, y) + \alpha}{\text{count}(y) + \alpha \cdot |V|}
+$$
 
 $\alpha = 1$ is Laplace smoothing, $|V|$ is vocabulary size.
 
@@ -296,21 +342,31 @@ Classify an email containing the words "free" and "money" as spam or ham.
 
 **Step 1 — Priors**:
 
-$$P(\text{spam}) = \frac{6}{10} = 0.6, \quad P(\text{ham}) = \frac{4}{10} = 0.4$$
+$$
+P(\text{spam}) = \frac{6}{10} = 0.6, \quad P(\text{ham}) = \frac{4}{10} = 0.4
+$$
 
 ---
 
 **Step 2 — Likelihoods** (with Laplace smoothing, $|V| = 3$):
 
-$$P(\text{"free"} \mid \text{spam}) = \frac{5 + 1}{6 + 3} = \frac{6}{9}, \quad P(\text{"free"} \mid \text{ham}) = \frac{1 + 1}{4 + 3} = \frac{2}{7}$$
+$$
+P(\text{"free"} \mid \text{spam}) = \frac{5 + 1}{6 + 3} = \frac{6}{9}, \quad P(\text{"free"} \mid \text{ham}) = \frac{1 + 1}{4 + 3} = \frac{2}{7}
+$$
 
-$$P(\text{"money"} \mid \text{spam}) = \frac{4 + 1}{6 + 3} = \frac{5}{9}, \quad P(\text{"money"} \mid \text{ham}) = \frac{0 + 1}{4 + 3} = \frac{1}{7}$$
+$$
+P(\text{"money"} \mid \text{spam}) = \frac{4 + 1}{6 + 3} = \frac{5}{9}, \quad P(\text{"money"} \mid \text{ham}) = \frac{0 + 1}{4 + 3} = \frac{1}{7}
+$$
 
 **Step 3 — Posteriors**:
 
-$$P(\text{spam} \mid \text{free}, \text{money}) \propto 0.6 \times \frac{6}{9} \times \frac{5}{9} = 0.6 \times 0.222 = 0.133$$
+$$
+P(\text{spam} \mid \text{free}, \text{money}) \propto 0.6 \times \frac{6}{9} \times \frac{5}{9} = 0.6 \times 0.222 = 0.133
+$$
 
-$$P(\text{ham} \mid \text{free}, \text{money}) \propto 0.4 \times \frac{2}{7} \times \frac{1}{7} = 0.4 \times 0.041 = 0.016$$
+$$
+P(\text{ham} \mid \text{free}, \text{money}) \propto 0.4 \times \frac{2}{7} \times \frac{1}{7} = 0.4 \times 0.041 = 0.016
+$$
 
 **Step 4 — Normalize**: $P(\text{spam}|\text{(emails contain "free","money")}) = \frac{0.133}{0.133 + 0.016} = 0.893$
 
@@ -337,15 +393,23 @@ The previous example only checked **whether** a word appears (Bernoulli). Multin
 
 **Likelihoods** (with Laplace smoothing, $|V| = 4$):
 
-$$P(\text{"free"} \mid \text{spam}) = \frac{8 + 1}{20 + 4} = \frac{9}{24}, \quad P(\text{"free"} \mid \text{ham}) = \frac{1 + 1}{15 + 4} = \frac{2}{19}$$
+$$
+P(\text{"free"} \mid \text{spam}) = \frac{8 + 1}{20 + 4} = \frac{9}{24}, \quad P(\text{"free"} \mid \text{ham}) = \frac{1 + 1}{15 + 4} = \frac{2}{19}
+$$
 
-$$P(\text{"money"} \mid \text{spam}) = \frac{6 + 1}{20 + 4} = \frac{7}{24}, \quad P(\text{"money"} \mid \text{ham}) = \frac{0 + 1}{15 + 4} = \frac{1}{19}$$
+$$
+P(\text{"money"} \mid \text{spam}) = \frac{6 + 1}{20 + 4} = \frac{7}{24}, \quad P(\text{"money"} \mid \text{ham}) = \frac{0 + 1}{15 + 4} = \frac{1}{19}
+$$
 
 **Posteriors** (use word frequency as exponent):
 
-$$P(\text{spam}) \cdot P(\text{"free"} \mid \text{spam})^2 \cdot P(\text{"money"} \mid \text{spam})^1 = 0.6 \times \left(\frac{9}{24}\right)^2 \times \frac{7}{24} = 0.0295$$
+$$
+P(\text{spam}) \cdot P(\text{"free"} \mid \text{spam})^2 \cdot P(\text{"money"} \mid \text{spam})^1 = 0.6 \times \left(\frac{9}{24}\right)^2 \times \frac{7}{24} = 0.0295
+$$
 
-$$P(\text{ham}) \cdot P(\text{"free"} \mid \text{ham})^2 \cdot P(\text{"money"} \mid \text{ham})^1 = 0.4 \times \left(\frac{2}{19}\right)^2 \times \frac{1}{19} = 0.00047$$
+$$
+P(\text{ham}) \cdot P(\text{"free"} \mid \text{ham})^2 \cdot P(\text{"money"} \mid \text{ham})^1 = 0.4 \times \left(\frac{2}{19}\right)^2 \times \frac{1}{19} = 0.00047
+$$
 
 **Normalize**: $P(\text{spam}) = \frac{0.0295}{0.0295 + 0.00047} = 0.984$
 
@@ -386,11 +450,15 @@ A **Bayesian Network** is a **Directed Acyclic Graph (DAG)** that represents cau
 - **Conditional Probability Tables (CPT)**: $P(X_i \mid \text{parents}(X_i))$
 **Key property**: each node is conditionally independent of all non-descendants given its parents.
 
-$$P(X_i \mid \text{parents}(X_i), \text{non-descendants}) = P(X_i \mid \text{parents}(X_i))$$
+$$
+P(X_i \mid \text{parents}(X_i), \text{non-descendants}) = P(X_i \mid \text{parents}(X_i))
+$$
 
 **Joint distribution factorization**:
 
-$$P(X_1, X_2, \ldots, X_n) = \prod_{i=1}^n P(X_i \mid \text{parents}(X_i))$$
+$$
+P(X_1, X_2, \ldots, X_n) = \prod_{i=1}^n P(X_i \mid \text{parents}(X_i))
+$$
 
 This is the **chain rule for Bayesian networks** — factorizes the full joint into local conditional probabilities.
 
@@ -404,11 +472,15 @@ This is the **chain rule for Bayesian networks** — factorizes the full joint i
 - Rain (R) and Sprinkler (S) affect Wet Grass (W)
 **Graph structure**:
 
-$$C \to R, \quad C \to S, \quad R \to W, \quad S \to W$$
+$$
+C \to R, \quad C \to S, \quad R \to W, \quad S \to W
+$$
 
 **Joint distribution**:
 
-$$P(C, R, S, W) = P(C) \cdot P(R \mid C) \cdot P(S \mid C) \cdot P(W \mid R, S)$$
+$$
+P(C, R, S, W) = P(C) \cdot P(R \mid C) \cdot P(S \mid C) \cdot P(W \mid R, S)
+$$
 
 **CPTs**:
 
@@ -433,7 +505,9 @@ $P(W=1 \mid R, S)$:
 
 **Question**: given that the grass is wet (W=1), what is the probability the sprinkler was on?
 
-$$P(S=1 \mid W=1) = \frac{P(S=1, W=1)}{P(W=1)} = \frac{\sum_{C,R} P(C, R, S=1, W=1)}{\sum_{C,R,S} P(C, R, S, W=1)}$$
+$$
+P(S=1 \mid W=1) = \frac{P(S=1, W=1)}{P(W=1)} = \frac{\sum_{C,R} P(C, R, S=1, W=1)}{\sum_{C,R,S} P(C, R, S, W=1)}
+$$
 
 **Code**:
 
@@ -496,7 +570,9 @@ A path is blocked if it contains a node that satisfies either:
 2. **Collider**: the middle node and its descendants are **not** in $Z$ (unobserved)
 **d-separation $\Rightarrow$ conditional independence**:
 
-$$X \perp Y \mid Z \quad \text{if } X \text{ and } Y \text{ are d-separated given } Z$$
+$$
+X \perp Y \mid Z \quad \text{if } X \text{ and } Y \text{ are d-separated given } Z
+$$
 
 **In the sprinkler problem**:
 
@@ -513,15 +589,21 @@ $$X \perp Y \mid Z \quad \text{if } X \text{ and } Y \text{ are d-separated give
 
 **Step 1**: Choose a model (likelihood)
 
-$$P(D \mid \theta) = \prod_{i=1}^N P(x_i \mid \theta)$$
+$$
+P(D \mid \theta) = \prod_{i=1}^N P(x_i \mid \theta)
+$$
 
 **Step 2**: Choose a prior
 
-$$P(\theta)$$
+$$
+P(\theta)
+$$
 
 **Step 3**: Compute the posterior
 
-$$P(\theta \mid D) = \frac{P(D \mid \theta) P(\theta)}{P(D)} \propto P(D \mid \theta) P(\theta)$$
+$$
+P(\theta \mid D) = \frac{P(D \mid \theta) P(\theta)}{P(D)} \propto P(D \mid \theta) P(\theta)
+$$
 
 **Step 4**: Use the posterior
 
@@ -537,21 +619,29 @@ We want $P(x_{\text{new}} \mid D)$ — the probability of new data given what we
 
 **Step 1**: marginalize over $\theta$ (law of total probability):
 
-$$P(x_{\text{new}} \mid D) = \int P(x_{\text{new}}, \theta \mid D) \, d\theta$$
+$$
+P(x_{\text{new}} \mid D) = \int P(x_{\text{new}}, \theta \mid D) \, d\theta
+$$
 
 **Step 2**: apply the chain rule to the joint:
 
-$$P(x_{\text{new}}, \theta \mid D) = P(x_{\text{new}} \mid \theta, D) \cdot P(\theta \mid D)$$
+$$
+P(x_{\text{new}}, \theta \mid D) = P(x_{\text{new}} \mid \theta, D) \cdot P(\theta \mid D)
+$$
 
 **Step 3**: key assumption — given $\theta$, the new data $x_{\text{new}}$ is independent of the old data $D$:
 
-$$P(x_{\text{new}} \mid \theta, D) = P(x_{\text{new}} \mid \theta)$$
+$$
+P(x_{\text{new}} \mid \theta, D) = P(x_{\text{new}} \mid \theta)
+$$
 
 This makes sense: once you know the parameter $\theta$, the old data doesn't tell you anything extra.
 
 **Step 4**: substitute back:
 
-$$\boxed{\;P(x_{\text{new}} \mid D) = \int P(x_{\text{new}} \mid \theta) \cdot P(\theta \mid D) \, d\theta\;}$$
+$$
+\boxed{\;P(x_{\text{new}} \mid D) = \int P(x_{\text{new}} \mid \theta) \cdot P(\theta \mid D) \, d\theta\;}
+$$
 
 ---
 
@@ -559,7 +649,9 @@ $$\boxed{\;P(x_{\text{new}} \mid D) = \int P(x_{\text{new}} \mid \theta) \cdot P
 
 To predict a new data point $x_{\text{new}}$, integrate over all possible $\theta$:
 
-$$P(x_{\text{new}} \mid D) = \int P(x_{\text{new}} \mid \theta) P(\theta \mid D) \, d\theta$$
+$$
+P(x_{\text{new}} \mid D) = \int P(x_{\text{new}} \mid \theta) P(\theta \mid D) \, d\theta
+$$
 
 > **Intuition**
 > don't use a single "best" $\theta$ — average over **all** $\theta$ weighted by their posterior probability.
@@ -575,7 +667,9 @@ $$P(x_{\text{new}} \mid D) = \int P(x_{\text{new}} \mid \theta) P(\theta \mid D)
 
 **Numerical approximation**: sample from the posterior:
 
-$$P(x_{\text{new}} \mid D) \approx \frac{1}{S} \sum_{s=1}^S P(x_{\text{new}} \mid \theta^{(s)}), \quad \theta^{(s)} \sim P(\theta \mid D)$$
+$$
+P(x_{\text{new}} \mid D) \approx \frac{1}{S} \sum_{s=1}^S P(x_{\text{new}} \mid \theta^{(s)}), \quad \theta^{(s)} \sim P(\theta \mid D)
+$$
 
 ---
 
@@ -591,13 +685,17 @@ Now predict: what score will this student get on the next test?
 
 The model says $x_{\text{new}} \sim \mathcal{N}(\mu, 15^2)$, but $\mu$ is unknown. MLE plugs in $\hat{\mu} = 130$:
 
-$$x_{\text{new}} \sim \mathcal{N}(\hat{\mu}, 15^2) = \mathcal{N}(130, 15^2)$$
+$$
+x_{\text{new}} \sim \mathcal{N}(\hat{\mu}, 15^2) = \mathcal{N}(130, 15^2)
+$$
 
 Treat $\hat{\mu}$ as if it were the true $\mu$. Prediction: mean 130, std 15.
 
 **Bayesian approach** (integrate over posterior):
 
-$$P(x_{\text{new}} \mid D) = \int \mathcal{N}(x_{\text{new}} \mid \mu, 15^2) \cdot \mathcal{N}(\mu \mid 124.4, 6^2) \, d\mu$$
+$$
+P(x_{\text{new}} \mid D) = \int \mathcal{N}(x_{\text{new}} \mid \mu, 15^2) \cdot \mathcal{N}(\mu \mid 124.4, 6^2) \, d\mu
+$$
 
 Result: $x_{\text{new}} \mid D \sim \mathcal{N}(124.4, 15^2 + 6^2) = \mathcal{N}(124.4, 261)$
 
@@ -636,15 +734,23 @@ Likelihood: $y \mid X, \theta \sim \mathcal{N}(X\theta, \beta^{-1}I)$ ($\beta = 
 
 Posterior (Gaussian-Gaussian conjugacy):
 
-$$\theta \mid X, y \sim \mathcal{N}(\mu_N, \Sigma_N)$$
+$$
+\theta \mid X, y \sim \mathcal{N}(\mu_N, \Sigma_N)
+$$
 
-$$\Sigma_N = (\alpha I + \beta X^T X)^{-1}$$
+$$
+\Sigma_N = (\alpha I + \beta X^T X)^{-1}
+$$
 
-$$\mu_N = \beta \Sigma_N X^T y$$
+$$
+\mu_N = \beta \Sigma_N X^T y
+$$
 
 **Predictive distribution** is also Gaussian:
 
-$$y_{\text{new}} \mid x_{\text{new}}, X, y \sim \mathcal{N}(\mu_N^T x_{\text{new}},\; \sigma_{\text{pred}}^2)$$
+$$
+y_{\text{new}} \mid x_{\text{new}}, X, y \sim \mathcal{N}(\mu_N^T x_{\text{new}},\; \sigma_{\text{pred}}^2)
+$$
 
 Prediction variance has **two parts**: noise $\beta^{-1}$ + parameter uncertainty.
 
@@ -664,7 +770,9 @@ Sample from the posterior, approximate with samples.
 **Method 2: Variational Inference**
 Approximate posterior with a simple distribution $q(\theta)$, minimize KL divergence:
 
-$$\min_{q} D_{\text{KL}}(q(\theta) \| P(\theta \mid D))$$
+$$
+\min_{q} D_{\text{KL}}(q(\theta) \| P(\theta \mid D))
+$$
 
 Faster than MCMC, but may sacrifice accuracy.
 
@@ -716,6 +824,8 @@ The latter is more intuitive, but requires a prior.
 - MCMC / Variational inference
 - Bayesian vs Frequentist
 
-$$\boxed{\;P(H \mid D) = \frac{P(D \mid H) \cdot P(H)}{P(D)}\;}$$
+$$
+\boxed{\;P(H \mid D) = \frac{P(D \mid H) \cdot P(H)}{P(D)}\;}
+$$
 
 The essence of Bayesian thinking: **update beliefs with data, make decisions with posteriors.**

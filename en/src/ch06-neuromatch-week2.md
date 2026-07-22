@@ -36,7 +36,9 @@ The simplest dynamical system: $\dot{x} = ax$
 
 **Forward Euler integration** (numerical solution):
 
-$$x(t_i) = x(t_{i-1}) + \dot{x}(t_{i-1}) \cdot dt$$
+$$
+x(t_i) = x(t_{i-1}) + \dot{x}(t_{i-1}) \cdot dt
+$$
 
 For $\dot{x} = ax$ specifically: $x[k] = x[k-1] + a \cdot x[k-1] \cdot dt$
 
@@ -48,7 +50,9 @@ For $\dot{x} = ax$ specifically: $x[k] = x[k-1] + a \cdot x[k-1] \cdot dt$
 
 When $a$ is complex ($a = \text{real} + i \cdot \text{imag}$), the system oscillates:
 
-$$x(t) = x_0 e^{(\text{real} + i \cdot \text{imag})t} = x_0 e^{\text{real} \cdot t} \cdot [\cos(\text{imag} \cdot t) + i \sin(\text{imag} \cdot t)]$$
+$$
+x(t) = x_0 e^{(\text{real} + i \cdot \text{imag})t} = x_0 e^{\text{real} \cdot t} \cdot [\cos(\text{imag} \cdot t) + i \sin(\text{imag} \cdot t)]
+$$
 
 **Key insight**:
 
@@ -67,7 +71,9 @@ Example: Producing a 0.5 Hz stable oscillation → imaginary part = $2\pi \times
 
 Extension to 2D: $\dot{\mathbf{x}} = \mathbf{A}\mathbf{x}$
 
-$$\begin{bmatrix} \dot{x}_1 \\ \dot{x}_2 \end{bmatrix} = \begin{bmatrix} a_{11} & a_{12} \\ a_{21} & a_{22} \end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \end{bmatrix}$$
+$$
+\begin{bmatrix} \dot{x}_1 \\ \dot{x}_2 \end{bmatrix} = \begin{bmatrix} a_{11} & a_{12} \\ a_{21} & a_{22} \end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \end{bmatrix}
+$$
 
 **Numerical solution**: Uses `scipy.integrate.solve_ivp` (not manual Euler in 2D)
 
@@ -105,7 +111,9 @@ $$\begin{bmatrix} \dot{x}_1 \\ \dot{x}_2 \end{bmatrix} = \begin{bmatrix} a_{11} 
 
 **State transition matrix**:
 
-$$\begin{bmatrix} C \\ O \end{bmatrix}_{k+1} = \begin{bmatrix} 1-\mu_{c2o} & \mu_{o2c} \\ \mu_{c2o} & 1-\mu_{o2c} \end{bmatrix} \begin{bmatrix} C \\ O \end{bmatrix}_k$$
+$$
+\begin{bmatrix} C \\ O \end{bmatrix}_{k+1} = \begin{bmatrix} 1-\mu_{c2o} & \mu_{o2c} \\ \mu_{c2o} & 1-\mu_{o2c} \end{bmatrix} \begin{bmatrix} C \\ O \end{bmatrix}_k
+$$
 
 - Each column sums to 1 (conservation of probability)
 - Matrix entries:
@@ -162,7 +170,9 @@ As $k \to \infty$: $x_k \to x_\infty$
 
 **Ornstein-Uhlenbeck (OU) process / Drift-Diffusion Model**:
 
-$$x_{k+1} = x_\infty + \lambda(x_k - x_\infty) + \sigma \eta$$
+$$
+x_{k+1} = x_\infty + \lambda(x_k - x_\infty) + \sigma \eta
+$$
 
 where $\eta \sim \mathcal{N}(0,1)$ (standard normal)
 
@@ -173,7 +183,9 @@ where $\eta \sim \mathcal{N}(0,1)$ (standard normal)
 
 **Equilibrium variance** (key result):
 
-$$\text{Var}_{eq} = \frac{\sigma^2}{1 - \lambda^2}$$
+$$
+\text{Var}_{eq} = \frac{\sigma^2}{1 - \lambda^2}
+$$
 
 **Properties**:
 
@@ -284,13 +296,17 @@ $r+1$ coefficients to fit (including intercept $\alpha_0$)
 
 **Core membrane potential equation (subthreshold dynamics)**:
 
-$$\tau_m \frac{dV}{dt} = -(V - E_L) + \frac{I}{g_L}$$
+$$
+\tau_m \frac{dV}{dt} = -(V - E_L) + \frac{I}{g_L}
+$$
 
 where $\tau_m = C_m / g_L$ is the membrane time constant, $g_L$ is leak conductance, $E_L$ is resting potential
 
 **Spike-and-reset rule**:
 
-$$\text{if } V(t_{sp}) \geq V_{th}: \quad V(t) = V_{reset} \text{ for } t \in (t_{sp}, t_{sp} + \tau_{ref}]$$
+$$
+\text{if } V(t_{sp}) \geq V_{th}: \quad V(t) = V_{reset} \text{ for } t \in (t_{sp}, t_{sp} + \tau_{ref}]
+$$
 
 **Default parameters**:
 
@@ -329,13 +345,17 @@ for it in range(Lt - 1):
 
 **Gaussian White Noise (GWN)**:
 
-$$I_{gwn} = \mu + \sigma \cdot \frac{\xi(t)}{\sqrt{dt/1000}}$$
+$$
+I_{gwn} = \mu + \sigma \cdot \frac{\xi(t)}{\sqrt{dt/1000}}
+$$
 
 where $\xi(t) \sim \mathcal{N}(0,1)$, dividing by $\sqrt{dt/1000}$ converts discrete-time noise to proper continuous-time scaling (units to seconds)
 
 **Ornstein-Uhlenbeck (OU) process (colored noise)**:
 
-$$\tau_\eta \frac{d\eta}{dt} = -\eta(t) + \sigma_\eta \sqrt{2\tau_\eta} \xi(t)$$
+$$
+\tau_\eta \frac{d\eta}{dt} = -\eta(t) + \sigma_\eta \sqrt{2\tau_\eta} \xi(t)
+$$
 
 **Properties**:
 
@@ -356,7 +376,9 @@ I_ou[it+1] = I_ou[it] + (dt/tau_ou)*(mu - I_ou[it]) + sqrt(2*dt/tau_ou)*sig*nois
 
 **Coefficient of Variation of ISI (CV_ISI)**:
 
-$$\text{CV}_{\text{ISI}} = \frac{\text{std}(\text{ISI})}{\text{mean}(\text{ISI})}$$
+$$
+\text{CV}_{\text{ISI}} = \frac{\text{std}(\text{ISI})}{\text{mean}(\text{ISI})}
+$$
 
 | CV Value | Meaning |
 |----------|---------|
@@ -376,13 +398,17 @@ $$\text{CV}_{\text{ISI}} = \frac{\text{std}(\text{ISI})}{\text{mean}(\text{ISI})
 
 **Correlated input model**:
 
-$$\frac{I_i}{g_L} = \mu_i + \sigma_i (\sqrt{1-c}\xi_i + \sqrt{c}\xi_c)$$
+$$
+\frac{I_i}{g_L} = \mu_i + \sigma_i (\sqrt{1-c}\xi_i + \sqrt{c}\xi_c)
+$$
 
 where $c \in [0,1]$ controls the fraction of common input, $\xi_i$ is independent noise, $\xi_c$ is shared common noise
 
 **Sample correlation coefficient (Pearson)**:
 
-$$r_{ij} = \frac{\text{cov}(I_i, I_j)}{\sqrt{\text{var}(I_i)} \sqrt{\text{var}(I_j)}}$$
+$$
+r_{ij} = \frac{\text{cov}(I_i, I_j)}{\sqrt{\text{var}(I_i)} \sqrt{\text{var}(I_j)}}
+$$
 
 where $\text{cov}(I_i, I_j) = \sum_{k=1}^{L}(I_i^k - \bar{I_i})(I_j^k - \bar{I_j})$
 
@@ -403,9 +429,13 @@ Spike probability per bin = $\text{rate} \times dt / 1000$
 
 **Campbell's theorem (mean and variance of synaptic current from Poisson input)**:
 
-$$\mu_{\rm syn} = \lambda J \int P(t) dt$$
+$$
+\mu_{\rm syn} = \lambda J \int P(t) dt
+$$
 
-$$\sigma_{\rm syn} = \lambda J \int P(t)^2 dt$$
+$$
+\sigma_{\rm syn} = \lambda J \int P(t)^2 dt
+$$
 
 where $\lambda$ is Poisson rate, $J$ is PSP amplitude, $P(t)$ is postsynaptic current kernel
 
@@ -422,25 +452,33 @@ where $\lambda$ is Poisson rate, $J$ is PSP amplitude, $P(t)$ is postsynaptic cu
 
 **Synaptic conductance dynamics**:
 
-$$\frac{dg_{\rm syn}(t)}{dt} = \bar{g}_{\rm syn} \sum_k \delta(t-t_k) - \frac{g_{\rm syn}(t)}{\tau_{\rm syn}}$$
+$$
+\frac{dg_{\rm syn}(t)}{dt} = \bar{g}_{\rm syn} \sum_k \delta(t-t_k) - \frac{g_{\rm syn}(t)}{\tau_{\rm syn}}
+$$
 
 - $\bar{g}_{\rm syn}$: maximum conductance change per spike (synaptic weight)
 - $\tau_{\rm syn}$: synaptic time constant (controls decay speed)
 
 **Ohm's law (conductance to current)**:
 
-$$I_{\rm syn}(t) = g_{\rm syn}(t)(V(t) - E_{\rm syn})$$
+$$
+I_{\rm syn}(t) = g_{\rm syn}(t)(V(t) - E_{\rm syn})
+$$
 
 - $E_E = 0$ mV (excitatory reversal potential, depolarizing)
 - $E_I = -80$ mV (inhibitory reversal potential, hyperpolarizing)
 
 **Total synaptic current**:
 
-$$I_{\rm syn} = -g_E(t)(V - E_E) - g_I(t)(V - E_I)$$
+$$
+I_{\rm syn} = -g_E(t)(V - E_E) - g_I(t)(V - E_I)
+$$
 
 **Conductance-based LIF membrane equation**:
 
-$$\tau_m \frac{dV}{dt} = -(V - E_L) - \frac{g_E(t)}{g_L}(V - E_E) - \frac{g_I(t)}{g_L}(V - E_I) + \frac{I_{\rm inj}}{g_L}$$
+$$
+\tau_m \frac{dV}{dt} = -(V - E_L) - \frac{g_E(t)}{g_L}(V - E_E) - \frac{g_I(t)}{g_L}(V - E_I) + \frac{I_{\rm inj}}{g_L}
+$$
 
 **Euler update for conductance (run_LIF_cond)**:
 
@@ -468,11 +506,17 @@ gI[it+1] = gI[it] - (dt/tau_syn_I)*gI[it] + gI_bar * spike_train_in[it+1]
 
 **Three-variable dynamic model**:
 
-$$\frac{du_E}{dt} = -\frac{u_E}{\tau_f} + U_0(1-u_E^-)\delta(t-t_{sp})$$
+$$
+\frac{du_E}{dt} = -\frac{u_E}{\tau_f} + U_0(1-u_E^-)\delta(t-t_{sp})
+$$
 
-$$\frac{dR_E}{dt} = \frac{1-R_E}{\tau_d} - u_E^+ R_E^- \delta(t-t_{sp})$$
+$$
+\frac{dR_E}{dt} = \frac{1-R_E}{\tau_d} - u_E^+ R_E^- \delta(t-t_{sp})
+$$
 
-$$\frac{dg_E}{dt} = -\frac{g_E}{\tau_E} + \bar{g}_E u_E^+ R_E^- \delta(t-t_{sp})$$
+$$
+\frac{dg_E}{dt} = -\frac{g_E}{\tau_E} + \bar{g}_E u_E^+ R_E^- \delta(t-t_{sp})
+$$
 
 **Variable meanings**:
 
@@ -537,7 +581,9 @@ for it in range(Lt - 1):
 
 **STDP weight change rule (biphasic exponential decay)**:
 
-$$\Delta W = \begin{cases} A_+ e^{(t_{pre}-t_{post})/\tau_+} & \text{if } t_{post} > t_{pre} \text{ (LTP)} \\ -A_- e^{-(t_{pre}-t_{post})/\tau_-} & \text{if } t_{post} < t_{pre} \text{ (LTD)} \end{cases}$$
+$$
+\Delta W = \begin{cases} A_+ e^{(t_{pre}-t_{post})/\tau_+} & \text{if } t_{post} > t_{pre} \text{ (LTP)} \\ -A_- e^{-(t_{pre}-t_{post})/\tau_-} & \text{if } t_{post} < t_{pre} \text{ (LTD)} \end{cases}
+$$
 
 where $\Delta t = t_{pre} - t_{post}$. For simplicity, $\tau_+ = \tau_- = \tau_{\rm stdp}$
 
@@ -551,13 +597,17 @@ where $\Delta t = t_{pre} - t_{post}$. For simplicity, $\tau_+ = \tau_- = \tau_{
 
 For each presynaptic neuron $i$:
 
-$$\tau_+ \frac{dP}{dt} = -P$$
+$$
+\tau_+ \frac{dP}{dt} = -P
+$$
 
 On presynaptic spike: $P(t) = P(t) + A_+$
 
 For each postsynaptic neuron:
 
-$$\tau_- \frac{dM}{dt} = -M$$
+$$
+\tau_- \frac{dM}{dt} = -M
+$$
 
 On postsynaptic spike: $M(t) = M(t) - A_-$
 
@@ -575,21 +625,27 @@ P[:,it+1] = P[:,it] + dP
 
 When presynaptic neuron $i$ fires (LTD):
 
-$$\bar{g}_i = \bar{g}_i + M(t) \cdot \bar{g}_{max}$$
+$$
+\bar{g}_i = \bar{g}_i + M(t) \cdot \bar{g}_{max}
+$$
 
 - $M$ is negative, so weight decreases
 - Clamp: if $\bar{g}_i < 0$, set $\bar{g}_i = 0$
 
 When postsynaptic neuron fires (LTP):
 
-$$\bar{g}_i = \bar{g}_i + P_i(t) \cdot \bar{g}_{max} \quad \forall i$$
+$$
+\bar{g}_i = \bar{g}_i + P_i(t) \cdot \bar{g}_{max} \quad \forall i
+$$
 
 - $P$ is positive, so weight increases
 - Clamp: if $\bar{g}_i > \bar{g}_{max}$, set $\bar{g}_i = \bar{g}_{max}$
 
 **LIF membrane equation with STDP synapses**:
 
-$$\tau_m \frac{dV}{dt} = -(V - E_L) - g_E(t)(V - E_E)$$
+$$
+\tau_m \frac{dV}{dt} = -(V - E_L) - g_E(t)(V - E_E)
+$$
 
 where $g_E(t) = \sum_i g_i(t)$, each $g_i(t)$ uses the dynamically updated $\bar{g}_i$
 
@@ -617,11 +673,15 @@ where $g_E(t) = \sum_i g_i(t)$, each $g_i(t)$ uses the dynamically updated $\bar
 
 **Feedforward firing rate dynamics (Eq. 1)**:
 
-$$\tau \frac{dr}{dt} = -r + F(I_{\rm ext})$$
+$$
+\tau \frac{dr}{dt} = -r + F(I_{\rm ext})
+$$
 
 **Sigmoidal transfer function / F-I curve (Eq. 2)**:
 
-$$F(x; a, \theta) = \frac{1}{1 + e^{-a(x-\theta)}} - \frac{1}{1 + e^{a\theta}}$$
+$$
+F(x; a, \theta) = \frac{1}{1 + e^{-a(x-\theta)}} - \frac{1}{1 + e^{a\theta}}
+$$
 
 - $a$ = gain, $\theta$ = threshold
 - The second term ensures $F(0; a, \theta) = 0$
@@ -636,13 +696,17 @@ def F(x, a, theta):
 
 **Recurrent network dynamics (Eq. 3)**:
 
-$$\tau \frac{dr}{dt} = -r + F(w \cdot r + I_{\rm ext})$$
+$$
+\tau \frac{dr}{dt} = -r + F(w \cdot r + I_{\rm ext})
+$$
 
 where $w$ is recurrent synaptic weight (E to E)
 
 **Analytical solution for $w = 0$**:
 
-$$r(t) = r(0) + [F(I_{\rm ext}; a, \theta) - r(0)](1 - e^{-t/\tau})$$
+$$
+r(t) = r(0) + [F(I_{\rm ext}; a, \theta) - r(0)](1 - e^{-t/\tau})
+$$
 
 ---
 
@@ -650,15 +714,21 @@ $$r(t) = r(0) + [F(I_{\rm ext}; a, \theta) - r(0)](1 - e^{-t/\tau})$$
 
 **Fixed point condition (Eq. 4)**: $r$ value when $\frac{dr}{dt} = 0$
 
-$$-r^* + F(w \cdot r^* + I_{\rm ext}; a, \theta) = 0$$
+$$
+-r^* + F(w \cdot r^* + I_{\rm ext}; a, \theta) = 0
+$$
 
 **Derivative of sigmoid transfer function (Eq. 5)**:
 
-$$\frac{dF}{dx} = a \cdot e^{-a(x-\theta)} \cdot (1 + e^{-a(x-\theta)})^{-2}$$
+$$
+\frac{dF}{dx} = a \cdot e^{-a(x-\theta)} \cdot (1 + e^{-a(x-\theta)})^{-2}
+$$
 
 **Eigenvalue for stability analysis (Eq. 4 in Bonus)**:
 
-$$\lambda = \frac{-1 + w \cdot F'(w \cdot r^* + I_{\rm ext}; a, \theta)}{\tau}$$
+$$
+\lambda = \frac{-1 + w \cdot F'(w \cdot r^* + I_{\rm ext}; a, \theta)}{\tau}
+$$
 
 | $\lambda$ | Stability |
 |-----------|-----------|
@@ -681,7 +751,9 @@ def eig_single(fp, tau, a, theta, w, I_ext, **other_pars):
 
 **OU process**:
 
-$$\tau_\eta \frac{d\eta}{dt} = -\eta(t) + \sigma_\eta \sqrt{2\tau_\eta} \xi(t)$$
+$$
+\tau_\eta \frac{d\eta}{dt} = -\eta(t) + \sigma_\eta \sqrt{2\tau_\eta} \xi(t)
+$$
 
 **Euler update**:
 
@@ -697,9 +769,13 @@ I_ou[it+1] = I_ou[it] + dt/tau_ou * (0 - I_ou[it]) + sqrt(2*dt/tau_ou) * sig * n
 
 **Two coupled populations (excitatory + inhibitory) (Eq. 1)**:
 
-$$\tau_E \frac{dr_E}{dt} = -r_E + F_E(w_{EE}r_E - w_{EI}r_I + I_E^{\rm ext}; a_E, \theta_E)$$
+$$
+\tau_E \frac{dr_E}{dt} = -r_E + F_E(w_{EE}r_E - w_{EI}r_I + I_E^{\rm ext}; a_E, \theta_E)
+$$
 
-$$\tau_I \frac{dr_I}{dt} = -r_I + F_I(w_{IE}r_E - w_{II}r_I + I_I^{\rm ext}; a_I, \theta_I)$$
+$$
+\tau_I \frac{dr_I}{dt} = -r_I + F_I(w_{IE}r_E - w_{II}r_I + I_I^{\rm ext}; a_I, \theta_I)
+$$
 
 **Euler updates**:
 
@@ -731,21 +807,31 @@ r_I[k+1] = r_I[k] + (dt/τ_I)*(-r_I[k] + F(w_IE*r_E[k] - w_II*r_I[k] + I_ext_I, 
 
 **E nullcline ($\frac{dr_E}{dt} = 0$, Eq. 2)**:
 
-$$-r_E + F_E(w_{EE}r_E - w_{EI}r_I + I_E^{\rm ext}; a_E, \theta_E) = 0$$
+$$
+-r_E + F_E(w_{EE}r_E - w_{EI}r_I + I_E^{\rm ext}; a_E, \theta_E) = 0
+$$
 
 **I nullcline ($\frac{dr_I}{dt} = 0$, Eq. 3)**:
 
-$$-r_I + F_I(w_{IE}r_E - w_{II}r_I + I_I^{\rm ext}; a_I, \theta_I) = 0$$
+$$
+-r_I + F_I(w_{IE}r_E - w_{II}r_I + I_I^{\rm ext}; a_I, \theta_I) = 0
+$$
 
 **Explicit nullcline expressions (Eqs. 4-5)**:
 
-$$\text{E nullcline: } \quad r_I = \frac{1}{w_{EI}}[w_{EE}r_E - F_E^{-1}(r_E; a_E, \theta_E) + I_E^{\rm ext}]$$
+$$
+\text{E nullcline: } \quad r_I = \frac{1}{w_{EI}}[w_{EE}r_E - F_E^{-1}(r_E; a_E, \theta_E) + I_E^{\rm ext}]
+$$
 
-$$\text{I nullcline: } \quad r_E = \frac{1}{w_{IE}}[w_{II}r_I + F_I^{-1}(r_I; a_I, \theta_I) - I_I^{\rm ext}]$$
+$$
+\text{I nullcline: } \quad r_E = \frac{1}{w_{IE}}[w_{II}r_I + F_I^{-1}(r_I; a_I, \theta_I) - I_I^{\rm ext}]
+$$
 
 **Inverse transfer function (Eq. 6)**:
 
-$$F^{-1}(x; a, \theta) = -\frac{1}{a} \ln\left[\frac{1}{x + \frac{1}{1+e^{a\theta}}} - 1\right] + \theta$$
+$$
+F^{-1}(x; a, \theta) = -\frac{1}{a} \ln\left[\frac{1}{x + \frac{1}{1+e^{a\theta}}} - 1\right] + \theta
+$$
 
 **Nullcline properties**:
 
@@ -779,27 +865,43 @@ def EIderivs(rE, rI, tau_E, a_E, theta_E, wEE, wEI, I_ext_E,
 
 **System rewrite**:
 
-$$\frac{dr_E}{dt} = G_E(r_E, r_I) = \frac{1}{\tau_E}[-r_E + F_E(w_{EE}r_E - w_{EI}r_I + I_E^{\rm ext}; a, \theta)]$$
+$$
+\frac{dr_E}{dt} = G_E(r_E, r_I) = \frac{1}{\tau_E}[-r_E + F_E(w_{EE}r_E - w_{EI}r_I + I_E^{\rm ext}; a, \theta)]
+$$
 
-$$\frac{dr_I}{dt} = G_I(r_E, r_I) = \frac{1}{\tau_I}[-r_I + F_I(w_{IE}r_E - w_{II}r_I + I_I^{\rm ext}; a, \theta)]$$
+$$
+\frac{dr_I}{dt} = G_I(r_E, r_I) = \frac{1}{\tau_I}[-r_I + F_I(w_{IE}r_E - w_{II}r_I + I_I^{\rm ext}; a, \theta)]
+$$
 
 **Jacobian matrix (Eq. 7)**:
 
-$$J = \begin{bmatrix} \frac{\partial G_E}{\partial r_E} & \frac{\partial G_E}{\partial r_I} \\ \frac{\partial G_I}{\partial r_E} & \frac{\partial G_I}{\partial r_I} \end{bmatrix}$$
+$$
+J = \begin{bmatrix} \frac{\partial G_E}{\partial r_E} & \frac{\partial G_E}{\partial r_I} \\ \frac{\partial G_I}{\partial r_E} & \frac{\partial G_I}{\partial r_I} \end{bmatrix}
+$$
 
 **Jacobian matrix elements (Eqs. 8-11)**:
 
-$$J[0,0] = \frac{\partial G_E}{\partial r_E} = \frac{1}{\tau_E}[-1 + w_{EE} F_E'(w_{EE}r_E^* - w_{EI}r_I^* + I_E^{\rm ext})]$$
+$$
+J[0,0] = \frac{\partial G_E}{\partial r_E} = \frac{1}{\tau_E}[-1 + w_{EE} F_E'(w_{EE}r_E^* - w_{EI}r_I^* + I_E^{\rm ext})]
+$$
 
-$$J[0,1] = \frac{\partial G_E}{\partial r_I} = \frac{1}{\tau_E}[-w_{EI} F_E'(w_{EE}r_E^* - w_{EI}r_I^* + I_E^{\rm ext})]$$
+$$
+J[0,1] = \frac{\partial G_E}{\partial r_I} = \frac{1}{\tau_E}[-w_{EI} F_E'(w_{EE}r_E^* - w_{EI}r_I^* + I_E^{\rm ext})]
+$$
 
-$$J[1,0] = \frac{\partial G_I}{\partial r_E} = \frac{1}{\tau_I}[w_{IE} F_I'(w_{IE}r_E^* - w_{II}r_I^* + I_I^{\rm ext})]$$
+$$
+J[1,0] = \frac{\partial G_I}{\partial r_E} = \frac{1}{\tau_I}[w_{IE} F_I'(w_{IE}r_E^* - w_{II}r_I^* + I_I^{\rm ext})]
+$$
 
-$$J[1,1] = \frac{\partial G_I}{\partial r_I} = \frac{1}{\tau_I}[-1 - w_{II} F_I'(w_{IE}r_E^* - w_{II}r_I^* + I_I^{\rm ext})]$$
+$$
+J[1,1] = \frac{\partial G_I}{\partial r_I} = \frac{1}{\tau_I}[-1 - w_{II} F_I'(w_{IE}r_E^* - w_{II}r_I^* + I_I^{\rm ext})]
+$$
 
 **Matrix notation**:
 
-$$J = T^{-1}(FW - I)$$
+$$
+J = T^{-1}(FW - I)
+$$
 
 where:
 
@@ -834,11 +936,15 @@ def get_eig_Jacobian(fp, tau_E, a_E, theta_E, wEE, wEI, I_ext_E,
 
 **E nullcline slope (Eq. 12)**:
 
-$$\left(\frac{dr_I}{dr_E}\right)_{\text{E-nullcline}} = \frac{F_E' w_{EE} - 1}{F_E' w_{EI}}$$
+$$
+\left(\frac{dr_I}{dr_E}\right)_{\text{E-nullcline}} = \frac{F_E' w_{EE} - 1}{F_E' w_{EI}}
+$$
 
 **I nullcline slope (Eq. 13)**:
 
-$$\left(\frac{dr_I}{dr_E}\right)_{\text{I-nullcline}} = \frac{F_I' w_{IE}}{F_I' w_{II} + 1}$$
+$$
+\left(\frac{dr_I}{dr_E}\right)_{\text{I-nullcline}} = \frac{F_I' w_{IE}}{F_I' w_{II} + 1}
+$$
 
 **Properties**:
 
@@ -877,7 +983,9 @@ $$\left(\frac{dr_I}{dr_E}\right)_{\text{I-nullcline}} = \frac{F_I' w_{IE}}{F_I' 
 
 **Two regimes based on $\frac{\partial G_E}{\partial r_E}$**:
 
-$$\frac{\partial G_E}{\partial r_E} = \frac{1}{\tau_E}[-1 + w_{EE} F_E'] = \frac{1}{\tau_E}(F_E' w_{EE} - 1)$$
+$$
+\frac{\partial G_E}{\partial r_E} = \frac{1}{\tau_E}[-1 + w_{EE} F_E'] = \frac{1}{\tau_E}(F_E' w_{EE} - 1)
+$$
 
 | Regime | Condition | E Nullcline Slope | Behavior |
 |--------|-----------|-------------------|----------|
@@ -964,31 +1072,57 @@ def my_inject(pars, t_start, t_lag=10.):
 
 ### Key Formulas
 
-$$\tau_m \frac{dV}{dt} = -(V-E_L) + \frac{I}{g_L} \quad \text{(LIF neuron)}$$
+$$
+\tau_m \frac{dV}{dt} = -(V-E_L) + \frac{I}{g_L} \quad \text{(LIF neuron)}
+$$
 
-$$\tau_m \frac{dV}{dt} = -(V-E_L) - \frac{g_E}{g_L}(V-E_E) - \frac{g_I}{g_L}(V-E_I) + \frac{I_{\rm inj}}{g_L} \quad \text{(Conductance-based LIF)}$$
+$$
+\tau_m \frac{dV}{dt} = -(V-E_L) - \frac{g_E}{g_L}(V-E_E) - \frac{g_I}{g_L}(V-E_I) + \frac{I_{\rm inj}}{g_L} \quad \text{(Conductance-based LIF)}
+$$
 
-$$x_{k+1} = x_\infty + \lambda(x_k - x_\infty) + \sigma\eta \quad \text{(OU process)}$$
+$$
+x_{k+1} = x_\infty + \lambda(x_k - x_\infty) + \sigma\eta \quad \text{(OU process)}
+$$
 
-$$\text{Var}_{eq} = \frac{\sigma^2}{1-\lambda^2} \quad \text{(OU equilibrium variance)}$$
+$$
+\text{Var}_{eq} = \frac{\sigma^2}{1-\lambda^2} \quad \text{(OU equilibrium variance)}
+$$
 
-$$\tau \frac{dr}{dt} = -r + F(w \cdot r + I_{\rm ext}) \quad \text{(Firing rate model)}$$
+$$
+\tau \frac{dr}{dt} = -r + F(w \cdot r + I_{\rm ext}) \quad \text{(Firing rate model)}
+$$
 
-$$F(x; a, \theta) = \frac{1}{1+e^{-a(x-\theta)}} - \frac{1}{1+e^{a\theta}} \quad \text{(Sigmoid transfer function)}$$
+$$
+F(x; a, \theta) = \frac{1}{1+e^{-a(x-\theta)}} - \frac{1}{1+e^{a\theta}} \quad \text{(Sigmoid transfer function)}
+$$
 
-$$\tau_E \frac{dr_E}{dt} = -r_E + F_E(w_{EE}r_E - w_{EI}r_I + I_E^{\rm ext}) \quad \text{(Wilson-Cowan E)}$$
+$$
+\tau_E \frac{dr_E}{dt} = -r_E + F_E(w_{EE}r_E - w_{EI}r_I + I_E^{\rm ext}) \quad \text{(Wilson-Cowan E)}
+$$
 
-$$\tau_I \frac{dr_I}{dt} = -r_I + F_I(w_{IE}r_E - w_{II}r_I + I_I^{\rm ext}) \quad \text{(Wilson-Cowan I)}$$
+$$
+\tau_I \frac{dr_I}{dt} = -r_I + F_I(w_{IE}r_E - w_{II}r_I + I_I^{\rm ext}) \quad \text{(Wilson-Cowan I)}
+$$
 
-$$\lambda = \frac{-1 + w \cdot F'(w \cdot r^* + I_{\rm ext})}{\tau} \quad \text{(Eigenvalue/stability)}$$
+$$
+\lambda = \frac{-1 + w \cdot F'(w \cdot r^* + I_{\rm ext})}{\tau} \quad \text{(Eigenvalue/stability)}
+$$
 
-$$J = T^{-1}(FW - I) \quad \text{(Jacobian matrix)}$$
+$$
+J = T^{-1}(FW - I) \quad \text{(Jacobian matrix)}
+$$
 
-$$\frac{dr_I}{dr_E}\bigg|_{\text{E-nullcline}} = \frac{F_E' w_{EE} - 1}{F_E' w_{EI}} \quad \text{(E nullcline slope)}$$
+$$
+\frac{dr_I}{dr_E}\bigg|_{\text{E-nullcline}} = \frac{F_E' w_{EE} - 1}{F_E' w_{EI}} \quad \text{(E nullcline slope)}
+$$
 
-$$\frac{dr_I}{dr_E}\bigg|_{\text{I-nullcline}} = \frac{F_I' w_{IE}}{F_I' w_{II} + 1} \quad \text{(I nullcline slope)}$$
+$$
+\frac{dr_I}{dr_E}\bigg|_{\text{I-nullcline}} = \frac{F_I' w_{IE}}{F_I' w_{II} + 1} \quad \text{(I nullcline slope)}
+$$
 
-$$\Delta W = \begin{cases} A_+ e^{\Delta t/\tau_+} & \Delta t < 0 \text{ (LTP)} \\ -A_- e^{-\Delta t/\tau_-} & \Delta t > 0 \text{ (LTD)} \end{cases} \quad \text{(STDP rule)}$$
+$$
+\Delta W = \begin{cases} A_+ e^{\Delta t/\tau_+} & \Delta t < 0 \text{ (LTP)} \\ -A_- e^{-\Delta t/\tau_-} & \Delta t > 0 \text{ (LTD)} \end{cases} \quad \text{(STDP rule)}
+$$
 
 ---
 

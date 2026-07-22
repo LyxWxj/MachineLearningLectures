@@ -1,0 +1,12 @@
+{
+  "MD013": false,
+  "MD033": false,
+  "MD049": false,
+  "no-inline-html": false,
+  "no-multiple-blanks": false,
+  "blanks-around-fences": false,
+  "blanks-around-lists": false,
+  "no-trailing-spaces": {
+    "br_spaces": 2
+  }
+}

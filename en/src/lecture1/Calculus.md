@@ -4,11 +4,15 @@
 
 The **limit** describes the value that $f(x)$ approaches as $x$ gets arbitrarily close to a point $a$:
 
-$$\lim_{x \to a} f(x) = L$$
+$$
+\lim_{x \to a} f(x) = L
+$$
 
 Formally: for every $\varepsilon > 0$, there exists $\delta > 0$ such that
 
-$$0 < |x - a| < \delta \implies |f(x) - L| < \varepsilon$$
+$$
+0 < |x - a| < \delta \implies |f(x) - L| < \varepsilon
+$$
 
 > **Intuition**
 > We can make $f(x)$ as close to $L$ as we want by choosing $x$ sufficiently close to $a$ (but $x \neq a$).
@@ -19,19 +23,29 @@ $$0 < |x - a| < \delta \implies |f(x) - L| < \varepsilon$$
 
 **Direct substitution** (when continuous):
 
-$$\lim_{x \to 2} (x^2 + 1) = 2^2 + 1 = 5$$
+$$
+\lim_{x \to 2} (x^2 + 1) = 2^2 + 1 = 5
+$$
 
 **Indeterminate form** $\frac{0}{0}$ — factor and cancel:
 
-$$\lim_{x \to 1} \frac{x^2 - 1}{x - 1} = \lim_{x \to 1} \frac{(x-1)(x+1)}{x-1} = \lim_{x \to 1}(x+1) = 2$$
+$$
+\lim_{x \to 1} \frac{x^2 - 1}{x - 1} = \lim_{x \to 1} \frac{(x-1)(x+1)}{x-1} = \lim_{x \to 1}(x+1) = 2
+$$
 
 **Important limits**:
 
-$$\lim_{x \to 0} \frac{\sin x}{x} = 1$$
+$$
+\lim_{x \to 0} \frac{\sin x}{x} = 1
+$$
 
-$$\lim_{x \to 0} \frac{e^x - 1}{x} = 1$$
+$$
+\lim_{x \to 0} \frac{e^x - 1}{x} = 1
+$$
 
-$$\lim_{x \to \infty}\left(1 + \frac{1}{x}\right)^x = e$$
+$$
+\lim_{x \to \infty}\left(1 + \frac{1}{x}\right)^x = e
+$$
 
 ---
 
@@ -39,15 +53,23 @@ $$\lim_{x \to \infty}\left(1 + \frac{1}{x}\right)^x = e$$
 
 **1. Linearity**:
 
-$$\lim_{x \to a} [f(x) + g(x)] = \lim_{x \to a} f(x) + \lim_{x \to a} g(x)$$
+$$
+\lim_{x \to a} [f(x) + g(x)] = \lim_{x \to a} f(x) + \lim_{x \to a} g(x)
+$$
 
-$$\lim_{x \to a} [c \cdot f(x)] = c \cdot \lim_{x \to a} f(x)$$
+$$
+\lim_{x \to a} [c \cdot f(x)] = c \cdot \lim_{x \to a} f(x)
+$$
 
 **2. Product and Quotient**:
 
-$$\lim_{x \to a} [f(x) \cdot g(x)] = \lim_{x \to a} f(x) \cdot \lim_{x \to a} g(x)$$
+$$
+\lim_{x \to a} [f(x) \cdot g(x)] = \lim_{x \to a} f(x) \cdot \lim_{x \to a} g(x)
+$$
 
-$$\lim_{x \to a} \frac{f(x)}{g(x)} = \frac{\displaystyle\lim_{x \to a} f(x)}{\displaystyle\lim_{x \to a} g(x)} \quad \text{(if } \lim_{x \to a} g(x) \neq 0\text{)}$$
+$$
+\lim_{x \to a} \frac{f(x)}{g(x)} = \frac{\displaystyle\lim_{x \to a} f(x)}{\displaystyle\lim_{x \to a} g(x)} \quad \text{(if } \lim_{x \to a} g(x) \neq 0\text{)}
+$$
 
 **3. Squeeze Theorem**: If $g(x) \leq f(x) \leq h(x)$ near $a$, and $\lim_{x \to a} g(x) = \lim_{x \to a} h(x) = L$, then $\lim_{x \to a} f(x) = L$.
 
@@ -57,7 +79,9 @@ $$\lim_{x \to a} \frac{f(x)}{g(x)} = \frac{\displaystyle\lim_{x \to a} f(x)}{\di
 
 A function $f$ is **continuous** at point $a$ if:
 
-$$\boxed{\lim_{x \to a} f(x) = f(a)}$$
+$$
+\boxed{\lim_{x \to a} f(x) = f(a)}
+$$
 
 This requires **three conditions**:
 
@@ -129,19 +153,27 @@ $\lim_{x \to a} f(x) = \pm\infty$ or does not exist
 
 A function $f$ is **differentiable** at $a$ if the derivative exists:
 
-$$f'(a) = \lim_{\Delta x \to 0} \frac{f(a + \Delta x) - f(a)}{\Delta x} \quad \text{exists}$$
+$$
+f'(a) = \lim_{\Delta x \to 0} \frac{f(a + \Delta x) - f(a)}{\Delta x} \quad \text{exists}
+$$
 
 **Key relationship**:
 
-$$\text{Differentiable at } a \implies \text{Continuous at } a$$
+$$
+\text{Differentiable at } a \implies \text{Continuous at } a
+$$
 
 **But NOT the converse!** A function can be continuous at $a$ but not differentiable there.
 
 **Why?** If $f'(a)$ exists, then:
 
-$$\lim_{\Delta x \to 0}[f(a+\Delta x) - f(a)] = \lim_{\Delta x \to 0} \frac{f(a+\Delta x) - f(a)}{\Delta x} \cdot \Delta x = f'(a) \cdot 0 = 0$$
+$$
+\lim_{\Delta x \to 0}[f(a+\Delta x) - f(a)] = \lim_{\Delta x \to 0} \frac{f(a+\Delta x) - f(a)}{\Delta x} \cdot \Delta x = f'(a) \cdot 0 = 0
+$$
 
-$$\implies \lim_{\Delta x \to 0} f(a+\Delta x) = f(a) \implies \text{continuous}$$
+$$
+\implies \lim_{\Delta x \to 0} f(a+\Delta x) = f(a) \implies \text{continuous}
+$$
 
 ---
 
@@ -156,8 +188,12 @@ $$\implies \lim_{\Delta x \to 0} f(a+\Delta x) = f(a) \implies \text{continuous}
 **$f(x) = |x|$** at $x = 0$:
 - **Continuous**: $\lim_{x \to 0}|x| = 0 = f(0)$ ✓
 - **NOT differentiable**: left and right derivatives disagree:
-$$f'_-(0) = \lim_{\Delta x \to 0^-}\frac{|\Delta x|}{\Delta x} = -1$$
-$$f'_+(0) = \lim_{\Delta x \to 0^+}\frac{|\Delta x|}{\Delta x} = +1$$
+$$
+f'_-(0) = \lim_{\Delta x \to 0^-}\frac{|\Delta x|}{\Delta x} = -1
+$$
+$$
+f'_+(0) = \lim_{\Delta x \to 0^+}\frac{|\Delta x|}{\Delta x} = +1
+$$
 The sharp **corner** means no unique tangent line exists.
 
 ---
@@ -247,13 +283,17 @@ Cusp — tangent is vertical ($\infty$ slope)
 
 The derivative is **defined** as a limit:
 
-$$f'(x) = \lim_{\Delta x \to 0} \frac{f(x + \Delta x) - f(x)}{\Delta x}$$
+$$
+f'(x) = \lim_{\Delta x \to 0} \frac{f(x + \Delta x) - f(x)}{\Delta x}
+$$
 
 **Connection**: Without limits, we cannot rigorously define derivatives. The limit captures the idea of "instantaneous rate of change" — the slope of the tangent line as the two points on the secant line merge into one.
 
 **Example**: Derivative of $f(x) = x^2$ from first principles:
 
-$$f'(x) = \lim_{\Delta x \to 0} \frac{(x+\Delta x)^2 - x^2}{\Delta x} = \lim_{\Delta x \to 0} \frac{2x\Delta x + (\Delta x)^2}{\Delta x} = \lim_{\Delta x \to 0}(2x + \Delta x) = 2x$$
+$$
+f'(x) = \lim_{\Delta x \to 0} \frac{(x+\Delta x)^2 - x^2}{\Delta x} = \lim_{\Delta x \to 0} \frac{2x\Delta x + (\Delta x)^2}{\Delta x} = \lim_{\Delta x \to 0}(2x + \Delta x) = 2x
+$$
 
 ---
 
@@ -261,11 +301,15 @@ $$f'(x) = \lim_{\Delta x \to 0} \frac{(x+\Delta x)^2 - x^2}{\Delta x} = \lim_{\D
 
 For a function $y=f(x)$, the derivative at point $x$ is:
 
-$$f'(x) = \lim_{\Delta x \to 0} \frac{f(x + \Delta x) - f(x)}{\Delta x} = \frac{dy}{dx}$$
+$$
+f'(x) = \lim_{\Delta x \to 0} \frac{f(x + \Delta x) - f(x)}{\Delta x} = \frac{dy}{dx}
+$$
 
 **Example**: $f(x) = x^3/3 - x$
 
-$$f'(x) = \frac{d}{dx}\left(\frac{x^3}{3} - x\right) = x^2 - 1$$
+$$
+f'(x) = \frac{d}{dx}\left(\frac{x^3}{3} - x\right) = x^2 - 1
+$$
 
 The sign of $\frac{df}{dx}$ indicates if $f$ increases by an increasing $x$.
 
@@ -275,31 +319,45 @@ Question: we have some $x_0$ and $x_1 = x_0 - \beta f'(x_0)$ ($\beta$ is small e
 
 ### Intuition
 
-$$x_1 = x_0 - \beta f'(x_0)$$
+$$
+x_1 = x_0 - \beta f'(x_0)
+$$
 
 - If $f'(x_0) > 0$: $f$ is increasing, $x_1 < x_0$ (move left) $\Rightarrow$ $f$ decreases
 - If $f'(x_0) < 0$: $f$ is decreasing, $x_1 > x_0$ (move right) $\Rightarrow$ $f$ decreases
 - Anyway $x_1$ moves in the direction that reduces $f$
 
-$$\boxed{f(x_0) \geq f(x_1)}$$
+$$
+\boxed{f(x_0) \geq f(x_1)}
+$$
 
 ### Derivation (Taylor Expansion)
 
-$$x_1 = x_0 - \beta f'(x_0)$$
+$$
+x_1 = x_0 - \beta f'(x_0)
+$$
 
-$$f(x_1) \approx f(x_0) + f'(x_0)(x_1 - x_0)$$
+$$
+f(x_1) \approx f(x_0) + f'(x_0)(x_1 - x_0)
+$$
 
 Substitute $x_1 - x_0 = -\beta f'(x_0)$:
 
-$$f(x_1) \approx f(x_0) - \beta\left(f'(x_0)\right)^2$$
+$$
+f(x_1) \approx f(x_0) - \beta\left(f'(x_0)\right)^2
+$$
 
 Since $\beta > 0$ and $\left(f'(x_0)\right)^2 \geq 0$:
 
-$$\boxed{f(x_1) \leq f(x_0)}$$
+$$
+\boxed{f(x_1) \leq f(x_0)}
+$$
 
 **Taylor Expansion**: For a smooth function $f$ near point $a$:
 
-$$f(x) = f(a) + f'(a)(x-a) + \frac{f''(a)}{2!}(x-a)^2 + \cdots+\frac{f^{(n)}(a)}{n!}(x-a)^n+o((x-a)^n)$$
+$$
+f(x) = f(a) + f'(a)(x-a) + \frac{f''(a)}{2!}(x-a)^2 + \cdots+\frac{f^{(n)}(a)}{n!}(x-a)^n+o((x-a)^n)
+$$
 
 For $a=0$,$f(x) = f(0) + f'(0)(x) + \frac{f''(0)}{2!}(x)^2 + \cdots+\frac{f^{(n)}(0)}{n!}(x)^n+o((x)^n)$
 
@@ -322,7 +380,9 @@ Points where f'(x) =0,then f(x)?
 
 <TaylorExpansion type="poly6" />
 <TaylorExpansion type="ln" />
-$$f(x) = f(a) + f'(a)(x-a) + \frac{f''(a)}{2!}(x-a)^2 + \cdots+\frac{f^{(n)}(a)}{n!}(x-a)^n+o((x-a)^n)$$
+$$
+f(x) = f(a) + f'(a)(x-a) + \frac{f''(a)}{2!}(x-a)^2 + \cdots+\frac{f^{(n)}(a)}{n!}(x-a)^n+o((x-a)^n)
+$$
 
 ---
 
@@ -330,7 +390,9 @@ $$f(x) = f(a) + f'(a)(x-a) + \frac{f''(a)}{2!}(x-a)^2 + \cdots+\frac{f^{(n)}(a)}
 
 <TaylorExpansion type="exp" />
 <TaylorExpansion type="sin" />
-$$f(x) = f(a) + f'(a)(x-a) + \frac{f''(a)}{2!}(x-a)^2 + \cdots+\frac{f^{(n)}(a)}{n!}(x-a)^n+o((x-a)^n)$$
+$$
+f(x) = f(a) + f'(a)(x-a) + \frac{f''(a)}{2!}(x-a)^2 + \cdots+\frac{f^{(n)}(a)}{n!}(x-a)^n+o((x-a)^n)
+$$
 
 ---
 
@@ -358,7 +420,9 @@ Hint: Look at which coefficients are zero and why.
 
 The **chain rule** is critical for backpropagation in neural networks. It computes derivatives of composite functions: propagating gradients backward layer by layer.
 
-$$\frac{\partial L}{\partial w_1} = \frac{\partial L}{\partial y} \cdot \frac{\partial y}{\partial z} \cdot \frac{\partial z}{\partial w_1}$$
+$$
+\frac{\partial L}{\partial w_1} = \frac{\partial L}{\partial y} \cdot \frac{\partial y}{\partial z} \cdot \frac{\partial z}{\partial w_1}
+$$
 
 ---
 
@@ -382,11 +446,17 @@ No matter which side we start, gradient descent always descends toward the minim
 
 <GradientDescentLR />
 **Function**:
-$$f(x) = (x - 2)^2 + 1$$
+$$
+f(x) = (x - 2)^2 + 1
+$$
 **Gradient**:
-$$f'(x) = 2(x - 2)$$
+$$
+f'(x) = 2(x - 2)
+$$
 **Update rule**:
-$$x_{n+1} = x_n - \eta \cdot f'(x_n)$$
+$$
+x_{n+1} = x_n - \eta \cdot f'(x_n)
+$$
 **Try adjusting $\eta$** with the slider and observe:
 **Tradeoff**: Small $\eta$ is safe but slow. Large $\eta$ is fast but risky. Choosing the right learning rate is critical in ML training.
 
@@ -396,9 +466,13 @@ $$x_{n+1} = x_n - \eta \cdot f'(x_n)$$
 
 <GradientDescentMulti />
 **Function**:
-$$f(x) = x^4 - 4x^3 + 2x^2 + 4x$$
+$$
+f(x) = x^4 - 4x^3 + 2x^2 + 4x
+$$
 **Gradient**:
-$$f'(x) = 4x^3 - 12x^2 + 4x + 4$$
+$$
+f'(x) = 4x^3 - 12x^2 + 4x + 4
+$$
 **Critical points** (where $f'(x) = 0$):
 
 | Point             | Type      |
@@ -413,7 +487,9 @@ $$f'(x) = 4x^3 - 12x^2 + 4x + 4$$
 
 For a multivariable function $f(x_1, x_2, \ldots, x_n)$, the partial derivative is the rate of change when **only one variable** varies:
 
-$$\frac{\partial f}{\partial x_i} = \lim_{\Delta x_i \to 0} \frac{f(x_1, \ldots, x_i + \Delta x_i, \ldots, x_n) - f(x_1, \ldots, x_n)}{\Delta x_i}$$
+$$
+\frac{\partial f}{\partial x_i} = \lim_{\Delta x_i \to 0} \frac{f(x_1, \ldots, x_i + \Delta x_i, \ldots, x_n) - f(x_1, \ldots, x_n)}{\Delta x_i}
+$$
 
 Example:
 
@@ -423,11 +499,15 @@ $$
 
 The **gradient** is the vector of all partial derivatives:
 
-$$\nabla f = \left[\frac{\partial f}{\partial x_1}, \frac{\partial f}{\partial x_2}, \ldots, \frac{\partial f}{\partial x_n}\right]$$
+$$
+\nabla f = \left[\frac{\partial f}{\partial x_1}, \frac{\partial f}{\partial x_2}, \ldots, \frac{\partial f}{\partial x_n}\right]
+$$
 
 The gradient points in the direction of **steepest ascent**. In ML, we update parameters in the **opposite** direction to minimize the loss:
 
-$$\mathbf{w} \leftarrow \mathbf{w} - \eta \nabla L(\mathbf{w})$$
+$$
+\mathbf{w} \leftarrow \mathbf{w} - \eta \nabla L(\mathbf{w})
+$$
 
 where $\eta$ is the learning rate.
 
@@ -437,7 +517,9 @@ where $\eta$ is the learning rate.
 
 The **second-order derivative** is the derivative of the derivative, measuring how the rate of change itself changes:
 
-$$f''(x) = \frac{d^2 f}{dx^2} = \frac{d}{dx}\left(\frac{df}{dx}\right) = \lim_{\Delta x \to 0} \frac{f'(x + \Delta x) - f'(x)}{\Delta x}$$
+$$
+f''(x) = \frac{d^2 f}{dx^2} = \frac{d}{dx}\left(\frac{df}{dx}\right) = \lim_{\Delta x \to 0} \frac{f'(x + \Delta x) - f'(x)}{\Delta x}
+$$
 
 **Geometric meaning**: $f''(x)$ describes the **concavity** of the function.
 
@@ -455,11 +537,15 @@ At $x = -1$: $f'(-1) = 0$ (critical point), $f''(-1) = -2 < 0$ → **local maxim
 
 **Second-Order Taylor Expansion** near point $a$:
 
-$$f(x) \approx f(a) + f'(a)(x-a) + \frac{f''(a)}{2}(x-a)^2$$
+$$
+f(x) \approx f(a) + f'(a)(x-a) + \frac{f''(a)}{2}(x-a)^2
+$$
 
 At a critical point where $f'(a) = 0$:
 
-$$f(x) \approx f(a) + \frac{f''(a)}{2}(x-a)^2$$
+$$
+f(x) \approx f(a) + \frac{f''(a)}{2}(x-a)^2
+$$
 
 - If $f''(a) > 0$: $f(x) \geq f(a)$ → **local minimum**
 - If $f''(a) < 0$: $f(x) \leq f(a)$ → **local maximum**
@@ -468,7 +554,9 @@ $$f(x) \approx f(a) + \frac{f''(a)}{2}(x-a)^2$$
 - Small $f''$ → flat region → can take larger steps
 This motivates **second-order optimization methods** like Newton's method:
 
-$$x_{n+1} = x_n - \frac{f'(x_n)}{f''(x_n)}$$
+$$
+x_{n+1} = x_n - \frac{f'(x_n)}{f''(x_n)}
+$$
 
 ---
 
@@ -476,13 +564,19 @@ $$x_{n+1} = x_n - \frac{f'(x_n)}{f''(x_n)}$$
 
 For a multivariable function $f(x_1, x_2, \ldots, x_n)$, we can take partial derivatives with respect to the same variable twice:
 
-$$\frac{\partial^2 f}{\partial x_i^2} = \frac{\partial}{\partial x_i}\left(\frac{\partial f}{\partial x_i}\right)$$
+$$
+\frac{\partial^2 f}{\partial x_i^2} = \frac{\partial}{\partial x_i}\left(\frac{\partial f}{\partial x_i}\right)
+$$
 
 **Example**: $f(x, y) = x^2 y + 3xy^2$
 
-$$\frac{\partial f}{\partial x} = 2xy + 3y^2, \quad \frac{\partial^2 f}{\partial x^2} = 2y$$
+$$
+\frac{\partial f}{\partial x} = 2xy + 3y^2, \quad \frac{\partial^2 f}{\partial x^2} = 2y
+$$
 
-$$\frac{\partial f}{\partial y} = x^2 + 6xy, \quad \frac{\partial^2 f}{\partial y^2} = 6x$$
+$$
+\frac{\partial f}{\partial y} = x^2 + 6xy, \quad \frac{\partial^2 f}{\partial y^2} = 6x
+$$
 
 **Interpretation**: $\frac{\partial^2 f}{\partial x_i^2}$ measures the concavity of $f$ along the $x_i$ direction, holding all other variables constant.
 
@@ -492,19 +586,27 @@ $$\frac{\partial f}{\partial y} = x^2 + 6xy, \quad \frac{\partial^2 f}{\partial 
 
 The **mixed partial derivative** involves taking partial derivatives with respect to **different variables**:
 
-$$\frac{\partial^2 f}{\partial x_j \partial x_i} = \frac{\partial}{\partial x_j}\left(\frac{\partial f}{\partial x_i}\right)$$
+$$
+\frac{\partial^2 f}{\partial x_j \partial x_i} = \frac{\partial}{\partial x_j}\left(\frac{\partial f}{\partial x_i}\right)
+$$
 
 **Example**: $f(x, y) = x^2 y + 3xy^2$
 
-$$\frac{\partial f}{\partial x} = 2xy + 3y^2 \quad \Rightarrow \quad \frac{\partial^2 f}{\partial y \partial x} = \frac{\partial}{\partial y}(2xy + 3y^2) = 2x + 6y$$
+$$
+\frac{\partial f}{\partial x} = 2xy + 3y^2 \quad \Rightarrow \quad \frac{\partial^2 f}{\partial y \partial x} = \frac{\partial}{\partial y}(2xy + 3y^2) = 2x + 6y
+$$
 
-$$\frac{\partial f}{\partial y} = x^2 + 6xy \quad \Rightarrow \quad \frac{\partial^2 f}{\partial x \partial y} = \frac{\partial}{\partial x}(x^2 + 6xy) = 2x + 6y$$
+$$
+\frac{\partial f}{\partial y} = x^2 + 6xy \quad \Rightarrow \quad \frac{\partial^2 f}{\partial x \partial y} = \frac{\partial}{\partial x}(x^2 + 6xy) = 2x + 6y
+$$
 
 **Clairaut's Theorem (Symmetry of Mixed Partials)**:
 
 If $f$ has continuous second-order partial derivatives, then:
 
-$$\boxed{\frac{\partial^2 f}{\partial x_j \partial x_i} = \frac{\partial^2 f}{\partial x_i \partial x_j}}$$
+$$
+\boxed{\frac{\partial^2 f}{\partial x_j \partial x_i} = \frac{\partial^2 f}{\partial x_i \partial x_j}}
+$$
 
 The order of differentiation does not matter!
 
@@ -514,11 +616,15 @@ The order of differentiation does not matter!
 
 The **Hessian matrix** collects all second-order partial derivatives of a multivariable function:
 
-$$H(f) = \begin{bmatrix} \dfrac{\partial^2 f}{\partial x_1^2} & \dfrac{\partial^2 f}{\partial x_1 \partial x_2} & \cdots & \dfrac{\partial^2 f}{\partial x_1 \partial x_n} \\[6pt] \dfrac{\partial^2 f}{\partial x_2 \partial x_1} & \dfrac{\partial^2 f}{\partial x_2^2} & \cdots & \dfrac{\partial^2 f}{\partial x_2 \partial x_n} \\[6pt] \vdots & \vdots & \ddots & \vdots \\[6pt] \dfrac{\partial^2 f}{\partial x_n \partial x_1} & \dfrac{\partial^2 f}{\partial x_n \partial x_2} & \cdots & \dfrac{\partial^2 f}{\partial x_n^2} \end{bmatrix}$$
+$$
+H(f) = \begin{bmatrix} \dfrac{\partial^2 f}{\partial x_1^2} & \dfrac{\partial^2 f}{\partial x_1 \partial x_2} & \cdots & \dfrac{\partial^2 f}{\partial x_1 \partial x_n} \\[6pt] \dfrac{\partial^2 f}{\partial x_2 \partial x_1} & \dfrac{\partial^2 f}{\partial x_2^2} & \cdots & \dfrac{\partial^2 f}{\partial x_2 \partial x_n} \\[6pt] \vdots & \vdots & \ddots & \vdots \\[6pt] \dfrac{\partial^2 f}{\partial x_n \partial x_1} & \dfrac{\partial^2 f}{\partial x_n \partial x_2} & \cdots & \dfrac{\partial^2 f}{\partial x_n^2} \end{bmatrix}
+$$
 
 **Example**: $f(x, y) = x^2 y + 3xy^2$
 
-$$H = \begin{bmatrix} \dfrac{\partial^2 f}{\partial x^2} & \dfrac{\partial^2 f}{\partial x \partial y} \\[6pt] \dfrac{\partial^2 f}{\partial y \partial x} & \dfrac{\partial^2 f}{\partial y^2} \end{bmatrix} = \begin{bmatrix} 2y & 2x + 6y \\ 2x + 6y & 6x \end{bmatrix}$$
+$$
+H = \begin{bmatrix} \dfrac{\partial^2 f}{\partial x^2} & \dfrac{\partial^2 f}{\partial x \partial y} \\[6pt] \dfrac{\partial^2 f}{\partial y \partial x} & \dfrac{\partial^2 f}{\partial y^2} \end{bmatrix} = \begin{bmatrix} 2y & 2x + 6y \\ 2x + 6y & 6x \end{bmatrix}
+$$
 
 ---
 
@@ -526,11 +632,15 @@ $$H = \begin{bmatrix} \dfrac{\partial^2 f}{\partial x^2} & \dfrac{\partial^2 f}{
 
 **Multivariable second-order Taylor expansion** near point $\mathbf{a}$:
 
-$$f(\mathbf{x}) \approx f(\mathbf{a}) + \nabla f(\mathbf{a})^T (\mathbf{x} - \mathbf{a}) + \frac{1}{2}(\mathbf{x} - \mathbf{a})^T H(\mathbf{a}) (\mathbf{x} - \mathbf{a})$$
+$$
+f(\mathbf{x}) \approx f(\mathbf{a}) + \nabla f(\mathbf{a})^T (\mathbf{x} - \mathbf{a}) + \frac{1}{2}(\mathbf{x} - \mathbf{a})^T H(\mathbf{a}) (\mathbf{x} - \mathbf{a})
+$$
 
 At a critical point where $\nabla f(\mathbf{a}) = \mathbf{0}$:
 
-$$f(\mathbf{x}) \approx f(\mathbf{a}) + \frac{1}{2}(\mathbf{x} - \mathbf{a})^T H(\mathbf{a}) (\mathbf{x} - \mathbf{a})$$
+$$
+f(\mathbf{x}) \approx f(\mathbf{a}) + \frac{1}{2}(\mathbf{x} - \mathbf{a})^T H(\mathbf{a}) (\mathbf{x} - \mathbf{a})
+$$
 
 **Classifying critical points** using the Hessian:
 
@@ -539,7 +649,9 @@ $$f(\mathbf{x}) \approx f(\mathbf{a}) + \frac{1}{2}(\mathbf{x} - \mathbf{a})^T H
 - $H$ **indefinite** → mixed signs → **saddle point**
 **In ML**: The Hessian informs optimization algorithms. Newton's method uses $H^{-1}$ to adapt step size per direction, converging faster than gradient descent on smooth loss surfaces.
 
-$$\mathbf{w} \leftarrow \mathbf{w} - H^{-1} \nabla L(\mathbf{w})$$
+$$
+\mathbf{w} \leftarrow \mathbf{w} - H^{-1} \nabla L(\mathbf{w})
+$$
 
 ---
 
@@ -547,7 +659,9 @@ $$\mathbf{w} \leftarrow \mathbf{w} - H^{-1} \nabla L(\mathbf{w})$$
 
 The **indefinite integral** is the antiderivative — the family of all functions whose derivative is $f(x)$:
 
-$$\int f(x)\, dx = F(x) + C$$
+$$
+\int f(x)\, dx = F(x) + C
+$$
 
 where $F'(x) = f(x)$ and $C$ is an arbitrary constant (since $(F(x)+C)' = f(x)$).
 
@@ -565,11 +679,15 @@ where $F'(x) = f(x)$ and $C$ is an arbitrary constant (since $(F(x)+C)' = f(x)$)
 
 **1. Linearity (Sum Rule)**:
 
-$$\int \left(f(x) + g(x)\right) dx = \int f(x)\, dx + \int g(x)\, dx$$
+$$
+\int \left(f(x) + g(x)\right) dx = \int f(x)\, dx + \int g(x)\, dx
+$$
 
 **2. Constant Multiple Rule**:
 
-$$\int C f(x)\, dx = C \int f(x)\, dx$$
+$$
+\int C f(x)\, dx = C \int f(x)\, dx
+$$
 
 Equivalently: $\int C f(x)\, dx = \int f(x)\, d(Cx) = C \int f(x)\, dx$
 
@@ -581,17 +699,23 @@ Equivalently: $\int C f(x)\, dx = \int f(x)\, d(Cx) = C \int f(x)\, dx$
 
 ### Integration by Substitution (凑微分法)
 
-$$\int f'(x)dx=\int df(x)=f(x)+C$$
+$$
+\int f'(x)dx=\int df(x)=f(x)+C
+$$
 
 If $\int f(x)\, dx = F(x) + C$, then:
 
-$$\boxed{\int f(g(x))\, g'(x)\, dx =\int f(g(x))dg(x)=\int f(u)du=F(u)+C= F(g(x)) + C}$$
+$$
+\boxed{\int f(g(x))\, g'(x)\, dx =\int f(g(x))dg(x)=\int f(u)du=F(u)+C= F(g(x)) + C}
+$$
 
 **Example**: $\int 2x \cos(x^2)\, dx$
 
 Let $u = x^2$, then $du = 2x\, dx$.
 
-$$\int 2x \cos(x^2)\, dx = \int \cos u\, du = \sin u + C = \sin(x^2) + C$$
+$$
+\int 2x \cos(x^2)\, dx = \int \cos u\, du = \sin u + C = \sin(x^2) + C
+$$
 
 **Example**: $\int e^{3x}\, dx$
 
@@ -607,13 +731,17 @@ Let $u = 3x$, then $du = 3\, dx$, so $dx = \frac{1}{3} du\r
 
 From the product rule $(uv)' = u'v + uv'$, we get:
 
-$$\boxed{\int u\, dv = uv - \int v\, du} or \boxed{\int u\, dv + \int v\, du=uv}$$
+$$
+\boxed{\int u\, dv = uv - \int v\, du} or \boxed{\int u\, dv + \int v\, du=uv}
+$$
 
 **Example**: $\int x e^x\, dx$
 
 Let $u = x$, $dv = e^x dx$. Then $du = dx$, $v = e^x$.
 
-$$\int x e^x\, dx = x e^x - \int e^x\, dx = x e^x - e^x + C = (x-1)e^x + C$$
+$$
+\int x e^x\, dx = x e^x - \int e^x\, dx = x e^x - e^x + C = (x-1)e^x + C
+$$
 
 **Exerciese**: $\int \ln\,x \, dx,\int xe^{-x}\,dx$
 
@@ -628,7 +756,9 @@ const n = ref(8)
 
 An **integral** is the inverse of the derivative, representing the accumulated quantity over $[a, b]$:
 
-$$\int_a^b f(x)\, dx = F(a)-F(b)=\left[F(x)\right]^{b}_{a}=\lim_{n \to \infty} \sum_{i=1}^{n} f(x_i) \Delta x$$
+$$
+\int_a^b f(x)\, dx = F(a)-F(b)=\left[F(x)\right]^{b}_{a}=\lim_{n \to \infty} \sum_{i=1}^{n} f(x_i) \Delta x
+$$
 
 <button class="px-3 py-1 rounded border border-gray-500 hover:bg-gray-400/20 font-mono" @click="n = Math.max(1, n - 1)">−</button>
 
@@ -638,9 +768,13 @@ $$\int_a^b f(x)\, dx = F(a)-F(b)=\left[F(x)\right]^{b}_{a}=\lim_{n \to \infty} \
 
 **Exact calculation** using the Fundamental Theorem of Calculus:
 
-$$\int_{0.5}^{2} \left(\frac{x^2}{2} + 0.3\right) dx = \left[\frac{x^3}{6} + 0.3x\right]_{0.5}^{2}$$
+$$
+\int_{0.5}^{2} \left(\frac{x^2}{2} + 0.3\right) dx = \left[\frac{x^3}{6} + 0.3x\right]_{0.5}^{2}
+$$
 
-$$= \underbrace{\left(\frac{2^3}{6} + 0.3 \times 2\right)}_{F(2) = \frac{29}{15} \approx 1.933} - \underbrace{\left(\frac{0.5^3}{6} + 0.3 \times 0.5\right)}_{F(0.5) = \frac{41}{240} \approx 0.171} = \frac{141}{80} \approx 1.7625$$
+$$
+= \underbrace{\left(\frac{2^3}{6} + 0.3 \times 2\right)}_{F(2) = \frac{29}{15} \approx 1.933} - \underbrace{\left(\frac{0.5^3}{6} + 0.3 \times 0.5\right)}_{F(0.5) = \frac{41}{240} \approx 0.171} = \frac{141}{80} \approx 1.7625
+$$
 
 <RiemannChart :a="0.5" :b="2" :n="n" />
 
@@ -652,13 +786,17 @@ A **differential equation** is an equation that relates a function to its deriva
 
 **Simple example**:
 
-$$\frac{dy}{dt} = ky$$
+$$
+\frac{dy}{dt} = ky
+$$
 
 This says: _the rate of change of $y$ is proportional to $y$ itself._
 
 **Solutions** are functions, not numbers:
 
-$$y(t) = Ce^{kt}$$
+$$
+y(t) = Ce^{kt}
+$$
 
 where $C$ is an arbitrary constant determined by initial conditions.
 
@@ -701,11 +839,17 @@ A **first-order linear ODE** has the form: $y' + p(t)\,y = g(t)$
 4. Integrate: $\mu(t)\,y = \int \mu(t)\,g(t)\,dt + C$
 **Example**: $y' + 2y = e^t$
 
-$$\mu(t) = e^{\int 2\,dt} = e^{2t}$$
+$$
+\mu(t) = e^{\int 2\,dt} = e^{2t}
+$$
 
-$$\frac{d}{dt}\!\left[e^{2t}y\right] = e^{2t} \cdot e^t = e^{3t}$$
+$$
+\frac{d}{dt}\!\left[e^{2t}y\right] = e^{2t} \cdot e^t = e^{3t}
+$$
 
-$$e^{2t}y = \frac{1}{3}e^{3t} + C \quad\Rightarrow\quad \boxed{y = \frac{1}{3}e^{t} + Ce^{-2t}}$$
+$$
+e^{2t}y = \frac{1}{3}e^{3t} + C \quad\Rightarrow\quad \boxed{y = \frac{1}{3}e^{t} + Ce^{-2t}}
+$$
 
 ---
 
@@ -727,6 +871,10 @@ $r^2 + ar + b = 0$
 
 **Example**: $y'' + 3y' + 2y = 0$
 
-$$r^2 + 3r + 2 = 0 \;\Rightarrow\; (r+1)(r+2) = 0 \;\Rightarrow\; r_1 = -1,\; r_2 = -2$$
+$$
+r^2 + 3r + 2 = 0 \;\Rightarrow\; (r+1)(r+2) = 0 \;\Rightarrow\; r_1 = -1,\; r_2 = -2
+$$
 
-$$\boxed{y = C_1 e^{-t} + C_2 e^{-2t}}$$
+$$
+\boxed{y = C_1 e^{-t} + C_2 e^{-2t}}
+$$

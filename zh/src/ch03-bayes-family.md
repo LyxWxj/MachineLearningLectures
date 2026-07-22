@@ -12,15 +12,21 @@
 
 从联合概率与条件概率的关系出发：
 
-$$P(A, B) = P(A \mid B) \cdot P(B)$$
+$$
+P(A, B) = P(A \mid B) \cdot P(B)
+$$
 
 交换 $A$ 和 $B$ 的角色：
 
-$$P(B, A) = P(B \mid A) \cdot P(A)$$
+$$
+P(B, A) = P(B \mid A) \cdot P(A)
+$$
 
 **核心洞察**：$A$ 和 $B$ 同时发生的事件与 $B$ 和 $A$ 同时发生的事件是同一事件——顺序无关：
 
-$$P(A, B) = P(B, A)$$
+$$
+P(A, B) = P(B, A)
+$$
 
 因此：
 
@@ -28,7 +34,9 @@ $P(A \mid B) \cdot P(B) = P(B \mid A) \cdot P(A)$
 
 两边同时除以 $P(B)$：
 
-$$\boxed{\;P(A \mid B) = \frac{P(B \mid A) \cdot P(A)}{P(B)}\;}$$
+$$
+\boxed{\;P(A \mid B) = \frac{P(B \mid A) \cdot P(A)}{P(B)}\;}
+$$
 
 ---
 
@@ -36,7 +44,9 @@ $$\boxed{\;P(A \mid B) = \frac{P(B \mid A) \cdot P(A)}{P(B)}\;}$$
 
 **用假设 - 证据的语言表述**（$H$ = 假设，$D$ = 数据）：
 
-$$\underbrace{P(H \mid D)}_{\text{后验}} = \frac{\overbrace{P(D \mid H)}^{\text{似然}} \cdot \underbrace{P(H)}_{\text{先验}}}{\underbrace{P(D)}_{\text{证据}}}$$
+$$
+\underbrace{P(H \mid D)}_{\text{后验}} = \frac{\overbrace{P(D \mid H)}^{\text{似然}} \cdot \underbrace{P(H)}_{\text{先验}}}{\underbrace{P(D)}_{\text{证据}}}
+$$
 
 **$\theta$ 是什么？** 在参数估计中，$\theta$ 是 $H$ 的一个具体实例——每个可能的参数值都是一个假设。例如，"$\theta = 0.7$" 是假设 " 硬币正面朝上的概率为 0.7"。所以 $P(\theta)$ 和 $P(H)$ 含义相同——参数的先验分布。
 
@@ -62,11 +72,15 @@ $$\underbrace{P(H \mid D)}_{\text{后验}} = \frac{\overbrace{P(D \mid H)}^{\tex
 
 " 地面是湿的——下雨的概率是多少？"
 
-$$P(\text{rain} \mid \text{wet}) = \frac{P(\text{wet} \mid \text{rain}) \cdot P(\text{rain})}{P(\text{wet})} = \frac{0.95 \times 0.20}{0.27} = 0.704$$
+$$
+P(\text{rain} \mid \text{wet}) = \frac{P(\text{wet} \mid \text{rain}) \cdot P(\text{rain})}{P(\text{wet})} = \frac{0.95 \times 0.20}{0.27} = 0.704
+$$
 
 **证据** (Evidence) $P(\text{wet})$ 通过全概率公式计算：
 
-$$P(\text{wet}) = P(\text{wet} \mid \text{rain})P(\text{rain}) + P(\text{wet} \mid \text{sunny})P(\text{sunny}) = 0.95 \times 0.20 + 0.10 \times 0.80 = 0.27$$
+$$
+P(\text{wet}) = P(\text{wet} \mid \text{rain})P(\text{rain}) + P(\text{wet} \mid \text{sunny})P(\text{sunny}) = 0.95 \times 0.20 + 0.10 \times 0.80 = 0.27
+$$
 
 ---
 
@@ -76,13 +90,17 @@ $$P(\text{wet}) = P(\text{wet} \mid \text{rain})P(\text{rain}) + P(\text{wet} \m
 
 **在实践中**，我们通常只关心相对后验：
 
-$$P(H \mid D) \propto P(D \mid H) \cdot P(H)$$
+$$
+P(H \mid D) \propto P(D \mid H) \cdot P(H)
+$$
 
 " 后验 ∝ 似然 × 先验 "
 
 **比较两个假设**：
 
-$$\frac{P(H_1 \mid D)}{P(H_2 \mid D)} = \frac{P(D \mid H_1)}{P(D \mid H_2)} \cdot \frac{P(H_1)}{P(H_2)}$$
+$$
+\frac{P(H_1 \mid D)}{P(H_2 \mid D)} = \frac{P(D \mid H_1)}{P(D \mid H_2)} \cdot \frac{P(H_1)}{P(H_2)}
+$$
 
 **后验几率 = 似然比 × 先验几率**
 
@@ -104,7 +122,9 @@ $$\frac{P(H_1 \mid D)}{P(H_2 \mid D)} = \frac{P(D \mid H_1)}{P(D \mid H_2)} \cdo
 
 **Beta 分布** (Beta distribution) —— 概率参数 $\theta \in [0, 1]$ 的标准先验：
 
-$$\text{Beta}(\theta; \alpha, \beta) = \frac{1}{B(\alpha, \beta)} \theta^{\alpha-1} (1-\theta)^{\beta-1}$$
+$$
+\text{Beta}(\theta; \alpha, \beta) = \frac{1}{B(\alpha, \beta)} \theta^{\alpha-1} (1-\theta)^{\beta-1}
+$$
 
 - $\alpha$：" 成功 " 的先验权重
 - $\beta$：" 失败 " 的先验权重
@@ -115,7 +135,9 @@ $$\text{Beta}(\theta; \alpha, \beta) = \frac{1}{B(\alpha, \beta)} \theta^{\alpha
 
 **问题**：贝叶斯定理需要计算证据：
 
-$$P(D) = \int P(D \mid \theta) P(\theta) \, d\theta$$
+$$
+P(D) = \int P(D \mid \theta) P(\theta) \, d\theta
+$$
 
 这个积分通常是难以处理的——没有解析解。
 
@@ -154,14 +176,20 @@ $$P(D) = \int P(D \mid \theta) P(\theta) \, d\theta$$
 
 后验：$\mu \mid \mathbf{x} \sim \mathcal{N}(\mu_{\text{post}}, \sigma_{\text{post}}^2)$
 
-$$\frac{1}{\sigma_{\text{post}}^2} = \frac{1}{\sigma_0^2} + \frac{n}{\sigma^2}$$
+$$
+\frac{1}{\sigma_{\text{post}}^2} = \frac{1}{\sigma_0^2} + \frac{n}{\sigma^2}
+$$
 
-$$\mu_{\text{post}} = \sigma_{\text{post}}^2 \left(\frac{\mu_0}{\sigma_0^2} + \frac{n\bar{x}}{\sigma^2}\right)$$
+$$
+\mu_{\text{post}} = \sigma_{\text{post}}^2 \left(\frac{\mu_0}{\sigma_0^2} + \frac{n\bar{x}}{\sigma^2}\right)
+$$
 
 > **直觉理解**
 > 后验精度 = 先验精度 + 数据精度。数据越多，先验的影响越小。
 
-$$\mu_{\text{post}} = w_{\text{prior}} \cdot \mu_0 + w_{\text{data}} \cdot \bar{x}$$
+$$
+\mu_{\text{post}} = w_{\text{prior}} \cdot \mu_0 + w_{\text{data}} \cdot \bar{x}
+$$
 
 权重与精度（方差的倒数）成正比。
 
@@ -178,11 +206,15 @@ $$\mu_{\text{post}} = w_{\text{prior}} \cdot \mu_0 + w_{\text{data}} \cdot \bar{
 
 **MAP 推导**：
 
-$$\hat{\theta}_{\text{MAP}} = \arg\max P(\theta \mid D) = \arg\max \left[\log P(D \mid \theta) + \log P(\theta)\right]$$
+$$
+\hat{\theta}_{\text{MAP}} = \arg\max P(\theta \mid D) = \arg\max \left[\log P(D \mid \theta) + \log P(\theta)\right]
+$$
 
 **使用高斯先验** $\theta \sim \mathcal{N}(0, \tau^2)$：
 
-$$\log P(\theta) = -\frac{\theta^2}{2\tau^2} + \text{const}$$
+$$
+\log P(\theta) = -\frac{\theta^2}{2\tau^2} + \text{const}
+$$
 
 MAP = MLE + L2 正则化，其中 $\lambda = \frac{\sigma^2}{\tau^2}$
 
@@ -202,7 +234,9 @@ $\hat{\mu}_{\text{MLE}} = \frac{130 + 125 + 135 + 128 + 132}{5} = 130$
 
 使用高斯 - 高斯共轭公式：
 
-$$\hat{\mu}_{\text{MAP}} = \frac{\sigma^2 \cdot \mu_0 + n \cdot \sigma_0^2 \cdot \bar{x}}{\sigma^2 + n \cdot \sigma_0^2} = \frac{225 \times 100 + 5 \times 225 \times 130}{225 + 5 \times 225} = \frac{22500 + 146250}{1350} = 124.4$$
+$$
+\hat{\mu}_{\text{MAP}} = \frac{\sigma^2 \cdot \mu_0 + n \cdot \sigma_0^2 \cdot \bar{x}}{\sigma^2 + n \cdot \sigma_0^2} = \frac{225 \times 100 + 5 \times 225 \times 130}{225 + 5 \times 225} = \frac{22500 + 146250}{1350} = 124.4
+$$
 
 **比较**：
 
@@ -228,21 +262,29 @@ $$\hat{\mu}_{\text{MAP}} = \frac{\sigma^2 \cdot \mu_0 + n \cdot \sigma_0^2 \cdot
 
 **贝叶斯定理**：
 
-$$P(y \mid \mathbf{x}) = \frac{P(\mathbf{x} \mid y) \cdot P(y)}{P(\mathbf{x})} \propto P(\mathbf{x} \mid y) \cdot P(y)$$
+$$
+P(y \mid \mathbf{x}) = \frac{P(\mathbf{x} \mid y) \cdot P(y)}{P(\mathbf{x})} \propto P(\mathbf{x} \mid y) \cdot P(y)
+$$
 
 **" 朴素 " 假设**：给定类别 $y$，所有特征**条件独立**：
 
-$$P(x_1, \ldots, x_n \mid y) = \prod_{i=1}^n P(x_i \mid y)$$
+$$
+P(x_1, \ldots, x_n \mid y) = \prod_{i=1}^n P(x_i \mid y)
+$$
 
 **为什么叫 " 朴素 "？** 这个假设在实践中几乎从不成立（特征通常是相关的），但它却出奇地好用。
 
 **预测规则**：
 
-$$\hat{y} = \arg\max_y P(y) \prod_{i=1}^n P(x_i \mid y)$$
+$$
+\hat{y} = \arg\max_y P(y) \prod_{i=1}^n P(x_i \mid y)
+$$
 
 在对数空间中（避免下溢）：
 
-$$\hat{y} = \arg\max_y \left[\log P(y) + \sum_{i=1}^n \log P(x_i \mid y)\right]$$
+$$
+\hat{y} = \arg\max_y \left[\log P(y) + \sum_{i=1}^n \log P(x_i \mid y)\right]
+$$
 
 ---
 
@@ -256,7 +298,9 @@ $$\hat{y} = \arg\max_y \left[\log P(y) + \sum_{i=1}^n \log P(x_i \mid y)\right]$
 
 **高斯朴素贝叶斯**：
 
-$$P(x_i \mid y) = \frac{1}{\sqrt{2\pi\sigma_{iy}^2}} \exp\!\left(-\frac{(x_i - \mu_{iy})^2}{2\sigma_{iy}^2}\right)$$
+$$
+P(x_i \mid y) = \frac{1}{\sqrt{2\pi\sigma_{iy}^2}} \exp\!\left(-\frac{(x_i - \mu_{iy})^2}{2\sigma_{iy}^2}\right)
+$$
 
 每个特征在每个类别中都有自己的均值和方差。
 
@@ -280,7 +324,9 @@ $P(\text{spam} \mid \text{free}, \text{money}) \propto P(\text{spam}) \prod_{i} 
 
 **拉普拉斯平滑** (Laplace smoothing)：防止 $P(w_i \mid y) = 0$（一个未见过的词会使所有概率归零）：
 
-$$P(w_i \mid y) = \frac{\text{count}(w_i, y) + \alpha}{\text{count}(y) + \alpha \cdot |V|}$$
+$$
+P(w_i \mid y) = \frac{\text{count}(w_i, y) + \alpha}{\text{count}(y) + \alpha \cdot |V|}
+$$
 
 $\alpha = 1$ 是拉普拉斯平滑，$|V|$ 是词汇表大小。
 
@@ -300,21 +346,31 @@ $\alpha = 1$ 是拉普拉斯平滑，$|V|$ 是词汇表大小。
 
 **第 1 步 — 先验**：
 
-$$P(\text{spam}) = \frac{6}{10} = 0.6, \quad P(\text{ham}) = \frac{4}{10} = 0.4$$
+$$
+P(\text{spam}) = \frac{6}{10} = 0.6, \quad P(\text{ham}) = \frac{4}{10} = 0.4
+$$
 
 ---
 
 **第 2 步 — 似然**（使用拉普拉斯平滑，$|V| = 3$）：
 
-$$P(\text{"free"} \mid \text{spam}) = \frac{5 + 1}{6 + 3} = \frac{6}{9}, \quad P(\text{"free"} \mid \text{ham}) = \frac{1 + 1}{4 + 3} = \frac{2}{7}$$
+$$
+P(\text{"free"} \mid \text{spam}) = \frac{5 + 1}{6 + 3} = \frac{6}{9}, \quad P(\text{"free"} \mid \text{ham}) = \frac{1 + 1}{4 + 3} = \frac{2}{7}
+$$
 
-$$P(\text{"money"} \mid \text{spam}) = \frac{4 + 1}{6 + 3} = \frac{5}{9}, \quad P(\text{"money"} \mid \text{ham}) = \frac{0 + 1}{4 + 3} = \frac{1}{7}$$
+$$
+P(\text{"money"} \mid \text{spam}) = \frac{4 + 1}{6 + 3} = \frac{5}{9}, \quad P(\text{"money"} \mid \text{ham}) = \frac{0 + 1}{4 + 3} = \frac{1}{7}
+$$
 
 **第 3 步 — 后验**：
 
-$$P(\text{spam} \mid \text{free}, \text{money}) \propto 0.6 \times \frac{6}{9} \times \frac{5}{9} = 0.6 \times 0.222 = 0.133$$
+$$
+P(\text{spam} \mid \text{free}, \text{money}) \propto 0.6 \times \frac{6}{9} \times \frac{5}{9} = 0.6 \times 0.222 = 0.133
+$$
 
-$$P(\text{ham} \mid \text{free}, \text{money}) \propto 0.4 \times \frac{2}{7} \times \frac{1}{7} = 0.4 \times 0.041 = 0.016$$
+$$
+P(\text{ham} \mid \text{free}, \text{money}) \propto 0.4 \times \frac{2}{7} \times \frac{1}{7} = 0.4 \times 0.041 = 0.016
+$$
 
 **第 4 步 — 归一化**：$P(\text{spam}|\text{(邮件包含 "free", "money")}) = \frac{0.133}{0.133 + 0.016} = 0.893$
 
@@ -341,15 +397,23 @@ $$P(\text{ham} \mid \text{free}, \text{money}) \propto 0.4 \times \frac{2}{7} \t
 
 **似然**（使用拉普拉斯平滑，$|V| = 4$）：
 
-$$P(\text{"free"} \mid \text{spam}) = \frac{8 + 1}{20 + 4} = \frac{9}{24}, \quad P(\text{"free"} \mid \text{ham}) = \frac{1 + 1}{15 + 4} = \frac{2}{19}$$
+$$
+P(\text{"free"} \mid \text{spam}) = \frac{8 + 1}{20 + 4} = \frac{9}{24}, \quad P(\text{"free"} \mid \text{ham}) = \frac{1 + 1}{15 + 4} = \frac{2}{19}
+$$
 
-$$P(\text{"money"} \mid \text{spam}) = \frac{6 + 1}{20 + 4} = \frac{7}{24}, \quad P(\text{"money"} \mid \text{ham}) = \frac{0 + 1}{15 + 4} = \frac{1}{19}$$
+$$
+P(\text{"money"} \mid \text{spam}) = \frac{6 + 1}{20 + 4} = \frac{7}{24}, \quad P(\text{"money"} \mid \text{ham}) = \frac{0 + 1}{15 + 4} = \frac{1}{19}
+$$
 
 **后验**（以词频作为指数）：
 
-$$P(\text{spam}) \cdot P(\text{"free"} \mid \text{spam})^2 \cdot P(\text{"money"} \mid \text{spam})^1 = 0.6 \times \left(\frac{9}{24}\right)^2 \times \frac{7}{24} = 0.0295$$
+$$
+P(\text{spam}) \cdot P(\text{"free"} \mid \text{spam})^2 \cdot P(\text{"money"} \mid \text{spam})^1 = 0.6 \times \left(\frac{9}{24}\right)^2 \times \frac{7}{24} = 0.0295
+$$
 
-$$P(\text{ham}) \cdot P(\text{"free"} \mid \text{ham})^2 \cdot P(\text{"money"} \mid \text{ham})^1 = 0.4 \times \left(\frac{2}{19}\right)^2 \times \frac{1}{19} = 0.00047$$
+$$
+P(\text{ham}) \cdot P(\text{"free"} \mid \text{ham})^2 \cdot P(\text{"money"} \mid \text{ham})^1 = 0.4 \times \left(\frac{2}{19}\right)^2 \times \frac{1}{19} = 0.00047
+$$
 
 **归一化**：$P(\text{spam}) = \frac{0.0295}{0.0295 + 0.00047} = 0.984$
 
@@ -394,11 +458,15 @@ $$P(\text{ham}) \cdot P(\text{"free"} \mid \text{ham})^2 \cdot P(\text{"money"} 
 
 **关键性质**：在给定父节点的条件下，每个节点与所有非后代节点条件独立。
 
-$$P(X_i \mid \text{parents}(X_i), \text{non-descendants}) = P(X_i \mid \text{parents}(X_i))$$
+$$
+P(X_i \mid \text{parents}(X_i), \text{non-descendants}) = P(X_i \mid \text{parents}(X_i))
+$$
 
 **联合分布分解**：
 
-$$P(X_1, X_2, \ldots, X_n) = \prod_{i=1}^n P(X_i \mid \text{parents}(X_i))$$
+$$
+P(X_1, X_2, \ldots, X_n) = \prod_{i=1}^n P(X_i \mid \text{parents}(X_i))
+$$
 
 这是**贝叶斯网络的链式法则**——将完整的联合分布分解为局部条件概率。
 
@@ -413,11 +481,15 @@ $$P(X_1, X_2, \ldots, X_n) = \prod_{i=1}^n P(X_i \mid \text{parents}(X_i))$$
 
 **图结构**：
 
-$$C \to R, \quad C \to S, \quad R \to W, \quad S \to W$$
+$$
+C \to R, \quad C \to S, \quad R \to W, \quad S \to W
+$$
 
 **联合分布**：
 
-$$P(C, R, S, W) = P(C) \cdot P(R \mid C) \cdot P(S \mid C) \cdot P(W \mid R, S)$$
+$$
+P(C, R, S, W) = P(C) \cdot P(R \mid C) \cdot P(S \mid C) \cdot P(W \mid R, S)
+$$
 
 **条件概率表**：
 
@@ -442,7 +514,9 @@ $P(W=1 \mid R, S)$:
 
 **问题**：已知草地是湿的 (W=1)，洒水器打开的概率是多少？
 
-$$P(S=1 \mid W=1) = \frac{P(S=1, W=1)}{P(W=1)} = \frac{\sum_{C,R} P(C, R, S=1, W=1)}{\sum_{C,R,S} P(C, R, S, W=1)}$$
+$$
+P(S=1 \mid W=1) = \frac{P(S=1, W=1)}{P(W=1)} = \frac{\sum_{C,R} P(C, R, S=1, W=1)}{\sum_{C,R,S} P(C, R, S, W=1)}
+$$
 
 **代码**：
 
@@ -506,7 +580,9 @@ $A \to B \leftarrow C$
 
 **d- 分离 $\Rightarrow$ 条件独立**：
 
-$$X \perp Y \mid Z \quad \text{如果 } X \text{ 和 } Y \text{ 在给定 } Z \text{ 时被 d-分离}$$
+$$
+X \perp Y \mid Z \quad \text{如果 } X \text{ 和 } Y \text{ 在给定 } Z \text{ 时被 d-分离}
+$$
 
 **在洒水器问题中**：
 
@@ -523,15 +599,21 @@ $$X \perp Y \mid Z \quad \text{如果 } X \text{ 和 } Y \text{ 在给定 } Z \t
 
 **第 1 步**：选择模型（似然）
 
-$$P(D \mid \theta) = \prod_{i=1}^N P(x_i \mid \theta)$$
+$$
+P(D \mid \theta) = \prod_{i=1}^N P(x_i \mid \theta)
+$$
 
 **第 2 步**：选择先验
 
-$$P(\theta)$$
+$$
+P(\theta)
+$$
 
 **第 3 步**：计算后验
 
-$$P(\theta \mid D) = \frac{P(D \mid \theta) P(\theta)}{P(D)} \propto P(D \mid \theta) P(\theta)$$
+$$
+P(\theta \mid D) = \frac{P(D \mid \theta) P(\theta)}{P(D)} \propto P(D \mid \theta) P(\theta)
+$$
 
 **第 4 步**：使用后验
 
@@ -547,21 +629,29 @@ $$P(\theta \mid D) = \frac{P(D \mid \theta) P(\theta)}{P(D)} \propto P(D \mid \t
 
 **第 1 步**：对 $\theta$ 边际化（全概率公式）：
 
-$$P(x_{\text{new}} \mid D) = \int P(x_{\text{new}}, \theta \mid D) \, d\theta$$
+$$
+P(x_{\text{new}} \mid D) = \int P(x_{\text{new}}, \theta \mid D) \, d\theta
+$$
 
 **第 2 步**：对联合分布应用链式法则：
 
-$$P(x_{\text{new}}, \theta \mid D) = P(x_{\text{new}} \mid \theta, D) \cdot P(\theta \mid D)$$
+$$
+P(x_{\text{new}}, \theta \mid D) = P(x_{\text{new}} \mid \theta, D) \cdot P(\theta \mid D)
+$$
 
 **第 3 步**：关键假设——给定 $\theta$，新数据 $x_{\text{new}}$ 与旧数据 $D$ 独立：
 
-$$P(x_{\text{new}} \mid \theta, D) = P(x_{\text{new}} \mid \theta)$$
+$$
+P(x_{\text{new}} \mid \theta, D) = P(x_{\text{new}} \mid \theta)
+$$
 
 这很合理：一旦你知道了参数 $\theta$，旧数据不会提供额外信息。
 
 **第 4 步**：代回：
 
-$$\boxed{\;P(x_{\text{new}} \mid D) = \int P(x_{\text{new}} \mid \theta) \cdot P(\theta \mid D) \, d\theta\;}$$
+$$
+\boxed{\;P(x_{\text{new}} \mid D) = \int P(x_{\text{new}} \mid \theta) \cdot P(\theta \mid D) \, d\theta\;}
+$$
 
 ---
 
@@ -569,7 +659,9 @@ $$\boxed{\;P(x_{\text{new}} \mid D) = \int P(x_{\text{new}} \mid \theta) \cdot P
 
 要预测新数据点 $x_{\text{new}}$，对所有可能的 $\theta$ 积分：
 
-$$P(x_{\text{new}} \mid D) = \int P(x_{\text{new}} \mid \theta) P(\theta \mid D) \, d\theta$$
+$$
+P(x_{\text{new}} \mid D) = \int P(x_{\text{new}} \mid \theta) P(\theta \mid D) \, d\theta
+$$
 
 > **直觉理解**
 > 不要使用单一的 " 最佳 " $\theta$ —— 要对**所有** $\theta$ 按其后验概率加权求平均。
@@ -586,7 +678,9 @@ $$P(x_{\text{new}} \mid D) = \int P(x_{\text{new}} \mid \theta) P(\theta \mid D)
 
 **数值近似**：从后验中采样：
 
-$$P(x_{\text{new}} \mid D) \approx \frac{1}{S} \sum_{s=1}^S P(x_{\text{new}} \mid \theta^{(s)}), \quad \theta^{(s)} \sim P(\theta \mid D)$$
+$$
+P(x_{\text{new}} \mid D) \approx \frac{1}{S} \sum_{s=1}^S P(x_{\text{new}} \mid \theta^{(s)}), \quad \theta^{(s)} \sim P(\theta \mid D)
+$$
 
 ---
 
@@ -602,13 +696,17 @@ $$P(x_{\text{new}} \mid D) \approx \frac{1}{S} \sum_{s=1}^S P(x_{\text{new}} \mi
 
 模型说 $x_{\text{new}} \sim \mathcal{N}(\mu, 15^2)$，但 $\mu$ 未知。MLE 代入 $\hat{\mu} = 130$：
 
-$$x_{\text{new}} \sim \mathcal{N}(\hat{\mu}, 15^2) = \mathcal{N}(130, 15^2)$$
+$$
+x_{\text{new}} \sim \mathcal{N}(\hat{\mu}, 15^2) = \mathcal{N}(130, 15^2)
+$$
 
 将 $\hat{\mu}$ 当作真实的 $\mu$。预测：均值 130，标准差 15。
 
 **贝叶斯方法**（对后验积分）：
 
-$$P(x_{\text{new}} \mid D) = \int \mathcal{N}(x_{\text{new}} \mid \mu, 15^2) \cdot \mathcal{N}(\mu \mid 124.4, 6^2) \, d\mu$$
+$$
+P(x_{\text{new}} \mid D) = \int \mathcal{N}(x_{\text{new}} \mid \mu, 15^2) \cdot \mathcal{N}(\mu \mid 124.4, 6^2) \, d\mu
+$$
 
 结果：$x_{\text{new}} \mid D \sim \mathcal{N}(124.4, 15^2 + 6^2) = \mathcal{N}(124.4, 261)$
 
@@ -648,15 +746,23 @@ $$P(x_{\text{new}} \mid D) = \int \mathcal{N}(x_{\text{new}} \mid \mu, 15^2) \cd
 
 后验（高斯 - 高斯共轭）：
 
-$$\theta \mid X, y \sim \mathcal{N}(\mu_N, \Sigma_N)$$
+$$
+\theta \mid X, y \sim \mathcal{N}(\mu_N, \Sigma_N)
+$$
 
-$$\Sigma_N = (\alpha I + \beta X^T X)^{-1}$$
+$$
+\Sigma_N = (\alpha I + \beta X^T X)^{-1}
+$$
 
-$$\mu_N = \beta \Sigma_N X^T y$$
+$$
+\mu_N = \beta \Sigma_N X^T y
+$$
 
 **预测分布**也是高斯分布：
 
-$$y_{\text{new}} \mid x_{\text{new}}, X, y \sim \mathcal{N}(\mu_N^T x_{\text{new}},\; \sigma_{\text{pred}}^2)$$
+$$
+y_{\text{new}} \mid x_{\text{new}}, X, y \sim \mathcal{N}(\mu_N^T x_{\text{new}},\; \sigma_{\text{pred}}^2)
+$$
 
 预测方差有**两部分**：噪声 $\beta^{-1}$ + 参数不确定性。
 
@@ -678,7 +784,9 @@ $$y_{\text{new}} \mid x_{\text{new}}, X, y \sim \mathcal{N}(\mu_N^T x_{\text{new
 
 用简单分布 $q(\theta)$ 近似后验，最小化 KL 散度：
 
-$$\min_{q} D_{\text{KL}}(q(\theta) \| P(\theta \mid D))$$
+$$
+\min_{q} D_{\text{KL}}(q(\theta) \| P(\theta \mid D))
+$$
 
 比 MCMC 更快，但可能牺牲精度。
 
@@ -731,6 +839,8 @@ $$\min_{q} D_{\text{KL}}(q(\theta) \| P(\theta \mid D))$$
 - MCMC / 变分推断
 - 贝叶斯 vs 频率派
 
-$$\boxed{\;P(H \mid D) = \frac{P(D \mid H) \cdot P(H)}{P(D)}\;}$$
+$$
+\boxed{\;P(H \mid D) = \frac{P(D \mid H) \cdot P(H)}{P(D)}\;}
+$$
 
 贝叶斯思维的精髓：**用数据更新信念，用后验做出决策。**

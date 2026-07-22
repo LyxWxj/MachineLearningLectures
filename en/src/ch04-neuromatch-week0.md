@@ -28,11 +28,15 @@ Week 0 builds the mathematical and programming foundations for computational neu
 
 The **Leaky-Integrate-and-Fire** neuron is the simplest spiking neuron model:
 
-$$\tau_m \frac{d}{dt}V(t) = E_L - V(t) + R\,I(t) \quad \text{if } V(t) \leq V_{threshold}$$
+$$
+\tau_m \frac{d}{dt}V(t) = E_L - V(t) + R\,I(t) \quad \text{if } V(t) \leq V_{threshold}
+$$
 
 **Reset condition**:
 
-$$V(t) = V_{reset} \quad \text{if } V(t) > V_{threshold}$$
+$$
+V(t) = V_{reset} \quad \text{if } V(t) > V_{threshold}
+$$
 
 **Physical intuition**: the membrane acts like a leaky capacitor — it integrates input current but also leaks charge back toward $E_L$.
 
@@ -51,7 +55,9 @@ $$V(t) = V_{reset} \quad \text{if } V(t) > V_{threshold}$$
 
 The ODE cannot be solved analytically in general. We discretize it:
 
-$$V(t + \Delta t) = V(t) + \frac{\Delta t}{\tau_m}\left(E_L - V(t) + R\,I(t)\right)$$
+$$
+V(t + \Delta t) = V(t) + \frac{\Delta t}{\tau_m}\left(E_L - V(t) + R\,I(t)\right)
+$$
 
 This is the **forward Euler method** — the single most reused technique across all notebooks.
 
@@ -73,17 +79,23 @@ for step in range(step_end):
 
 **Step 1**: Start with the continuous membrane equation (ODE):
 
-$$\tau_m \frac{dV}{dt} = E_L - V(t) + R\,I(t)$$
+$$
+\tau_m \frac{dV}{dt} = E_L - V(t) + R\,I(t)
+$$
 
 **Step 2**: Approximate the derivative with a finite difference — replace $\frac{dV}{dt}$ with $\frac{\Delta V}{\Delta t}$:
 
-$$\tau_m\frac{\Delta V}{\Delta t}=\tau_m \frac{V(t + \Delta t) - V(t)}{\Delta t} = E_L - V(t) + R\,I(t)$$
+$$
+\tau_m\frac{\Delta V}{\Delta t}=\tau_m \frac{V(t + \Delta t) - V(t)}{\Delta t} = E_L - V(t) + R\,I(t)
+$$
 
 This is no longer a differential equation — it's an algebraic equation relating $V(t+\Delta t)$ to $V(t)$.
 
 **Step 3**: Multiply both sides by $\frac{\Delta t}{\tau_m}$:
 
-$$V(t + \Delta t) - V(t) = \frac{\Delta t}{\tau_m}\left(E_L - V(t) + R\,I(t)\right)$$
+$$
+V(t + \Delta t) - V(t) = \frac{\Delta t}{\tau_m}\left(E_L - V(t) + R\,I(t)\right)
+$$
 
 ---
 
@@ -91,7 +103,9 @@ $$V(t + \Delta t) - V(t) = \frac{\Delta t}{\tau_m}\left(E_L - V(t) + R\,I(t)\rig
 
 **Step 4**: Move $V(t)$ to the right side:
 
-$$\boxed{\;V(t + \Delta t) = V(t) + \frac{\Delta t}{\tau_m}\left(E_L - V(t) + R\,I(t)\right)\;}$$
+$$
+\boxed{\;V(t + \Delta t) = V(t) + \frac{\Delta t}{\tau_m}\left(E_L - V(t) + R\,I(t)\right)\;}
+$$
 
 This is the **forward Euler update rule** — given the current state $V(t)$ and input $I(t)$, we can compute the next state $V(t+\Delta t)$.
 
@@ -114,13 +128,17 @@ The **same variable** `v` appears on both sides because Python evaluates the rig
 
 **Sinusoidal input** (deterministic)
 
-$$I(t) = I_{mean}\left(1 + \sin\left(\frac{2\pi}{0.01}\,t\right)\right)$$
+$$
+I(t) = I_{mean}\left(1 + \sin\left(\frac{2\pi}{0.01}\,t\right)\right)
+$$
 
 Period = 10 ms, oscillates between $0$ and $2 I_{mean}$.
 
 **Random input** (stochastic)
 
-$$I(t) = I_{mean}\left(1 + 0.1\sqrt{\frac{t_{max}}{\Delta t}}\,\xi(t)\right)$$
+$$
+I(t) = I_{mean}\left(1 + 0.1\sqrt{\frac{t_{max}}{\Delta t}}\,\xi(t)\right)
+$$
 
 where $\xi(t) \sim \mathcal{U}(-1, 1)$.
 
@@ -170,11 +188,15 @@ With $N$ independent neurons receiving different random inputs:
 
 **Sample mean**:
 
-$$\langle V(t)\rangle = \frac{1}{N}\sum_{n=1}^N V_n(t)$$
+$$
+\langle V(t)\rangle = \frac{1}{N}\sum_{n=1}^N V_n(t)
+$$
 
 **Sample variance** (with Bessel's correction):
 
-$$\text{Var}(t) = \frac{1}{N-1}\sum_{n=1}^N \left(V_n(t) - \langle V(t)\rangle\right)^2$$
+$$
+\text{Var}(t) = \frac{1}{N-1}\sum_{n=1}^N \left(V_n(t) - \langle V(t)\rangle\right)^2
+$$
 
 **Standard deviation**: $\sigma(t) = \sqrt{\text{Var}(t)}$
 
@@ -409,7 +431,9 @@ class LIFNeurons:
 
 The **dot product** connects algebra to geometry:
 
-$$\mathbf{x} \cdot \mathbf{y} = \sum_i x_i y_i = \|\mathbf{x}\|\,\|\mathbf{y}\|\cos\theta$$
+$$
+\mathbf{x} \cdot \mathbf{y} = \sum_i x_i y_i = \|\mathbf{x}\|\,\|\mathbf{y}\|\cos\theta
+$$
 
 **Vector length**: $\|\mathbf{x}\| = \sqrt{\sum_i x_i^2}$;
 
@@ -431,7 +455,9 @@ The **span** of a set of vectors is all possible linear combinations. If vectors
 
 A matrix $W$ represents a linear transformation $\mathbf{y} = W\mathbf{x}$:
 
-$$\begin{bmatrix} y_1 \\ y_2 \end{bmatrix} = \begin{bmatrix} W_{11} & W_{12} \\ W_{21} & W_{22} \end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \end{bmatrix}$$
+$$
+\begin{bmatrix} y_1 \\ y_2 \end{bmatrix} = \begin{bmatrix} W_{11} & W_{12} \\ W_{21} & W_{22} \end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \end{bmatrix}
+$$
 
 **Key operations**:
 
@@ -443,7 +469,9 @@ $$\begin{bmatrix} y_1 \\ y_2 \end{bmatrix} = \begin{bmatrix} W_{11} & W_{12} \\ 
 
 **Neural application**: a weight matrix maps a population of input neurons to output neurons:
 
-$$\mathbf{r}_{out} = W \mathbf{r}_{in}$$
+$$
+\mathbf{r}_{out} = W \mathbf{r}_{in}
+$$
 
 The **rank** of $W$ reveals the intrinsic dimensionality of the mapping.
 
@@ -496,11 +524,15 @@ C = A @ B
 
 **Finite difference** — approximate the derivative:
 
-$$f'(a) \approx \frac{f(a+h) - f(a)}{h}$$
+$$
+f'(a) \approx \frac{f(a+h) - f(a)}{h}
+$$
 
 **Central difference** (more accurate):
 
-$$f'(a) \approx \frac{f(a+h) - f(a-h)}{2h}$$
+$$
+f'(a) \approx \frac{f(a+h) - f(a-h)}{2h}
+$$
 
 **Code with SymPy** (symbolic, exact):
 
@@ -520,19 +552,25 @@ integral = sp.integrate(f, t)   # exact integral
 
 **Product Rule**
 
-$$\frac{d}{dt}[u \cdot v] = v\frac{du}{dt} + u\frac{dv}{dt}$$
+$$
+\frac{d}{dt}[u \cdot v] = v\frac{du}{dt} + u\frac{dv}{dt}
+$$
 
 Example: $\frac{d}{dt}[t \cdot e^{-t/\tau}] = e^{-t/\tau} + t \cdot (-\frac{1}{\tau})e^{-t/\tau}$
 
 **Chain Rule**
 
-$$\frac{dr}{da} = \frac{dr}{dt} \cdot \frac{dt}{da}$$
+$$
+\frac{dr}{da} = \frac{dr}{dt} \cdot \frac{dt}{da}
+$$
 
 Example: if $r = \sigma(V)$ and $V = RI$, then $\frac{dr}{dI} = \sigma'(V) \cdot R$
 
 **Partial Derivatives**
 
-$$\frac{\partial f}{\partial x_1}\bigg|_{x_2 \text{ fixed}}$$
+$$
+\frac{\partial f}{\partial x_1}\bigg|_{x_2 \text{ fixed}}
+$$
 
 For $f(x_1, x_2) = x_1^2 x_2$: $\frac{\partial f}{\partial x_1} = 2x_1 x_2$
 
@@ -544,11 +582,15 @@ For $f(x_1, x_2) = x_1^2 x_2$: $\frac{\partial f}{\partial x_1} = 2x_1 x_2$
 
 The **sigmoid** (logistic) transfer function maps input current to firing rate:
 
-$$\sigma(x; a, \theta) = \frac{1}{1 + e^{-a(x - \theta)}}$$
+$$
+\sigma(x; a, \theta) = \frac{1}{1 + e^{-a(x - \theta)}}
+$$
 
 **Gain** = derivative of the transfer function:
 
-$$g = \frac{d\sigma}{dx} = a\,\sigma(1 - \sigma)$$
+$$
+g = \frac{d\sigma}{dx} = a\,\sigma(1 - \sigma)
+$$
 
 | Parameter | Meaning   | Effect                                        |
 | --------- | --------- | --------------------------------------------- |
@@ -564,7 +606,9 @@ $$g = \frac{d\sigma}{dx} = a\,\sigma(1 - \sigma)$$
 
 **Riemann sum** — approximate the integral:
 
-$$\int_a^b f(x)\,dx \approx \sum_{i} f(x_i)\,\Delta x$$
+$$
+\int_a^b f(x)\,dx \approx \sum_{i} f(x_i)\,\Delta x
+$$
 
 **Code with `np.cumsum`**:
 
@@ -591,7 +635,9 @@ Multiplied by $\Delta x$, this gives the accumulated area under the curve at eac
 
 **Binomial Distribution**
 
-$$P(k \mid n, p) = \binom{n}{k} p^k (1-p)^{n-k}$$
+$$
+P(k \mid n, p) = \binom{n}{k} p^k (1-p)^{n-k}
+$$
 
 $k$ successes in $n$ independent trials, each with probability $p$.
 
@@ -601,7 +647,9 @@ samples = np.random.binomial(n=10, p=0.5, size=1000)
 
 **Poisson Distribution**
 
-$$P(k \mid \lambda) = \frac{\lambda^k e^{-\lambda}}{k!}$$
+$$
+P(k \mid \lambda) = \frac{\lambda^k e^{-\lambda}}{k!}
+$$
 
 Number of events in a fixed interval, rate $\lambda$.
 
@@ -617,7 +665,9 @@ samples = np.random.poisson(lam=5, size=1000)
 
 **Gaussian (Normal) Distribution**
 
-$$f(x \mid \mu, \sigma^2) = \frac{1}{\sqrt{2\pi\sigma^2}} \exp\left(-\frac{(x-\mu)^2}{2\sigma^2}\right)$$
+$$
+f(x \mid \mu, \sigma^2) = \frac{1}{\sqrt{2\pi\sigma^2}} \exp\left(-\frac{(x-\mu)^2}{2\sigma^2}\right)
+$$
 
 ```python
 samples = np.random.normal(mu=0, sigma=1, size=1000)
@@ -627,7 +677,9 @@ pdf = norm.pdf(x, loc=0, scale=1)
 
 **Uniform Distribution**
 
-$$f(x \mid a, b) = \frac{1}{b-a} \quad \text{for } x \in [a,b]$$
+$$
+f(x \mid a, b) = \frac{1}{b-a} \quad \text{for } x \in [a,b]
+$$
 
 ```python
 samples = np.random.uniform(-1, 1, size=1000)
@@ -742,7 +794,9 @@ The `&` (and), `|` (or), `~` (not) operators work element-wise on boolean arrays
 
 The least-squares solution appears across W0D3, W1D2, W1D3:
 
-$$\hat{\boldsymbol{\theta}} = (X^T X)^{-1} X^T \mathbf{y}$$
+$$
+\hat{\boldsymbol{\theta}} = (X^T X)^{-1} X^T \mathbf{y}
+$$
 
 **Where it appears**:
 
@@ -768,13 +822,17 @@ theta_hat = np.linalg.lstsq(X, y, rcond=None)[0]
 
 **Step 1 — Define the objective**:
 
-$$L(\boldsymbol{\theta}) = \frac{1}{N} \|\mathbf{y} - X\boldsymbol{\theta}\|^2 = \frac{1}{N}(\mathbf{y} - X\boldsymbol{\theta})^T(\mathbf{y} - X\boldsymbol{\theta})$$
+$$
+L(\boldsymbol{\theta}) = \frac{1}{N} \|\mathbf{y} - X\boldsymbol{\theta}\|^2 = \frac{1}{N}(\mathbf{y} - X\boldsymbol{\theta})^T(\mathbf{y} - X\boldsymbol{\theta})
+$$
 
 - **Loss** $L$ measures the gap between predictions $X\theta$ and ground truth $\mathbf{y}$ — minimize it to find the best fit.
 - **Norm squared**: $\|\mathbf{v}\|^2 = \mathbf{v}^T\mathbf{v} = v_1^2 + \cdots + v_n^2$
 **Step 2 — Expand**:
 
-$$L = \frac{1}{N}\left(\mathbf{y}^T\mathbf{y} - 2\boldsymbol{\theta}^T X^T\mathbf{y} + \boldsymbol{\theta}^T X^T X \boldsymbol{\theta}\right)$$
+$$
+L = \frac{1}{N}\left(\mathbf{y}^T\mathbf{y} - 2\boldsymbol{\theta}^T X^T\mathbf{y} + \boldsymbol{\theta}^T X^T X \boldsymbol{\theta}\right)
+$$
 
 Uses transpose properties — see next page.
 
@@ -782,11 +840,15 @@ Uses transpose properties — see next page.
 
 **Step 3 — Take the gradient and set to zero**:
 
-$$\frac{\partial L}{\partial \boldsymbol{\theta}} = \frac{1}{N}\left(-2X^T\mathbf{y} + 2X^T X\boldsymbol{\theta}\right) = 0$$
+$$
+\frac{\partial L}{\partial \boldsymbol{\theta}} = \frac{1}{N}\left(-2X^T\mathbf{y} + 2X^T X\boldsymbol{\theta}\right) = 0
+$$
 
 **Step 4 — Solve**:
 
-$$X^T X\hat{\boldsymbol{\theta}} = X^T\mathbf{y} \quad \Longrightarrow \quad \hat{\boldsymbol{\theta}} = (X^T X)^{-1} X^T \mathbf{y}$$
+$$
+X^T X\hat{\boldsymbol{\theta}} = X^T\mathbf{y} \quad \Longrightarrow \quad \hat{\boldsymbol{\theta}} = (X^T X)^{-1} X^T \mathbf{y}
+$$
 
 $X^T\mathbf{y}$ is the projection of $\mathbf{y}$ onto the column space of $X$; $(X^TX)^{-1}$ maps it back to parameter space.
 
@@ -803,11 +865,17 @@ $X^T\mathbf{y}$ is the projection of $\mathbf{y}$ onto the column space of $X$; 
 
 **Full expansion of Step 2**:
 
-$$\|\mathbf{y} - X\theta\|^2 = (\mathbf{y} - X\theta)^T(\mathbf{y} - X\theta)$$
+$$
+\|\mathbf{y} - X\theta\|^2 = (\mathbf{y} - X\theta)^T(\mathbf{y} - X\theta)
+$$
 
-$$= \mathbf{y}^T\mathbf{y} - \mathbf{y}^TX\theta - (X\theta)^T\mathbf{y} + (X\theta)^TX\theta$$
+$$
+= \mathbf{y}^T\mathbf{y} - \mathbf{y}^TX\theta - (X\theta)^T\mathbf{y} + (X\theta)^TX\theta
+$$
 
-$$= \mathbf{y}^T\mathbf{y} - 2\theta^TX^T\mathbf{y} + \theta^TX^TX\theta$$
+$$
+= \mathbf{y}^T\mathbf{y} - 2\theta^TX^T\mathbf{y} + \theta^TX^TX\theta
+$$
 
 The cross terms merge because $\mathbf{y}^TX\theta$ is a scalar, so $\mathbf{y}^TX\theta = (\mathbf{y}^TX\theta)^T = \theta^TX^T\mathbf{y}$.
 
@@ -935,7 +1003,9 @@ def running_mean(a):
 
 **Softmax** converts logits into a probability distribution:
 
-$$\text{softmax}(z_i) = \frac{e^{z_i}}{\sum_{j=1}^{K} e^{z_j}}$$
+$$
+\text{softmax}(z_i) = \frac{e^{z_i}}{\sum_{j=1}^{K} e^{z_j}}
+$$
 
 **Properties**: all outputs positive, sum to 1, preserves ordering.
 
@@ -993,7 +1063,9 @@ def softmax_online(z):
 
 **Monte Carlo principle**: sample $x_i \sim \mathcal{U}(a,b)$, then:
 
-$$\int_a^b f(x)\,dx \approx \frac{b-a}{N}\sum_{i=1}^{N} f(x_i)$$
+$$
+\int_a^b f(x)\,dx \approx \frac{b-a}{N}\sum_{i=1}^{N} f(x_i)
+$$
 
 ```python
 def gaussian(x, mu=0, sigma=1):

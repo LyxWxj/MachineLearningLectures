@@ -26,7 +26,9 @@ This slides cover three core topics, from inference with discrete latent states 
 
 **Markov Property**: The future depends only on the present, not on the past.
 
-$$p(s_t | s_{t-1}, s_{t-2}, \ldots, s_1) = p(s_t | s_{t-1})$$
+$$
+p(s_t | s_{t-1}, s_{t-2}, \ldots, s_1) = p(s_t | s_{t-1})
+$$
 
 **Markov Chain**: A sequence of states $\{s_1, s_2, \ldots, s_T\}$ that satisfies the Markov property
 
@@ -36,7 +38,9 @@ s_1 → s_2 → s_3 → ... → s_T
 
 **Transition Matrix** $D$: Describes the transition probabilities between states
 
-$$D = \begin{bmatrix} p(s_t=+1|s_{t-1}=+1) & p(s_t=-1|s_{t-1}=+1) \\ p(s_t=+1|s_{t-1}=-1) & p(s_t=-1|s_{t-1}=-1) \end{bmatrix}$$
+$$
+D = \begin{bmatrix} p(s_t=+1|s_{t-1}=+1) & p(s_t=-1|s_{t-1}=+1) \\ p(s_t=+1|s_{t-1}=-1) & p(s_t=-1|s_{t-1}=-1) \end{bmatrix}
+$$
 
 **State Update**: $P_t = P_{t-1} D$, where $P_t = [p(s_t=+1), p(s_t=-1)]$
 
@@ -107,7 +111,9 @@ Even if the current state is completely known, the future becomes uncertain.
 
 **Prediction without observations**:
 
-$$P_t = P_{t-1} D = P_0 D^t$$
+$$
+P_t = P_{t-1} D = P_0 D^t
+$$
 
 ```python
 def simulate_prediction_only(model, nstep):
@@ -137,11 +143,15 @@ Given an observation sequence $m_{1:t}$, infer the current hidden state $s_t$.
 
 **1. Predict**: Use the transition matrix to turn yesterday's posterior into today's prior
 
-$$\text{today's prior} = p(s_t | m_{1:t-1}) = p(s_{t-1} | m_{1:t-1}) \cdot D$$
+$$
+\text{today's prior} = p(s_t | m_{1:t-1}) = p(s_{t-1} | m_{1:t-1}) \cdot D
+$$
 
 **2. Update**: Combine the new observation $m_t$ to compute the posterior
 
-$$\text{posterior} \propto \text{prior} \times \text{likelihood} = p(m_t | s_t) \cdot p(s_t | m_{1:t-1})$$
+$$
+\text{posterior} \propto \text{prior} \times \text{likelihood} = p(m_t | s_t) \cdot p(s_t | m_{1:t-1})
+$$
 
 ```python
 def one_step_update(model, posterior_tm1, M_t):
@@ -235,14 +245,18 @@ Core assumption: All distributions are **Gaussian** → mathematically solvable 
 
 **State Equation** (Dynamics Model):
 
-$$s_t = D \cdot s_{t-1} + w_t, \quad w_t \sim \mathcal{N}(0, \sigma_p^2)$$
+$$
+s_t = D \cdot s_{t-1} + w_t, \quad w_t \sim \mathcal{N}(0, \sigma_p^2)
+$$
 
 - $D$: Dynamics parameter (how states evolve)
 - $w_t$: Process noise (uncertainty in dynamics)
 
 **Observation Equation** (Measurement Model):
 
-$$m_t = s_t + \eta_t, \quad \eta_t \sim \mathcal{N}(0, \sigma_m^2)$$
+$$
+m_t = s_t + \eta_t, \quad \eta_t \sim \mathcal{N}(0, \sigma_m^2)
+$$
 
 - $\eta_t$: Measurement noise (sensor uncertainty)
 
@@ -264,7 +278,9 @@ At each step: Gaussian × Gaussian = Gaussian
 
 **Step 1: Predict** — Turn yesterday's posterior into today's prior
 
-$$\text{prior} = \mathcal{N}(D \cdot \mu_{t-1}, D^2 \cdot \sigma_{t-1}^2 + \sigma_p^2)$$
+$$
+\text{prior} = \mathcal{N}(D \cdot \mu_{t-1}, D^2 \cdot \sigma_{t-1}^2 + \sigma_p^2)
+$$
 
 **Step 2: Update** — Combine with likelihood to compute posterior
 
@@ -272,9 +288,13 @@ Posterior = Prior × Likelihood = Gaussian × Gaussian = Gaussian
 
 **Information Weighting** (Key Insight):
 
-$$\frac{1}{\sigma_{\text{post}}^2} = \frac{1}{\sigma_{\text{prior}}^2} + \frac{1}{\sigma_{\text{likelihood}}^2}$$
+$$
+\frac{1}{\sigma_{\text{post}}^2} = \frac{1}{\sigma_{\text{prior}}^2} + \frac{1}{\sigma_{\text{likelihood}}^2}
+$$
 
-$$\mu_{\text{post}} = g_{\text{prior}} \cdot \mu_{\text{prior}} + g_{\text{likelihood}} \cdot m_t$$
+$$
+\mu_{\text{post}} = g_{\text{prior}} \cdot \mu_{\text{prior}} + g_{\text{likelihood}} \cdot m_t
+$$
 
 where $g = \frac{\text{information}}{\text{total information}}$ is the information weight
 
@@ -296,9 +316,13 @@ Posterior mean = (Prior information × Prior mean + Likelihood information × Ob
 
 **Classical Kalman Gain**:
 
-$$K = \frac{\sigma_{\text{prior}}^2}{\sigma_{\text{prior}}^2 + \sigma_m^2}$$
+$$
+K = \frac{\sigma_{\text{prior}}^2}{\sigma_{\text{prior}}^2 + \sigma_m^2}
+$$
 
-$$\mu_{\text{post}} = \mu_{\text{prior}} + K(m_t - \mu_{\text{prior}})$$
+$$
+\mu_{\text{post}} = \mu_{\text{prior}} + K(m_t - \mu_{\text{prior}})
+$$
 
 $K$ close to 1 → trust measurement; $K$ close to 0 → trust prediction
 
@@ -333,7 +357,9 @@ def kalman_filter_step(posterior, D, process_noise, measurement_noise, m):
 
 **1. Posterior variance decreases over time**
 
-$$\sigma_t^2 < \sigma_{t-1}^2$$
+$$
+\sigma_t^2 < \sigma_{t-1}^2
+$$
 
 Each new observation reduces uncertainty.
 
@@ -341,7 +367,9 @@ Each new observation reduces uncertainty.
 
 As $t \to \infty$, the posterior variance converges to:
 
-$$\sigma_{\infty}^2 = \frac{\sigma_p^2}{1-D^2} \cdot \frac{1}{\text{SNR}+1}$$
+$$
+\sigma_{\infty}^2 = \frac{\sigma_p^2}{1-D^2} \cdot \frac{1}{\text{SNR}+1}
+$$
 
 where $\text{SNR} = \sigma_p^2 / \sigma_m^2$ is the signal-to-noise ratio
 
@@ -405,11 +433,15 @@ Uses only past data and can run in real-time.
 
 **State Equation**:
 
-$$\mathbf{s}_t = D \mathbf{s}_{t-1} + \mathbf{w}_t, \quad \mathbf{w}_t \sim \mathcal{N}(0, Q)$$
+$$
+\mathbf{s}_t = D \mathbf{s}_{t-1} + \mathbf{w}_t, \quad \mathbf{w}_t \sim \mathcal{N}(0, Q)
+$$
 
 **Observation Equation**:
 
-$$\mathbf{m}_t = H \mathbf{s}_t + \boldsymbol{\eta}_t, \quad \boldsymbol{\eta}_t \sim \mathcal{N}(0, R)$$
+$$
+\mathbf{m}_t = H \mathbf{s}_t + \boldsymbol{\eta}_t, \quad \boldsymbol{\eta}_t \sim \mathcal{N}(0, R)
+$$
 
 **Parameter Matrices**:
 
@@ -426,11 +458,15 @@ $$\mathbf{m}_t = H \mathbf{s}_t + \boldsymbol{\eta}_t, \quad \boldsymbol{\eta}_t
 
 **Predicted mean**:
 
-$$\hat{\mu}_t^{\text{pred}} = D \hat{\mu}_{t-1}$$
+$$
+\hat{\mu}_t^{\text{pred}} = D \hat{\mu}_{t-1}
+$$
 
 **Predicted covariance**:
 
-$$\hat{\Sigma}_t^{\text{pred}} = D \hat{\Sigma}_{t-1} D^\top + Q$$
+$$
+\hat{\Sigma}_t^{\text{pred}} = D \hat{\Sigma}_{t-1} D^\top + Q
+$$
 
 **Intuition**:
 
@@ -443,15 +479,21 @@ $$\hat{\Sigma}_t^{\text{pred}} = D \hat{\Sigma}_{t-1} D^\top + Q$$
 
 **Kalman Gain Matrix**:
 
-$$K_t = \hat{\Sigma}_t^{\text{pred}} H^\top (H \hat{\Sigma}_t^{\text{pred}} H^\top + R)^{-1}$$
+$$
+K_t = \hat{\Sigma}_t^{\text{pred}} H^\top (H \hat{\Sigma}_t^{\text{pred}} H^\top + R)^{-1}
+$$
 
 **Filtered mean**:
 
-$$\hat{\mu}_t^{\text{filter}} = \hat{\mu}_t^{\text{pred}} + K_t (\mathbf{m}_t - H \hat{\mu}_t^{\text{pred}})$$
+$$
+\hat{\mu}_t^{\text{filter}} = \hat{\mu}_t^{\text{pred}} + K_t (\mathbf{m}_t - H \hat{\mu}_t^{\text{pred}})
+$$
 
 **Filtered covariance**:
 
-$$\hat{\Sigma}_t^{\text{filter}} = (I - K_t H) \hat{\Sigma}_t^{\text{pred}}$$
+$$
+\hat{\Sigma}_t^{\text{filter}} = (I - K_t H) \hat{\Sigma}_t^{\text{pred}}
+$$
 
 **Innovation** $\mathbf{m}_t - H \hat{\mu}_t^{\text{pred}}$: The difference between actual observation and predicted observation
 
@@ -490,15 +532,21 @@ def kalman_filter(data, params):
 
 **Smoothed mean** (backward pass):
 
-$$\hat{\mu}_t^{\text{smooth}} = \hat{\mu}_t^{\text{filter}} + J_t (\hat{\mu}_{t+1}^{\text{smooth}} - D \hat{\mu}_t^{\text{filter}})$$
+$$
+\hat{\mu}_t^{\text{smooth}} = \hat{\mu}_t^{\text{filter}} + J_t (\hat{\mu}_{t+1}^{\text{smooth}} - D \hat{\mu}_t^{\text{filter}})
+$$
 
 **Smoothed covariance**:
 
-$$\hat{\Sigma}_t^{\text{smooth}} = \hat{\Sigma}_t^{\text{filter}} + J_t (\hat{\Sigma}_{t+1}^{\text{smooth}} - P_t) J_t^\top$$
+$$
+\hat{\Sigma}_t^{\text{smooth}} = \hat{\Sigma}_t^{\text{filter}} + J_t (\hat{\Sigma}_{t+1}^{\text{smooth}} - P_t) J_t^\top
+$$
 
 **Smoothing gain**:
 
-$$J_t = \hat{\Sigma}_t^{\text{filter}} D^\top P_t^{-1}$$
+$$
+J_t = \hat{\Sigma}_t^{\text{filter}} D^\top P_t^{-1}
+$$
 
 where $P_t = D \hat{\Sigma}_t^{\text{filter}} D^\top + Q$ is the predicted covariance at time $t+1$
 
@@ -537,7 +585,9 @@ When we don't know the system parameters $D, Q, H, R$, we need to learn them fro
 
 **M Step Update Formula** (example):
 
-$$D^{\text{new}} = \left(\sum_{t=2}^T \mathbb{E}[s_t s_{t-1}^\top]\right) \left(\sum_{t=2}^T \mathbb{E}[s_{t-1} s_{t-1}^\top]\right)^{-1}$$
+$$
+D^{\text{new}} = \left(\sum_{t=2}^T \mathbb{E}[s_t s_{t-1}^\top]\right) \left(\sum_{t=2}^T \mathbb{E}[s_{t-1} s_{t-1}^\top]\right)^{-1}
+$$
 
 ```python
 import pykalman
@@ -580,19 +630,29 @@ smoothed_mean, smoothed_cov = kf.smooth(data)
 
 **HMM Forward Inference**:
 
-$$P(s_t | m_{1:t}) \propto p(m_t | s_t) \cdot [P(s_{t-1}|m_{1:t-1}) \cdot D]$$
+$$
+P(s_t | m_{1:t}) \propto p(m_t | s_t) \cdot [P(s_{t-1}|m_{1:t-1}) \cdot D]
+$$
 
 **1D Kalman Filter**:
 
-$$\mu_t^{\text{post}} = g_{\text{prior}} \cdot D\mu_{t-1} + g_{\text{likelihood}} \cdot m_t$$
+$$
+\mu_t^{\text{post}} = g_{\text{prior}} \cdot D\mu_{t-1} + g_{\text{likelihood}} \cdot m_t
+$$
 
-$$\frac{1}{(\sigma_t^{\text{post}})^2} = \frac{1}{(D\sigma_{t-1})^2 + \sigma_p^2} + \frac{1}{\sigma_m^2}$$
+$$
+\frac{1}{(\sigma_t^{\text{post}})^2} = \frac{1}{(D\sigma_{t-1})^2 + \sigma_p^2} + \frac{1}{\sigma_m^2}
+$$
 
 **2D Kalman Filter**:
 
-$$K_t = \Sigma_t^{\text{pred}} H^\top (H \Sigma_t^{\text{pred}} H^\top + R)^{-1}$$
+$$
+K_t = \Sigma_t^{\text{pred}} H^\top (H \Sigma_t^{\text{pred}} H^\top + R)^{-1}
+$$
 
-$$\mu_t^{\text{filter}} = \mu_t^{\text{pred}} + K_t (m_t - H\mu_t^{\text{pred}})$$
+$$
+\mu_t^{\text{filter}} = \mu_t^{\text{pred}} + K_t (m_t - H\mu_t^{\text{pred}})
+$$
 
 ---
 

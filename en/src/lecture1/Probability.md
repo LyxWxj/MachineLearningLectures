@@ -45,7 +45,9 @@ Note: $P(X = a) = 0$ for continuous.
 
 $X \sim \mathcal{U}(a, b)$ — equal probability for all values in $[a, b]$:
 
-$$p(x) = \frac{1}{b - a} \quad \text{for } x \in [a, b]$$
+$$
+p(x) = \frac{1}{b - a} \quad \text{for } x \in [a, b]
+$$
 
 **Sampling in NumPy**:
 
@@ -70,13 +72,17 @@ x[step+1] = x[step] + (np.random.uniform() - 0.5) * step_size
 
 $n$ independent binary trials, each with success probability $p$:
 
-$$P(X = k) = \binom{n}{k} p^k (1-p)^{n-k}$$
+$$
+P(X = k) = \binom{n}{k} p^k (1-p)^{n-k}
+$$
 
 where $\binom{n}{k} = \frac{n!}{k!(n-k)!}$ counts the number of ways to choose $k$ successes from $n$ trials.
 
 **Example**: rat in a T-maze, 10 trials, $p = 0.5$ (random choice). What's the probability of 7 left turns?
 
-$$P(k=7 \mid n=10, p=0.5) = \binom{10}{7}(0.5)^7(0.5)^3 = 120 \times 0.000977 = 0.117$$
+$$
+P(k=7 \mid n=10, p=0.5) = \binom{10}{7}(0.5)^7(0.5)^3 = 120 \times 0.000977 = 0.117
+$$
 
 **Sampling**:
 
@@ -92,11 +98,15 @@ samples = np.random.binomial(n=10, p=0.5, size=1000)
 
 Models the number of events in a fixed interval, with average rate $\lambda$:
 
-$$P(X = k) = \frac{\lambda^k e^{-\lambda}}{k!}$$
+$$
+P(X = k) = \frac{\lambda^k e^{-\lambda}}{k!}
+$$
 
 **Example**: a neuron fires at average rate $\lambda = 4$ spikes/second. What's the probability of exactly 7 spikes in one second?
 
-$$P(k=7 \mid \lambda=4) = \frac{4^7 e^{-4}}{7!} = \frac{16384 \times 0.0183}{5040} \approx 0.060$$
+$$
+P(k=7 \mid \lambda=4) = \frac{4^7 e^{-4}}{7!} = \frac{16384 \times 0.0183}{5040} \approx 0.060
+$$
 
 **Sampling**:
 
@@ -114,7 +124,9 @@ spike_counts = np.random.poisson(lam=4, size=100)
 
 The most important continuous distribution:
 
-$$X \sim \mathcal{N}(\mu, \sigma^2) \quad \Rightarrow \quad p(x) = \frac{1}{\sigma\sqrt{2\pi}} \exp\!\left(-\frac{(x - \mu)^2}{2\sigma^2}\right)$$
+$$
+X \sim \mathcal{N}(\mu, \sigma^2) \quad \Rightarrow \quad p(x) = \frac{1}{\sigma\sqrt{2\pi}} \exp\!\left(-\frac{(x - \mu)^2}{2\sigma^2}\right)
+$$
 
 | Parameter | Symbol | Meaning |
 | --------- | ------ | ------- |
@@ -184,15 +196,21 @@ For events $A$ and $B$ with $P(B) > 0$:
 
 **Conditional probability** — probability of $A$ given $B$ occurred:
 
-$$P(A \mid B) = \frac{P(A \cap B)}{P(B)}$$
+$$
+P(A \mid B) = \frac{P(A \cap B)}{P(B)}
+$$
 
 **Joint probability** — both $A$ and $B$ occur:
 
-$$P(A \cap B) = P(A \mid B) \cdot P(B) = P(B \mid A) \cdot P(A)$$
+$$
+P(A \cap B) = P(A \mid B) \cdot P(B) = P(B \mid A) \cdot P(A)
+$$
 
 **Marginal probability** — probability of $A$ regardless of $B$:
 
-$$P(A) = P(A \mid B_1)P(B_1) + P(A \mid B_2)P(B_2) + \cdots = \sum_i P(A \mid B_i)P(B_i)$$
+$$
+P(A) = P(A \mid B_1)P(B_1) + P(A \mid B_2)P(B_2) + \cdots = \sum_i P(A \mid B_i)P(B_i)
+$$
 
 For continuous: $P(A) = \int P(A \mid y)\, p(y)\, dy$
 
@@ -204,17 +222,23 @@ For continuous: $P(A) = \int P(A \mid y)\, p(y)\, dy$
 
 **Independence** → joint = product:
 
-$$P(h_+ \cap v_+) = P(h_+) \cdot P(v_+) = 0.4 \times 0.3 = 0.12$$
+$$
+P(h_+ \cap v_+) = P(h_+) \cdot P(v_+) = 0.4 \times 0.3 = 0.12
+$$
 
 **Not independent** → use conditional:
 
 Given $P(h_+ \mid v_+) = 0.1$, then:
 
-$$P(h_+ \cap v_+) = P(h_+ \mid v_+) \cdot P(v_+) = 0.1 \times 0.3 = 0.03$$
+$$
+P(h_+ \cap v_+) = P(h_+ \mid v_+) \cdot P(v_+) = 0.1 \times 0.3 = 0.03
+$$
 
 **Marginal recovery** (check):
 
-$$P(v_+) = P(v_+ \mid h_+)P(h_+) + P(v_+ \mid h_0)P(h_0)$$
+$$
+P(v_+) = P(v_+ \mid h_+)P(h_+) + P(v_+ \mid h_0)P(h_0)
+$$
 
 You need $P(v_+ \mid h_+)$ and $P(v_+ \mid h_0)$ — compute from joint and marginal.
 
@@ -222,7 +246,9 @@ You need $P(v_+ \mid h_+)$ and $P(v_+ \mid h_0)$ — compute from joint and marg
 
 ### Bayes' Theorem
 
-$$\boxed{\;P(Y \mid X) = \frac{P(X \mid Y) \cdot P(Y)}{P(X)}\;}$$
+$$
+\boxed{\;P(Y \mid X) = \frac{P(X \mid Y) \cdot P(Y)}{P(X)}\;}
+$$
 
 ### Prior $P(Y)$
 
@@ -238,7 +264,9 @@ Updated belief
 
 **Medical test**: disease rate 1%, test sensitivity 95%, false positive 10%.
 
-$$P(\text{disease} \mid +) = \frac{0.95 \times 0.01}{0.95 \times 0.01 + 0.10 \times 0.99} = 8.8\%$$
+$$
+P(\text{disease} \mid +) = \frac{0.95 \times 0.01}{0.95 \times 0.01 + 0.10 \times 0.99} = 8.8\%
+$$
 
 Prior (rare disease) dominates with weak evidence (one test).
 
@@ -270,11 +298,15 @@ $\log L = 1000 \times \log(0.01) = -4605$ — a manageable number.
 
 Given data $\mathbf{x} = (x_1, \ldots, x_n)$, the **likelihood** of parameters $(\mu, \sigma)$ is:
 
-$$L(\mu, \sigma) = \prod_{i=1}^n p(x_i \mid \mu, \sigma)$$
+$$
+L(\mu, \sigma) = \prod_{i=1}^n p(x_i \mid \mu, \sigma)
+$$
 
 **Log-likelihood** (apply log to the product):
 
-$$\log L = \log \prod_{i=1}^n p(x_i \mid \mu, \sigma) = \sum_{i=1}^n \log\, p(x_i \mid \mu, \sigma)$$
+$$
+\log L = \log \prod_{i=1}^n p(x_i \mid \mu, \sigma) = \sum_{i=1}^n \log\, p(x_i \mid \mu, \sigma)
+$$
 
 **Code**:
 
@@ -295,11 +327,15 @@ Log-likelihood is always $\leq 0$. Closer to 0 = better fit.
 
 Find parameters that maximize the log-likelihood:
 
-$$\hat{\theta}_{\text{MLE}} = \arg\max_{\theta} \log L(\theta)$$
+$$
+\hat{\theta}_{\text{MLE}} = \arg\max_{\theta} \log L(\theta)
+$$
 
 **Analytical solution** for Gaussian (set derivative to 0):
 
-$$\hat{\mu} = \frac{1}{n}\sum_{i=1}^n x_i, \qquad \hat{\sigma}^2 = \frac{1}{n}\sum_{i=1}^n (x_i - \hat{\mu})^2$$
+$$
+\hat{\mu} = \frac{1}{n}\sum_{i=1}^n x_i, \qquad \hat{\sigma}^2 = \frac{1}{n}\sum_{i=1}^n (x_i - \hat{\mu})^2
+$$
 
 **Numerical solution** (when no closed form):
 
@@ -341,7 +377,9 @@ Plot as a heatmap. The peak of the heatmap = MLE estimate. Should be near the tr
 
 ### Prior, Likelihood, Posterior
 
-$$\underbrace{P(\theta \mid D)}_{\text{posterior}} = \frac{\overbrace{P(D \mid \theta)}^{\text{likelihood}} \cdot \underbrace{P(\theta)}_{\text{prior}}}{P(D)}$$
+$$
+\underbrace{P(\theta \mid D)}_{\text{posterior}} = \frac{\overbrace{P(D \mid \theta)}^{\text{likelihood}} \cdot \underbrace{P(\theta)}_{\text{prior}}}{P(D)}
+$$
 
 **Conjugate priors**: when prior × likelihood = same family as prior, updating is just arithmetic.
 
@@ -409,7 +447,9 @@ var_bayes = np.var(x_with_prior)
 
 A stochastic process has the **Markov property** if the future depends only on the present, not the past:
 
-$$P(X_{t+1} \mid X_t, X_{t-1}, \ldots, X_0) = P(X_{t+1} \mid X_t)$$
+$$
+P(X_{t+1} \mid X_t, X_{t-1}, \ldots, X_0) = P(X_{t+1} \mid X_t)
+$$
 
 **Analogy**: a drunk person's next step depends only on where they are now, not how they got there. The entire history is irrelevant.
 
@@ -426,7 +466,9 @@ In reality, many systems are not truly Markov, but we can *make* them Markov by 
 
 For a system with $n$ states, the **transition matrix** $T$ is an $n \times n$ matrix where:
 
-$$T_{ij} = P(\text{next state} = j \mid \text{current state} = i)$$
+$$
+T_{ij} = P(\text{next state} = j \mid \text{current state} = i)
+$$
 
 **Properties**:
 
@@ -435,7 +477,9 @@ $$T_{ij} = P(\text{next state} = j \mid \text{current state} = i)$$
 - $T$ is a **stochastic matrix** (row-stochastic)
 **Example**: rat in a 3-area maze (dark = 1, nesting = 2, bright = 3)
 
-$$T = \begin{bmatrix} 0.2 & 0.6 & 0.2 \\ 0.6 & 0.3 & 0.1 \\ 0.8 & 0.2 & 0.0 \end{bmatrix}$$
+$$
+T = \begin{bmatrix} 0.2 & 0.6 & 0.2 \\ 0.6 & 0.3 & 0.1 \\ 0.8 & 0.2 & 0.0 \end{bmatrix}
+$$
 
 Read row 1: "If the rat is in area 1 (dark), there's 20% chance it stays, 60% it moves to nesting, 20% it moves to bright."
 
@@ -458,13 +502,17 @@ How do we compute the probability of being in each state after $k$ steps?
 
 **One step**: if current state is known (e.g., in area 2), represent as row vector $\mathbf{p}_0 = [0, 1, 0]$:
 
-$$\mathbf{p}_1 = \mathbf{p}_0 \cdot T = [0, 1, 0] \cdot T = [0.6,\; 0.3,\; 0.1]$$
+$$
+\mathbf{p}_1 = \mathbf{p}_0 \cdot T = [0, 1, 0] \cdot T = [0.6,\; 0.3,\; 0.1]
+$$
 
 After 1 step: 60% chance in dark, 30% in nesting, 10% in bright.
 
 **Two steps**: apply $T$ again:
 
-$$\mathbf{p}_2 = \mathbf{p}_1 \cdot T = \mathbf{p}_0 \cdot T^2$$
+$$
+\mathbf{p}_2 = \mathbf{p}_1 \cdot T = \mathbf{p}_0 \cdot T^2
+$$
 
 **$k$ steps**: $\mathbf{p}_k = \mathbf{p}_0 \cdot T^k$
 
@@ -487,7 +535,9 @@ print(f"P(area 2 after 4 steps) = {p4[1]:.4f}")  # 0.4311
 
 As $k \to \infty$, $\mathbf{p}_k$ converges to **steady state** $\boldsymbol{\pi}$, regardless of starting position:
 
-$$\boldsymbol{\pi} = \boldsymbol{\pi} \cdot T$$
+$$
+\boldsymbol{\pi} = \boldsymbol{\pi} \cdot T
+$$
 
 > **Intuition**
 > after many transitions, the system "forgets" where it started. The steady state is the long-term proportion of time spent in each area.
@@ -536,4 +586,6 @@ print(p_avg)  # ≈ [[0.447, 0.421, 0.132]]
 - **Bayesian**: Beta prior + Binomial data
 - **Markov**: $\mathbf{p} \cdot T^k$
 
-$$\boxed{\;P(Y \mid X) = \frac{P(X \mid Y) \cdot P(Y)}{P(X)}\;}$$
+$$
+\boxed{\;P(Y \mid X) = \frac{P(X \mid Y) \cdot P(Y)}{P(X)}\;}
+$$

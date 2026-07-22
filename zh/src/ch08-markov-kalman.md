@@ -26,7 +26,9 @@ Hidden Markov Models · Kalman Filter · Forward Inference · Smoothing
 
 **马尔可夫性质**: 未来只依赖于现在，与过去无关。
 
-$$p(s_t | s_{t-1}, s_{t-2}, \ldots, s_1) = p(s_t | s_{t-1})$$
+$$
+p(s_t | s_{t-1}, s_{t-2}, \ldots, s_1) = p(s_t | s_{t-1})
+$$
 
 **马尔可夫链**: 满足马尔可夫性质的状态序列 $\{s_1, s_2, \ldots, s_T\}$
 
@@ -36,7 +38,9 @@ s_1 → s_2 → s_3 → ... → s_T
 
 **转移矩阵** $D$: 描述状态之间的转移概率
 
-$$D = \begin{bmatrix} p(s_t=+1|s_{t-1}=+1) & p(s_t=-1|s_{t-1}=+1) \\ p(s_t=+1|s_{t-1}=-1) & p(s_t=-1|s_{t-1}=-1) \end{bmatrix}$$
+$$
+D = \begin{bmatrix} p(s_t=+1|s_{t-1}=+1) & p(s_t=-1|s_{t-1}=+1) \\ p(s_t=+1|s_{t-1}=-1) & p(s_t=-1|s_{t-1}=-1) \end{bmatrix}
+$$
 
 **状态更新**: $P_t = P_{t-1} D$，其中 $P_t = [p(s_t=+1), p(s_t=-1)]$
 
@@ -107,7 +111,9 @@ transmat = np.array([[1 - switch_prob, switch_prob],
 
 **无观测时的预测**:
 
-$$P_t = P_{t-1} D = P_0 D^t$$
+$$
+P_t = P_{t-1} D = P_0 D^t
+$$
 
 ```python
 def simulate_prediction_only(model, nstep):
@@ -136,11 +142,15 @@ def simulate_prediction_only(model, nstep):
 
 **1. 预测 (Predict)**: 用转移矩阵将昨天的后验变成今天的先验
 
-$$\text{today's prior} = p(s_t | m_{1:t-1}) = p(s_{t-1} | m_{1:t-1}) \cdot D$$
+$$
+\text{today's prior} = p(s_t | m_{1:t-1}) = p(s_{t-1} | m_{1:t-1}) \cdot D
+$$
 
 **2. 更新 (Update)**: 结合新的观测 $m_t$ 计算后验
 
-$$\text{posterior} \propto \text{prior} \times \text{likelihood} = p(m_t | s_t) \cdot p(s_t | m_{1:t-1})$$
+$$
+\text{posterior} \propto \text{prior} \times \text{likelihood} = p(m_t | s_t) \cdot p(s_t | m_{1:t-1})
+$$
 
 ```python
 def one_step_update(model, posterior_tm1, M_t):
@@ -232,13 +242,17 @@ HMM 处理**离散**隐状态，但很多真实系统是**连续**的。
 
 **状态方程** (动力学模型):
 
-$$s_t = D \cdot s_{t-1} + w_t, \quad w_t \sim \mathcal{N}(0, \sigma_p^2)$$
+$$
+s_t = D \cdot s_{t-1} + w_t, \quad w_t \sim \mathcal{N}(0, \sigma_p^2)
+$$
 
 - $D$: 动力学参数（状态如何演化）
 - $w_t$: 过程噪声（动力学的不确定性）
   **观测方程** (测量模型):
 
-$$m_t = s_t + \eta_t, \quad \eta_t \sim \mathcal{N}(0, \sigma_m^2)$$
+$$
+m_t = s_t + \eta_t, \quad \eta_t \sim \mathcal{N}(0, \sigma_m^2)
+$$
 
 - $\eta_t$: 测量噪声（传感器的不确定性）
   **完整模型**:
@@ -259,7 +273,9 @@ $$m_t = s_t + \eta_t, \quad \eta_t \sim \mathcal{N}(0, \sigma_m^2)$$
 
 **Step 1: 预测** — 将昨天的后验变成今天的先验
 
-$$\text{prior} = \mathcal{N}(D \cdot \mu_{t-1}, D^2 \cdot \sigma_{t-1}^2 + \sigma_p^2)$$
+$$
+\text{prior} = \mathcal{N}(D \cdot \mu_{t-1}, D^2 \cdot \sigma_{t-1}^2 + \sigma_p^2)
+$$
 
 **Step 2: 更新** — 结合似然计算后验
 
@@ -267,9 +283,13 @@ $$\text{prior} = \mathcal{N}(D \cdot \mu_{t-1}, D^2 \cdot \sigma_{t-1}^2 + \sigm
 
 **信息加权** (关键洞见):
 
-$$\frac{1}{\sigma_{\text{post}}^2} = \frac{1}{\sigma_{\text{prior}}^2} + \frac{1}{\sigma_{\text{likelihood}}^2}$$
+$$
+\frac{1}{\sigma_{\text{post}}^2} = \frac{1}{\sigma_{\text{prior}}^2} + \frac{1}{\sigma_{\text{likelihood}}^2}
+$$
 
-$$\mu_{\text{post}} = g_{\text{prior}} \cdot \mu_{\text{prior}} + g_{\text{likelihood}} \cdot m_t$$
+$$
+\mu_{\text{post}} = g_{\text{prior}} \cdot \mu_{\text{prior}} + g_{\text{likelihood}} \cdot m_t
+$$
 
 其中 $g = \frac{\text{信息}}{\text{总信息}}$ 是信息权重
 
@@ -291,9 +311,13 @@ $$\mu_{\text{post}} = g_{\text{prior}} \cdot \mu_{\text{prior}} + g_{\text{likel
 
 **经典卡尔曼增益**:
 
-$$K = \frac{\sigma_{\text{prior}}^2}{\sigma_{\text{prior}}^2 + \sigma_m^2}$$
+$$
+K = \frac{\sigma_{\text{prior}}^2}{\sigma_{\text{prior}}^2 + \sigma_m^2}
+$$
 
-$$\mu_{\text{post}} = \mu_{\text{prior}} + K(m_t - \mu_{\text{prior}})$$
+$$
+\mu_{\text{post}} = \mu_{\text{prior}} + K(m_t - \mu_{\text{prior}})
+$$
 
 $K$ 接近 1 → 信任测量；$K$ 接近 0 → 信任预测
 
@@ -328,7 +352,9 @@ def kalman_filter_step(posterior, D, process_noise, measurement_noise, m):
 
 **1. 后验方差随时间减小**
 
-$$\sigma_t^2 < \sigma_{t-1}^2$$
+$$
+\sigma_t^2 < \sigma_{t-1}^2
+$$
 
 每次获得新观测，不确定性都减小。
 
@@ -336,7 +362,9 @@ $$\sigma_t^2 < \sigma_{t-1}^2$$
 
 当 $t \to \infty$，后验方差收敛到：
 
-$$\sigma_{\infty}^2 = \frac{\sigma_p^2}{1-D^2} \cdot \frac{1}{\text{SNR}+1}$$
+$$
+\sigma_{\infty}^2 = \frac{\sigma_p^2}{1-D^2} \cdot \frac{1}{\text{SNR}+1}
+$$
 
 其中 $\text{SNR} = \sigma_p^2 / \sigma_m^2$ 是信噪比
 
@@ -394,11 +422,15 @@ $$\sigma_{\infty}^2 = \frac{\sigma_p^2}{1-D^2} \cdot \frac{1}{\text{SNR}+1}$$
 
 **状态方程**:
 
-$$\mathbf{s}_t = D \mathbf{s}_{t-1} + \mathbf{w}_t, \quad \mathbf{w}_t \sim \mathcal{N}(0, Q)$$
+$$
+\mathbf{s}_t = D \mathbf{s}_{t-1} + \mathbf{w}_t, \quad \mathbf{w}_t \sim \mathcal{N}(0, Q)
+$$
 
 **观测方程**:
 
-$$\mathbf{m}_t = H \mathbf{s}_t + \boldsymbol{\eta}_t, \quad \boldsymbol{\eta}_t \sim \mathcal{N}(0, R)$$
+$$
+\mathbf{m}_t = H \mathbf{s}_t + \boldsymbol{\eta}_t, \quad \boldsymbol{\eta}_t \sim \mathcal{N}(0, R)
+$$
 
 **参数矩阵**:
 
@@ -415,11 +447,15 @@ $$\mathbf{m}_t = H \mathbf{s}_t + \boldsymbol{\eta}_t, \quad \boldsymbol{\eta}_t
 
 **预测均值**:
 
-$$\hat{\mu}_t^{\text{pred}} = D \hat{\mu}_{t-1}$$
+$$
+\hat{\mu}_t^{\text{pred}} = D \hat{\mu}_{t-1}
+$$
 
 **预测协方差**:
 
-$$\hat{\Sigma}_t^{\text{pred}} = D \hat{\Sigma}_{t-1} D^\top + Q$$
+$$
+\hat{\Sigma}_t^{\text{pred}} = D \hat{\Sigma}_{t-1} D^\top + Q
+$$
 
 **直觉**:
 
@@ -432,15 +468,21 @@ $$\hat{\Sigma}_t^{\text{pred}} = D \hat{\Sigma}_{t-1} D^\top + Q$$
 
 **卡尔曼增益矩阵**:
 
-$$K_t = \hat{\Sigma}_t^{\text{pred}} H^\top (H \hat{\Sigma}_t^{\text{pred}} H^\top + R)^{-1}$$
+$$
+K_t = \hat{\Sigma}_t^{\text{pred}} H^\top (H \hat{\Sigma}_t^{\text{pred}} H^\top + R)^{-1}
+$$
 
 **滤波均值**:
 
-$$\hat{\mu}_t^{\text{filter}} = \hat{\mu}_t^{\text{pred}} + K_t (\mathbf{m}_t - H \hat{\mu}_t^{\text{pred}})$$
+$$
+\hat{\mu}_t^{\text{filter}} = \hat{\mu}_t^{\text{pred}} + K_t (\mathbf{m}_t - H \hat{\mu}_t^{\text{pred}})
+$$
 
 **滤波协方差**:
 
-$$\hat{\Sigma}_t^{\text{filter}} = (I - K_t H) \hat{\Sigma}_t^{\text{pred}}$$
+$$
+\hat{\Sigma}_t^{\text{filter}} = (I - K_t H) \hat{\Sigma}_t^{\text{pred}}
+$$
 
 **创新项** $\mathbf{m}_t - H \hat{\mu}_t^{\text{pred}}$：实际观测与预测观测的差异
 
@@ -479,15 +521,21 @@ def kalman_filter(data, params):
 
 **平滑均值** (反向传播):
 
-$$\hat{\mu}_t^{\text{smooth}} = \hat{\mu}_t^{\text{filter}} + J_t (\hat{\mu}_{t+1}^{\text{smooth}} - D \hat{\mu}_t^{\text{filter}})$$
+$$
+\hat{\mu}_t^{\text{smooth}} = \hat{\mu}_t^{\text{filter}} + J_t (\hat{\mu}_{t+1}^{\text{smooth}} - D \hat{\mu}_t^{\text{filter}})
+$$
 
 **平滑协方差**:
 
-$$\hat{\Sigma}_t^{\text{smooth}} = \hat{\Sigma}_t^{\text{filter}} + J_t (\hat{\Sigma}_{t+1}^{\text{smooth}} - P_t) J_t^\top$$
+$$
+\hat{\Sigma}_t^{\text{smooth}} = \hat{\Sigma}_t^{\text{filter}} + J_t (\hat{\Sigma}_{t+1}^{\text{smooth}} - P_t) J_t^\top
+$$
 
 **平滑增益**:
 
-$$J_t = \hat{\Sigma}_t^{\text{filter}} D^\top P_t^{-1}$$
+$$
+J_t = \hat{\Sigma}_t^{\text{filter}} D^\top P_t^{-1}
+$$
 
 其中 $P_t = D \hat{\Sigma}_t^{\text{filter}} D^\top + Q$ 是 $t+1$ 时刻的预测协方差
 
@@ -526,7 +574,9 @@ print(f"平滑 MSE: {np.mean((state - smoothed_state_means)**2):.3f}")
 
 **M 步更新公式** (示例):
 
-$$D^{\text{new}} = \left(\sum_{t=2}^T \mathbb{E}[s_t s_{t-1}^\top]\right) \left(\sum_{t=2}^T \mathbb{E}[s_{t-1} s_{t-1}^\top]\right)^{-1}$$
+$$
+D^{\text{new}} = \left(\sum_{t=2}^T \mathbb{E}[s_t s_{t-1}^\top]\right) \left(\sum_{t=2}^T \mathbb{E}[s_{t-1} s_{t-1}^\top]\right)^{-1}
+$$
 
 ```python
 import pykalman
@@ -569,19 +619,29 @@ smoothed_mean, smoothed_cov = kf.smooth(data)
 
 **HMM 前向推断**:
 
-$$P(s_t | m_{1:t}) \propto p(m_t | s_t) \cdot [P(s_{t-1}|m_{1:t-1}) \cdot D]$$
+$$
+P(s_t | m_{1:t}) \propto p(m_t | s_t) \cdot [P(s_{t-1}|m_{1:t-1}) \cdot D]
+$$
 
 **1D 卡尔曼滤波**:
 
-$$\mu_t^{\text{post}} = g_{\text{prior}} \cdot D\mu_{t-1} + g_{\text{likelihood}} \cdot m_t$$
+$$
+\mu_t^{\text{post}} = g_{\text{prior}} \cdot D\mu_{t-1} + g_{\text{likelihood}} \cdot m_t
+$$
 
-$$\frac{1}{(\sigma_t^{\text{post}})^2} = \frac{1}{(D\sigma_{t-1})^2 + \sigma_p^2} + \frac{1}{\sigma_m^2}$$
+$$
+\frac{1}{(\sigma_t^{\text{post}})^2} = \frac{1}{(D\sigma_{t-1})^2 + \sigma_p^2} + \frac{1}{\sigma_m^2}
+$$
 
 **2D 卡尔曼滤波**:
 
-$$K_t = \Sigma_t^{\text{pred}} H^\top (H \Sigma_t^{\text{pred}} H^\top + R)^{-1}$$
+$$
+K_t = \Sigma_t^{\text{pred}} H^\top (H \Sigma_t^{\text{pred}} H^\top + R)^{-1}
+$$
 
-$$\mu_t^{\text{filter}} = \mu_t^{\text{pred}} + K_t (m_t - H\mu_t^{\text{pred}})$$
+$$
+\mu_t^{\text{filter}} = \mu_t^{\text{pred}} + K_t (m_t - H\mu_t^{\text{pred}})
+$$
 
 ---
 

@@ -128,11 +128,15 @@ def entropy(pmf):
 
 **均方误差**（Mean Squared Error，目标函数）：
 
-$$\text{MSE}(\theta) = \frac{1}{N}\sum_{i=1}^N (y_i - \theta x_i)^2$$
+$$
+\text{MSE}(\theta) = \frac{1}{N}\sum_{i=1}^N (y_i - \theta x_i)^2
+$$
 
 **解析解**（令导数为零）：
 
-$$\hat{\theta} = \frac{\mathbf{x}^T \mathbf{y}}{\mathbf{x}^T \mathbf{x}} = \frac{\sum x_i y_i}{\sum x_i^2}$$
+$$
+\hat{\theta} = \frac{\mathbf{x}^T \mathbf{y}}{\mathbf{x}^T \mathbf{x}} = \frac{\sum x_i y_i}{\sum x_i^2}
+$$
 
 **代码**：
 
@@ -156,7 +160,9 @@ def mse(x, y, theta):
 
 每个散点是一个 $(x_i, y_i)$ 点。将所有点收集到向量中：
 
-$$\mathbf{x} = \begin{bmatrix} x_1 \\ x_2 \\ \vdots \\ x_N \end{bmatrix}, \quad \mathbf{y} = \begin{bmatrix} y_1 \\ y_2 \\ \vdots \\ y_N \end{bmatrix}$$
+$$
+\mathbf{x} = \begin{bmatrix} x_1 \\ x_2 \\ \vdots \\ x_N \end{bmatrix}, \quad \mathbf{y} = \begin{bmatrix} y_1 \\ y_2 \\ \vdots \\ y_N \end{bmatrix}
+$$
 
 **示例**（5 个数据点）：
 
@@ -193,11 +199,15 @@ mse = np.mean(residuals**2)                 # mean squared error
 
 **似然函数**（Likelihood）：
 
-$$L(\theta) = \prod_{i=1}^N \frac{1}{\sqrt{2\pi\sigma^2}} \exp\!\left(-\frac{(y_i - \theta x_i)^2}{2\sigma^2}\right)$$
+$$
+L(\theta) = \prod_{i=1}^N \frac{1}{\sqrt{2\pi\sigma^2}} \exp\!\left(-\frac{(y_i - \theta x_i)^2}{2\sigma^2}\right)
+$$
 
 **对数似然函数**（Log-likelihood）：
 
-$$\log L(\theta) = -\frac{N}{2}\log(2\pi\sigma^2) - \frac{1}{2\sigma^2}\sum_{i=1}^N (y_i - \theta x_i)^2$$
+$$
+\log L(\theta) = -\frac{N}{2}\log(2\pi\sigma^2) - \frac{1}{2\sigma^2}\sum_{i=1}^N (y_i - \theta x_i)^2
+$$
 
 **关键结果**：最大化对数似然 $\Leftrightarrow$ 最小化均方误差。它们给出相同的 $\hat{\theta}$！
 
@@ -217,11 +227,15 @@ def likelihood(theta, x, y):
 
 **概率视角**：噪声是模型的一部分。将 $y$ 视为**随机变量**（Random Variable）：
 
-$$y \sim \mathcal{N}(\theta x,\; \sigma^2)$$
+$$
+y \sim \mathcal{N}(\theta x,\; \sigma^2)
+$$
 
 这意味着：对于给定的 $x$ 和 $\theta$，响应 $y$ 不是确定性的 — 它遵循以 $\theta x$ 为中心的高斯分布。
 
-$$p(y \mid x, \theta) = \frac{1}{\sqrt{2\pi\sigma^2}} \exp\!\left(-\frac{(y - \theta x)^2}{2\sigma^2}\right)$$
+$$
+p(y \mid x, \theta) = \frac{1}{\sqrt{2\pi\sigma^2}} \exp\!\left(-\frac{(y - \theta x)^2}{2\sigma^2}\right)
+$$
 
 **为什么这很重要**：与仅仅找到一个 " 最佳 "$\hat{\theta}$ 不同，我们现在可以：
 
@@ -258,11 +272,15 @@ y = theta_true * x + noise             # y ~ N(1.2x, 1)
 
 给定一个数据点 $(x, y)$，参数 $\hat{\theta}$ 的**似然**为：
 
-$$\mathcal{L}(\hat{\theta} \mid x, y) = p(y \mid x, \hat{\theta}) = \frac{1}{\sqrt{2\pi}} \exp\!\left(-\frac{(y - \hat{\theta} x)^2}{2}\right)$$
+$$
+\mathcal{L}(\hat{\theta} \mid x, y) = p(y \mid x, \hat{\theta}) = \frac{1}{\sqrt{2\pi}} \exp\!\left(-\frac{(y - \hat{\theta} x)^2}{2}\right)
+$$
 
 **示例**：$x = 2.1$，$y = 3.7$，测试 $\hat{\theta} = 1.0$：
 
-$$\mathcal{L}(1.0 \mid 2.1, 3.7) = \frac{1}{\sqrt{2\pi}} \exp\!\left(-\frac{(3.7 - 1.0 \times 2.1)^2}{2}\right) = \frac{1}{\sqrt{2\pi}} e^{-1.28} \approx 0.11$$
+$$
+\mathcal{L}(1.0 \mid 2.1, 3.7) = \frac{1}{\sqrt{2\pi}} \exp\!\left(-\frac{(3.7 - 1.0 \times 2.1)^2}{2}\right) = \frac{1}{\sqrt{2\pi}} e^{-1.28} \approx 0.11
+$$
 
 **代码**：
 
@@ -280,7 +298,9 @@ likelihood(1.0, 2.1, 3.7)  # ≈ 0.113
 
 我们有 $N$ 个数据点。假设噪声在各次观测之间**独立**：
 
-$$\mathcal{L}(\hat{\theta} \mid \mathbf{x}, \mathbf{y}) = \prod_{i=1}^N p(y_i \mid x_i, \hat{\theta}) = \prod_{i=1}^N \frac{1}{\sqrt{2\pi}} \exp\!\left(-\frac{(y_i - \hat{\theta} x_i)^2}{2}\right)$$
+$$
+\mathcal{L}(\hat{\theta} \mid \mathbf{x}, \mathbf{y}) = \prod_{i=1}^N p(y_i \mid x_i, \hat{\theta}) = \prod_{i=1}^N \frac{1}{\sqrt{2\pi}} \exp\!\left(-\frac{(y_i - \hat{\theta} x_i)^2}{2}\right)
+$$
 
 **问题**：将 $N$ 个小概率相乘 → **数值下溢**（Numerical Underflow）。
 
@@ -288,7 +308,9 @@ $$\mathcal{L}(\hat{\theta} \mid \mathbf{x}, \mathbf{y}) = \prod_{i=1}^N p(y_i \m
 
 **解决方案**：取对数
 
-$$\log \mathcal{L}(\hat{\theta}) = \sum_{i=1}^N \log p(y_i \mid x_i, \hat{\theta}) = -\frac{N}{2}\log(2\pi) - \frac{1}{2}\sum_{i=1}^N (y_i - \hat{\theta} x_i)^2$$
+$$
+\log \mathcal{L}(\hat{\theta}) = \sum_{i=1}^N \log p(y_i \mid x_i, \hat{\theta}) = -\frac{N}{2}\log(2\pi) - \frac{1}{2}\sum_{i=1}^N (y_i - \hat{\theta} x_i)^2
+$$
 
 **关键性质**：$\log$ 是单调递增的，所以 $\arg\max \mathcal{L} = \arg\max \log \mathcal{L}$。最大化似然的 $\hat{\theta}$ 也最大化对数似然。
 
@@ -319,13 +341,19 @@ for th in theta_hats:
 
 通过求导并令其为零来最大化对数似然：
 
-$$\log \mathcal{L}(\theta) = -\frac{N}{2}\log(2\pi) - \frac{1}{2}\sum_{i=1}^N (y_i - \theta x_i)^2$$
+$$
+\log \mathcal{L}(\theta) = -\frac{N}{2}\log(2\pi) - \frac{1}{2}\sum_{i=1}^N (y_i - \theta x_i)^2
+$$
 
-$$\frac{\partial \log \mathcal{L}}{\partial \theta} = \sum_{i=1}^N (y_i - \theta x_i) x_i = 0$$
+$$
+\frac{\partial \log \mathcal{L}}{\partial \theta} = \sum_{i=1}^N (y_i - \theta x_i) x_i = 0
+$$
 
 展开：$\sum x_i y_i - \theta \sum x_i^2 = 0$
 
-$$\boxed{\;\hat{\theta}_{\text{MLE}} = \frac{\sum x_i y_i}{\sum x_i^2} = \frac{\mathbf{x}^T \mathbf{y}}{\mathbf{x}^T \mathbf{x}}\;}$$
+$$
+\boxed{\;\hat{\theta}_{\text{MLE}} = \frac{\sum x_i y_i}{\sum x_i^2} = \frac{\mathbf{x}^T \mathbf{y}}{\mathbf{x}^T \mathbf{x}}\;}
+$$
 
 **这与均方误差的公式相同！** 当噪声是具有恒定方差的高斯噪声时，最小化均方误差和最大化似然给出相同的 $\hat{\theta}$。
 
@@ -386,11 +414,15 @@ ci_95 = np.percentile(theta_boots, [2.5, 97.5])
 
 **普通最小二乘估计量**（OLS Estimator）：
 
-$$\hat{\boldsymbol{\theta}} = (X^T X)^{-1} X^T \mathbf{y}$$
+$$
+\hat{\boldsymbol{\theta}} = (X^T X)^{-1} X^T \mathbf{y}
+$$
 
 **多项式回归**（Polynomial Regression）：特征是 $x$ 的幂次
 
-$$X = \begin{bmatrix} 1 & x_1 & x_1^2 \\ 1 & x_2 & x_2^2 \\ \vdots & \vdots & \vdots \end{bmatrix}$$
+$$
+X = \begin{bmatrix} 1 & x_1 & x_1^2 \\ 1 & x_2 & x_2^2 \\ \vdots & \vdots & \vdots \end{bmatrix}
+$$
 
 ```python
 def make_design_matrix(x, order):
@@ -418,7 +450,9 @@ def ordinary_least_squares(X, y):
 
 **解决方案**：应用**连接函数**（Link Function）$g$ 来变换线性输出：
 
-$$g(\hat{y}) = X\boldsymbol{\theta} \quad \Leftrightarrow \quad \hat{y} = g^{-1}(X\boldsymbol{\theta})$$
+$$
+g(\hat{y}) = X\boldsymbol{\theta} \quad \Leftrightarrow \quad \hat{y} = g^{-1}(X\boldsymbol{\theta})
+$$
 
 | 模型            | 连接函数 $g$        | 逆函数 $g^{-1}$ | 输出类型     |
 | --------------- | ------------------- | --------------- | ------------ |
@@ -436,7 +470,9 @@ $$g(\hat{y}) = X\boldsymbol{\theta} \quad \Leftrightarrow \quad \hat{y} = g^{-1}
 
 **在神经科学中**：我们想知道 " 过去 $d$ 个时间步的刺激如何影响当前的脉冲？" 设计矩阵将过去 $d$ 个刺激值排列成一行：
 
-$$\mathbf{X} = \begin{bmatrix} \text{stim}[t_0 - d+1] & \cdots & \text{stim}[t_0 - 1] & \text{stim}[t_0] \\ \text{stim}[t_T - d+1] & \cdots & \text{stim}[t_T - 1] & \text{stim}[t_T] \end{bmatrix}$$
+$$
+\mathbf{X} = \begin{bmatrix} \text{stim}[t_0 - d+1] & \cdots & \text{stim}[t_0 - 1] & \text{stim}[t_0] \\ \text{stim}[t_T - d+1] & \cdots & \text{stim}[t_T - 1] & \text{stim}[t_T] \end{bmatrix}
+$$
 
 **零填充**（Zero-padding）：对于最早的时间点，我们没有完整的 $d$ 个历史数据 — 用零填充：
 
@@ -487,7 +523,9 @@ for t in range(T):
 
 **概率质量函数**（Probability Mass Function, PMF）：
 
-$$P(Y = k) = \frac{\lambda^k \cdot e^{-\lambda}}{k!}, \quad k = 0, 1, 2, \ldots$$
+$$
+P(Y = k) = \frac{\lambda^k \cdot e^{-\lambda}}{k!}, \quad k = 0, 1, 2, \ldots
+$$
 
 其中 $\lambda > 0$ 是**速率参数**（Rate Parameter） — 每单位时间/空间的平均事件数。
 
@@ -552,7 +590,9 @@ for lam in [1, 3, 5, 10]:
 
 计算刺激和权重的加权和：
 
-$$z_t = \mathbf{x}_t^\top \boldsymbol{\theta} + b = \sum_{j=1}^{d} \theta_j \cdot \text{stim}[t-d+j] + b$$
+$$
+z_t = \mathbf{x}_t^\top \boldsymbol{\theta} + b = \sum_{j=1}^{d} \theta_j \cdot \text{stim}[t-d+j] + b
+$$
 
 其中 $\boldsymbol{\theta}$ 是时间滤波器（Temporal Filter），$b$ 是偏置（Bias）。
 
@@ -564,7 +604,9 @@ $$z_t = \mathbf{x}_t^\top \boldsymbol{\theta} + b = \sum_{j=1}^{d} \theta_j \cdo
 
 通过指数函数将线性输出映射为正的放电率：
 
-$$\lambda_t = \exp(z_t) = \exp(\mathbf{x}_t^\top \boldsymbol{\theta} + b)$$
+$$
+\lambda_t = \exp(z_t) = \exp(\mathbf{x}_t^\top \boldsymbol{\theta} + b)
+$$
 
 **为什么用 exp？**
 
@@ -582,27 +624,37 @@ $$\lambda_t = \exp(z_t) = \exp(\mathbf{x}_t^\top \boldsymbol{\theta} + b)$$
 
 假设脉冲计数遵循泊松分布：
 
-$$y_t \mid \mathbf{x}_t, \boldsymbol{\theta} \sim \text{Poisson}(\lambda_t)$$
+$$
+y_t \mid \mathbf{x}_t, \boldsymbol{\theta} \sim \text{Poisson}(\lambda_t)
+$$
 
 概率质量函数：
 
-$$P(y_t \mid \mathbf{x}_t, \boldsymbol{\theta}) = \frac{\lambda_t^{y_t} \cdot e^{-\lambda_t}}{y_t!}$$
+$$
+P(y_t \mid \mathbf{x}_t, \boldsymbol{\theta}) = \frac{\lambda_t^{y_t} \cdot e^{-\lambda_t}}{y_t!}
+$$
 
 **第四步：构造似然函数**
 
 假设脉冲在时间上独立，联合似然为：
 
-$$\mathcal{L}(\boldsymbol{\theta}) = \prod_{t=1}^{T} P(y_t \mid \mathbf{x}_t, \boldsymbol{\theta}) = \prod_{t=1}^{T} \frac{\lambda_t^{y_t} \cdot e^{-\lambda_t}}{y_t!}$$
+$$
+\mathcal{L}(\boldsymbol{\theta}) = \prod_{t=1}^{T} P(y_t \mid \mathbf{x}_t, \boldsymbol{\theta}) = \prod_{t=1}^{T} \frac{\lambda_t^{y_t} \cdot e^{-\lambda_t}}{y_t!}
+$$
 
 ---
 
 **第五步：取对数简化**
 
-$$\log \mathcal{L}(\boldsymbol{\theta}) = \sum_{t=1}^{T} \left[ y_t \log \lambda_t - \lambda_t - \log(y_t!) \right]$$
+$$
+\log \mathcal{L}(\boldsymbol{\theta}) = \sum_{t=1}^{T} \left[ y_t \log \lambda_t - \lambda_t - \log(y_t!) \right]
+$$
 
 丢弃不依赖于 $\boldsymbol{\theta}$ 的常数项 $\log(y_t!)$：
 
-$$\log \mathcal{L}(\boldsymbol{\theta}) = \sum_{t=1}^{T} \left[ y_t \log \lambda_t - \lambda_t \right]$$
+$$
+\log \mathcal{L}(\boldsymbol{\theta}) = \sum_{t=1}^{T} \left[ y_t \log \lambda_t - \lambda_t \right]
+$$
 
 ---
 
@@ -612,7 +664,9 @@ $$\log \mathcal{L}(\boldsymbol{\theta}) = \sum_{t=1}^{T} \left[ y_t \log \lambda
 
 将 $\lambda_t = \exp(\mathbf{x}_t^\top \boldsymbol{\theta})$ 代入，用矩阵符号表示：
 
-$$\log \mathcal{L}(\boldsymbol{\theta}) = \mathbf{y}^\top \log(\boldsymbol{\lambda}) - \mathbf{1}^\top \boldsymbol{\lambda}$$
+$$
+\log \mathcal{L}(\boldsymbol{\theta}) = \mathbf{y}^\top \log(\boldsymbol{\lambda}) - \mathbf{1}^\top \boldsymbol{\lambda}
+$$
 
 其中 $\boldsymbol{\lambda} = \exp(\mathbf{X}\boldsymbol{\theta})$。
 
@@ -620,7 +674,9 @@ $$\log \mathcal{L}(\boldsymbol{\theta}) = \mathbf{y}^\top \log(\boldsymbol{\lamb
 
 最小化负对数似然：
 
-$$-\log \mathcal{L}(\boldsymbol{\theta}) = -\left( \mathbf{y}^\top \log(\boldsymbol{\lambda}) - \mathbf{1}^\top \boldsymbol{\lambda} \right) = \mathbf{1}^\top \boldsymbol{\lambda} - \mathbf{y}^\top \log(\boldsymbol{\lambda})$$
+$$
+-\log \mathcal{L}(\boldsymbol{\theta}) = -\left( \mathbf{y}^\top \log(\boldsymbol{\lambda}) - \mathbf{1}^\top \boldsymbol{\lambda} \right) = \mathbf{1}^\top \boldsymbol{\lambda} - \mathbf{y}^\top \log(\boldsymbol{\lambda})
+$$
 
 ---
 
@@ -722,7 +778,9 @@ $\exp$ 确保 $\lambda_t > 0$。
 
 **对数似然**：
 
-$$\log L(\boldsymbol{\theta}) = \sum_t \left[ y_t \log \lambda_t - \lambda_t \right] = \sum_t \left[ y_t (\mathbf{x}_t^T \boldsymbol{\theta}) - \exp(\mathbf{x}_t^T \boldsymbol{\theta}) \right]$$
+$$
+\log L(\boldsymbol{\theta}) = \sum_t \left[ y_t \log \lambda_t - \lambda_t \right] = \sum_t \left[ y_t (\mathbf{x}_t^T \boldsymbol{\theta}) - \exp(\mathbf{x}_t^T \boldsymbol{\theta}) \right]
+$$
 
 **没有闭式解** — 使用数值优化：
 
@@ -762,7 +820,9 @@ def fit_lnp(stim, spikes, d=25):
 
 **Sigmoid 函数**：
 
-$$\sigma(z) = \frac{1}{1 + e^{-z}}$$
+$$
+\sigma(z) = \frac{1}{1 + e^{-z}}
+$$
 
 | $z$             | $\sigma(z)$ | 解释                   |
 | --------------- | ----------- | ---------------------- |
@@ -780,7 +840,9 @@ $$\sigma(z) = \frac{1}{1 + e^{-z}}$$
 - 导数形式简洁：$\sigma'(z) = \sigma(z)(1 - \sigma(z))$
   **用 GLM 术语表示**：Sigmoid 是**逆连接函数** $g^{-1}$：
 
-$$\underbrace{\sigma^{-1}(\hat{y})}_{\text{log-odds}} = \mathbf{x}^\top \boldsymbol{\theta} \quad \Leftrightarrow \quad \hat{y} = \sigma(\mathbf{x}^\top \boldsymbol{\theta})$$
+$$
+\underbrace{\sigma^{-1}(\hat{y})}_{\text{log-odds}} = \mathbf{x}^\top \boldsymbol{\theta} \quad \Leftrightarrow \quad \hat{y} = \sigma(\mathbf{x}^\top \boldsymbol{\theta})
+$$
 
 连接函数 $g = \sigma^{-1}$ 是 **Logit 函数**（对数几率）：$g(p) = \log \frac{p}{1-p}$。
 
@@ -792,11 +854,15 @@ $$\underbrace{\sigma^{-1}(\hat{y})}_{\text{log-odds}} = \mathbf{x}^\top \boldsym
 
 **模型**：
 
-$$P(y = 1 \mid \mathbf{x}, \boldsymbol{\theta}) = \hat{y} = \sigma(\mathbf{x}^\top \boldsymbol{\theta})$$
+$$
+P(y = 1 \mid \mathbf{x}, \boldsymbol{\theta}) = \hat{y} = \sigma(\mathbf{x}^\top \boldsymbol{\theta})
+$$
 
 **单次观测的伯努利似然**：
 
-$$P(y_i \mid \hat{y}_i) = \hat{y}_i^{\,y_i} (1 - \hat{y}_i)^{1 - y_i}$$
+$$
+P(y_i \mid \hat{y}_i) = \hat{y}_i^{\,y_i} (1 - \hat{y}_i)^{1 - y_i}
+$$
 
 这是一种紧凑的写法：
 
@@ -804,13 +870,17 @@ $$P(y_i \mid \hat{y}_i) = \hat{y}_i^{\,y_i} (1 - \hat{y}_i)^{1 - y_i}$$
 - 如果 $y_i = 0$：概率 = $1 - \hat{y}_i$
   **所有数据的对数似然**（假设独立）：
 
-$$\log \mathcal{L}(\boldsymbol{\theta}) = \sum_{i=1}^N \left[ y_i \log \hat{y}_i + (1 - y_i) \log(1 - \hat{y}_i) \right]$$
+$$
+\log \mathcal{L}(\boldsymbol{\theta}) = \sum_{i=1}^N \left[ y_i \log \hat{y}_i + (1 - y_i) \log(1 - \hat{y}_i) \right]
+$$
 
 这是**交叉熵损失**（Cross-Entropy Loss）的取反。它对自信的错误预测给予重罚。
 
 **负对数似然**（我们最小化的目标）：
 
-$$-\log \mathcal{L} = -\sum_{i=1}^N \left[ y_i \log \sigma(\mathbf{x}_i^\top \boldsymbol{\theta}) + (1 - y_i) \log(1 - \sigma(\mathbf{x}_i^\top \boldsymbol{\theta})) \right]$$
+$$
+-\log \mathcal{L} = -\sum_{i=1}^N \left[ y_i \log \sigma(\mathbf{x}_i^\top \boldsymbol{\theta}) + (1 - y_i) \log(1 - \sigma(\mathbf{x}_i^\top \boldsymbol{\theta})) \right]
+$$
 
 没有闭式解 — 使用数值优化（例如梯度下降、牛顿法）。
 
@@ -885,7 +955,9 @@ cv_scores = cross_val_score(model, X, y, cv=8)
 > 我们不再问 " 找到最佳的 $\boldsymbol{\theta}$"，而是问 " 找到**最小的**最佳 $\boldsymbol{\theta}$"。
 > 这在目标函数中为大权重添加了**惩罚**：
 
-$$\text{Objective} = \underbrace{-\log \mathcal{L}(\boldsymbol{\theta})}_{\text{拟合数据}} + \underbrace{\Omega(\boldsymbol{\theta})}_{\text{复杂度惩罚}}$$
+$$
+\text{Objective} = \underbrace{-\log \mathcal{L}(\boldsymbol{\theta})}_{\text{拟合数据}} + \underbrace{\Omega(\boldsymbol{\theta})}_{\text{复杂度惩罚}}
+$$
 
 **为什么这有帮助？**
 
@@ -915,7 +987,9 @@ $$\text{Objective} = \underbrace{-\log \mathcal{L}(\boldsymbol{\theta})}_{\text{
 
 **目标函数**：
 
-$$-\log \mathcal{L}'(\boldsymbol{\theta}) = -\log \mathcal{L}(\boldsymbol{\theta}) + \frac{\beta}{2} \sum_j \theta_j^2 = -\log \mathcal{L}(\boldsymbol{\theta}) + \frac{\beta}{2} \|\boldsymbol{\theta}\|_2^2$$
+$$
+-\log \mathcal{L}'(\boldsymbol{\theta}) = -\log \mathcal{L}(\boldsymbol{\theta}) + \frac{\beta}{2} \sum_j \theta_j^2 = -\log \mathcal{L}(\boldsymbol{\theta}) + \frac{\beta}{2} \|\boldsymbol{\theta}\|_2^2
+$$
 
 其中 $\beta > 0$ 是**正则化强度**（Regularization Strength）。
 
@@ -936,7 +1010,9 @@ L2 regularization:    θ = [ 0.3,  -0.2,  0.1, -0.1, ...]   (small values)
 
 **目标函数**：
 
-$$-\log \mathcal{L}'(\boldsymbol{\theta}) = -\log \mathcal{L}(\boldsymbol{\theta}) + \frac{\beta}{2} \sum_j |\theta_j| = -\log \mathcal{L}(\boldsymbol{\theta}) + \frac{\beta}{2} \|\boldsymbol{\theta}\|_1$$
+$$
+-\log \mathcal{L}'(\boldsymbol{\theta}) = -\log \mathcal{L}(\boldsymbol{\theta}) + \frac{\beta}{2} \sum_j |\theta_j| = -\log \mathcal{L}(\boldsymbol{\theta}) + \frac{\beta}{2} \|\boldsymbol{\theta}\|_1
+$$
 
 ---
 
@@ -948,7 +1024,9 @@ $$-\log \mathcal{L}'(\boldsymbol{\theta}) = -\log \mathcal{L}(\boldsymbol{\theta
 
 给定两个变量 $x$ 和 $y$，**协方差**（Covariance）衡量它们是否倾向于一起变化：
 
-$$\text{Cov}(x, y) = \frac{1}{N} \sum_{i=1}^N (x_i - \bar{x})(y_i - \bar{y})$$
+$$
+\text{Cov}(x, y) = \frac{1}{N} \sum_{i=1}^N (x_i - \bar{x})(y_i - \bar{y})
+$$
 
 > **直觉**
 > 每一项 $(x_i - \bar{x})(y_i - \bar{y})$ 都在问：
@@ -983,11 +1061,15 @@ $$\text{Cov}(x, y) = \frac{1}{N} \sum_{i=1}^N (x_i - \bar{x})(y_i - \bar{y})$$
 
 对于 $d$ 个特征，**协方差矩阵**（Covariance Matrix）捕获所有成对协方差：
 
-$$\Sigma = \begin{bmatrix} \text{Var}(x_1) & \text{Cov}(x_1, x_2) & \cdots & \text{Cov}(x_1, x_d) \\ \text{Cov}(x_2, x_1) & \text{Var}(x_2) & \cdots & \text{Cov}(x_2, x_d) \\ \vdots & \vdots & \ddots & \vdots \\ \text{Cov}(x_d, x_1) & \text{Cov}(x_d, x_2) & \cdots & \text{Var}(x_d) \end{bmatrix}$$
+$$
+\Sigma = \begin{bmatrix} \text{Var}(x_1) & \text{Cov}(x_1, x_2) & \cdots & \text{Cov}(x_1, x_d) \\ \text{Cov}(x_2, x_1) & \text{Var}(x_2) & \cdots & \text{Cov}(x_2, x_d) \\ \vdots & \vdots & \ddots & \vdots \\ \text{Cov}(x_d, x_1) & \text{Cov}(x_d, x_2) & \cdots & \text{Var}(x_d) \end{bmatrix}
+$$
 
 **矩阵形式**（在对 $\mathbf{X}$ 进行均值中心化之后）：
 
-$$\hat{\Sigma} = \frac{1}{N}\mathbf{X}^\top\mathbf{X}$$
+$$
+\hat{\Sigma} = \frac{1}{N}\mathbf{X}^\top\mathbf{X}
+$$
 
 每个元素 $\hat{\Sigma}_{ij}$ 告诉你特征 $i$ 和特征 $j$ 在所有样本中的协变关系。
 
@@ -1032,11 +1114,15 @@ $$\hat{\Sigma} = \frac{1}{N}\mathbf{X}^\top\mathbf{X}$$
 
 协方差矩阵是一个**线性变换**，将单位圆映射为数据的展开形状：
 
-$$\text{Unit circle} \xrightarrow{\;\Sigma\;} \text{Data ellipse}$$
+$$
+\text{Unit circle} \xrightarrow{\;\Sigma\;} \text{Data ellipse}
+$$
 
 **特征分解**（Eigendecomposition）使这一点变得明确：
 
-$$\Sigma = V \Lambda V^\top$$
+$$
+\Sigma = V \Lambda V^\top
+$$
 
 其中 $V = [\mathbf{v}_1 \mid \mathbf{v}_2]$（特征向量）和 $\Lambda = \text{diag}(\lambda_1, \lambda_2)$（特征值）。
 
@@ -1066,9 +1152,13 @@ $r_{xy} = \frac{\text{Cov}(x, y)}{\sigma_x \cdot \sigma_y} \in [-1, 1]$
 
 ### 公式
 
-$$\Sigma_{ij} = \frac{1}{N}\sum_n (x_i^{(n)} - \bar{x}_i)(x_j^{(n)} - \bar{x}_j)$$
+$$
+\Sigma_{ij} = \frac{1}{N}\sum_n (x_i^{(n)} - \bar{x}_i)(x_j^{(n)} - \bar{x}_j)
+$$
 
-$$\hat{\Sigma} = \frac{1}{N}\mathbf{X}^\top\mathbf{X}$$
+$$
+\hat{\Sigma} = \frac{1}{N}\mathbf{X}^\top\mathbf{X}
+$$
 
 ### 关键性质
 
@@ -1088,7 +1178,9 @@ $$\hat{\Sigma} = \frac{1}{N}\mathbf{X}^\top\mathbf{X}$$
 
 **定义**：对于矩阵 $\Sigma$：
 
-$$\Sigma \mathbf{w} = \lambda \mathbf{w}$$
+$$
+\Sigma \mathbf{w} = \lambda \mathbf{w}
+$$
 
 其中 $\mathbf{w}$ 是特征向量，$\lambda$ 是对应的特征值。
 
@@ -1113,7 +1205,9 @@ $$\Sigma \mathbf{w} = \lambda \mathbf{w}$$
 5. 将数据投影到前 $K$ 个特征向量上
    **投影**（得分，Scores）：
 
-$$\mathbf{S} = \mathbf{X} \mathbf{W}_{1:K}$$
+$$
+\mathbf{S} = \mathbf{X} \mathbf{W}_{1:K}
+$$
 
 其中 $\mathbf{W}_{1:K}$ 包含前 $K$ 个特征向量作为列。
 
@@ -1133,7 +1227,9 @@ $$\mathbf{S} = \mathbf{X} \mathbf{W}_{1:K}$$
 
 **累积解释方差**（Cumulative Variance Explained）：
 
-$$\text{Variance explained}(K) = \frac{\sum_{i=1}^K \lambda_i}{\sum_{i=1}^N \lambda_i}$$
+$$
+\text{Variance explained}(K) = \frac{\sum_{i=1}^K \lambda_i}{\sum_{i=1}^N \lambda_i}
+$$
 
 **内在维数 vs 外在维数**（Intrinsic vs Extrinsic Dimensionality）：
 
@@ -1226,17 +1322,23 @@ t-SNE 有一个关键超参数：**困惑度**（Perplexity），它大致控制
 
 **第一步 — 高维相似度**：对于每对点 $(x_i, x_j)$，计算基于高斯的概率：
 
-$$p_{j|i} = \frac{\exp(-\|x_i - x_j\|^2 / 2\sigma_i^2)}{\sum_{k \neq i} \exp(-\|x_i - x_k\|^2 / 2\sigma_i^2)}$$
+$$
+p_{j|i} = \frac{\exp(-\|x_i - x_j\|^2 / 2\sigma_i^2)}{\sum_{k \neq i} \exp(-\|x_i - x_k\|^2 / 2\sigma_i^2)}
+$$
 
 " 给定点 $i$，选择 $j$ 作为其邻居的概率是多少？"
 
 **第二步 — 低维相似度**：在二维映射中，使用**t 分布**（重尾分布）代替高斯分布：
 
-$$q_{ij} = \frac{(1 + \|y_i - y_j\|^2)^{-1}}{\sum_{k \neq l} (1 + \|y_k - y_l\|^2)^{-1}}$$
+$$
+q_{ij} = \frac{(1 + \|y_i - y_j\|^2)^{-1}}{\sum_{k \neq l} (1 + \|y_k - y_l\|^2)^{-1}}
+$$
 
 **第三步 — 优化**：最小化 $P$ 和 $Q$ 之间的 KL 散度（KL Divergence）：
 
-$$\text{KL}(P \| Q) = \sum_{i \neq j} p_{ij} \log \frac{p_{ij}}{q_{ij}}$$
+$$
+\text{KL}(P \| Q) = \sum_{i \neq j} p_{ij} \log \frac{p_{ij}}{q_{ij}}
+$$
 
 KL 散度对**假阴性**（在高维中是邻居但在低维中被分开的点对）给予重罚，因此相邻的点会保持在一起。
 
@@ -1268,7 +1370,9 @@ t 分布有**更厚的尾部** — 它为中等距离的点分配更多概率。
 
 **单隐藏层**：
 
-$$\mathbf{h} = \phi(\mathbf{W}^{in} \mathbf{r} + \mathbf{b}^{in}), \quad y = \mathbf{W}^{out} \mathbf{h} + \mathbf{b}^{out}$$
+$$
+\mathbf{h} = \phi(\mathbf{W}^{in} \mathbf{r} + \mathbf{b}^{in}), \quad y = \mathbf{W}^{out} \mathbf{h} + \mathbf{b}^{out}
+$$
 
 其中 $\phi$ 是**非线性激活函数**（Nonlinear Activation Function）。
 
@@ -1276,7 +1380,9 @@ $$\mathbf{h} = \phi(\mathbf{W}^{in} \mathbf{r} + \mathbf{b}^{in}), \quad y = \ma
 
 **为什么非线性很重要**：没有它，堆叠线性层等价于单个线性变换：
 
-$$y = \mathbf{W}^{out}(\mathbf{W}^{in} \mathbf{r} + \mathbf{b}^{in}) + \mathbf{b}^{out} = (\mathbf{W}^{out}\mathbf{W}^{in})\mathbf{r} + \text{bias}$$
+$$
+y = \mathbf{W}^{out}(\mathbf{W}^{in} \mathbf{r} + \mathbf{b}^{in}) + \mathbf{b}^{out} = (\mathbf{W}^{out}\mathbf{W}^{in})\mathbf{r} + \text{bias}
+$$
 
 非线性激活使网络能够计算**任意函数**（万能近似定理，Universal Approximation Theorem）。
 
@@ -1350,7 +1456,9 @@ $$y = \mathbf{W}^{out}(\mathbf{W}^{in} \mathbf{r} + \mathbf{b}^{in}) + \mathbf{b
 3. **更新**：$\theta \leftarrow \theta - \alpha \frac{\partial L}{\partial \theta}$
    **反向传播**逐层应用链式法则：
 
-$$\frac{\partial L}{\partial \mathbf{W}^{in}} = \frac{\partial L}{\partial \mathbf{h}} \cdot \frac{\partial \mathbf{h}}{\partial \mathbf{W}^{in}}$$
+$$
+\frac{\partial L}{\partial \mathbf{W}^{in}} = \frac{\partial L}{\partial \mathbf{h}} \cdot \frac{\partial \mathbf{h}}{\partial \mathbf{W}^{in}}
+$$
 
 PyTorch 通过 `loss.backward()` 自动计算。
 
@@ -1379,7 +1487,9 @@ PyTorch 通过 `loss.backward()` 自动计算。
 - 噪声有助于逃离浅层局部极小值
   **动量**（Momentum）：累积过去的梯度以平滑更新：
 
-$$\mathbf{v} \leftarrow \beta \mathbf{v} + \mathbf{g}, \quad \theta \leftarrow \theta - \alpha \mathbf{v}$$
+$$
+\mathbf{v} \leftarrow \beta \mathbf{v} + \mathbf{g}, \quad \theta \leftarrow \theta - \alpha \mathbf{v}
+$$
 
 - $\beta$（通常为 0.9）：过去梯度对当前更新的影响程度
 - 有助于在一致的梯度方向上加速
@@ -1397,7 +1507,9 @@ Adam 结合了动量和每个参数的**自适应学习率**。
 - 二阶矩（方差）：$\mathbf{v} \leftarrow \beta_2 \mathbf{v} + (1-\beta_2)\mathbf{g}^2$
   **更新规则**（带偏差校正）：
 
-$$\theta \leftarrow \theta - \alpha \frac{\hat{\mathbf{m}}}{\sqrt{\hat{\mathbf{v}}} + \epsilon}$$
+$$
+\theta \leftarrow \theta - \alpha \frac{\hat{\mathbf{m}}}{\sqrt{\hat{\mathbf{v}}} + \epsilon}
+$$
 
 其中 $\hat{\mathbf{m}} = \frac{\mathbf{m}}{1-\beta_1^t}$，$\hat{\mathbf{v}} = \frac{\mathbf{v}}{1-\beta_2^t}$（对早期步骤的偏差校正）。
 
@@ -1425,13 +1537,17 @@ $$\theta \leftarrow \theta - \alpha \frac{\hat{\mathbf{m}}}{\sqrt{\hat{\mathbf{v
 
 给定一个含噪信号 $[3, 5, 2, 8, 1, 4]$，窗口大小为 3 的移动平均对其进行平滑：
 
-$$\text{output}[i] = \frac{1}{3}(x[i-1] + x[i] + x[i+1])$$
+$$
+\text{output}[i] = \frac{1}{3}(x[i-1] + x[i] + x[i+1])
+$$
 
 这是使用卷积核 $f = [\frac{1}{3}, \frac{1}{3}, \frac{1}{3}]$ 的卷积。
 
 **通用一维卷积**：
 
-$$\text{output}[i] = \sum_{k=-K/2}^{K/2} f[k] \cdot x[i+k]$$
+$$
+\text{output}[i] = \sum_{k=-K/2}^{K/2} f[k] \cdot x[i+k]
+$$
 
 卷积核 $f$ 是一个在输入上滑动的**可学习权重**小数组。
 
@@ -1464,7 +1580,9 @@ Output:    [0, 0, 5, 5, 0, -5, -5, 0, 0]   (edges at transitions!)
 
 **二维卷积**：
 
-$$\text{output}(x, y) = \sum_{k_x, k_y} f(k_x, k_y) \cdot I(x+k_x, y+k_y)$$
+$$
+\text{output}(x, y) = \sum_{k_x, k_y} f(k_x, k_y) \cdot I(x+k_x, y+k_y)
+$$
 
 其中 $f$ 是 $K \times K$ 的卷积核，$I$ 是输入图像。
 
@@ -1565,7 +1683,9 @@ Conv + ReLU → Pool → Conv + ReLU → Pool → ... → Flatten → FC → Out
 
 **设置**：在呈现 $S$ 种不同刺激（例如图像）时记录 $N$ 个神经元。每种刺激重复多次试次，然后在试次间取平均。
 
-$$\mathbf{R} = \begin{bmatrix} r_{1,1} & r_{1,2} & \cdots & r_{1,S} \\ r_{2,1} & r_{2,2} & \cdots & r_{2,S} \\ \vdots & \vdots & \ddots & \vdots \\ r_{N,1} & r_{N,2} & \cdots & r_{N,S} \end{bmatrix}$$
+$$
+\mathbf{R} = \begin{bmatrix} r_{1,1} & r_{1,2} & \cdots & r_{1,S} \\ r_{2,1} & r_{2,2} & \cdots & r_{2,S} \\ \vdots & \vdots & \ddots & \vdots \\ r_{N,1} & r_{N,2} & \cdots & r_{N,S} \end{bmatrix}
+$$
 
 - **行** = 神经元（每个神经元对什么有响应）
 - **列** = 刺激（每种刺激如何被表征）
@@ -1579,7 +1699,9 @@ $$\mathbf{R} = \begin{bmatrix} r_{1,1} & r_{1,2} & \cdots & r_{1,S} \\ r_{2,1} &
 
 **Z 分数化**（Z-scoring）通过独立地对每个神经元进行中心化和缩放来消除这个问题：
 
-$$Z_{n,s} = \frac{R_{n,s} - \bar{r}_n}{\sigma_n}$$
+$$
+Z_{n,s} = \frac{R_{n,s} - \bar{r}_n}{\sigma_n}
+$$
 
 其中 $\bar{r}_n$ = 神经元 $n$ 在所有刺激上的平均响应，$\sigma_n$ = 标准差。
 
@@ -1603,7 +1725,9 @@ $$Z_{n,s} = \frac{R_{n,s} - \bar{r}_n}{\sigma_n}$$
 
 **表征不相似矩阵**（Representational Dissimilarity Matrix, RDM）总结了刺激在大脑中的相似程度：
 
-$$\mathbf{M} = 1 - \frac{1}{N}\mathbf{Z}\mathbf{Z}^\top$$
+$$
+\mathbf{M} = 1 - \frac{1}{N}\mathbf{Z}\mathbf{Z}^\top
+$$
 
 **这个公式的含义**：
 
@@ -1701,10 +1825,18 @@ Input (784) → Encoder → Bottleneck (K) → Decoder → Output (784)
 
 ### 关键公式
 
-$$\hat{\boldsymbol{\theta}} = (X^T X)^{-1} X^T \mathbf{y} \quad \text{(OLS)}$$
+$$
+\hat{\boldsymbol{\theta}} = (X^T X)^{-1} X^T \mathbf{y} \quad \text{(OLS)}
+$$
 
-$$\mathbf{S} = \mathbf{X}\mathbf{W}, \quad \hat{\mathbf{X}} = \mathbf{S}_{1:K}\mathbf{W}_{1:K}^\top \quad \text{(PCA)}$$
+$$
+\mathbf{S} = \mathbf{X}\mathbf{W}, \quad \hat{\mathbf{X}} = \mathbf{S}_{1:K}\mathbf{W}_{1:K}^\top \quad \text{(PCA)}
+$$
 
-$$\mathbf{h} = \phi(\mathbf{W}^{in}\mathbf{r} + \mathbf{b}^{in}), \quad y = \mathbf{W}^{out}\mathbf{h} + \mathbf{b}^{out} \quad \text{(Neural net)}$$
+$$
+\mathbf{h} = \phi(\mathbf{W}^{in}\mathbf{r} + \mathbf{b}^{in}), \quad y = \mathbf{W}^{out}\mathbf{h} + \mathbf{b}^{out} \quad \text{(Neural net)}
+$$
 
-$$\mathbf{M} = 1 - \frac{1}{N}\mathbf{Z}\mathbf{Z}^\top \quad \text{(RSA)}$$
+$$
+\mathbf{M} = 1 - \frac{1}{N}\mathbf{Z}\mathbf{Z}^\top \quad \text{(RSA)}
+$$

@@ -43,7 +43,9 @@ The confusion matrix is the foundation of **all** classification metrics.
 
 **Accuracy**
 
-$$\text{Acc} = \frac{TP + TN}{TP + TN + FP + FN}$$
+$$
+\text{Acc} = \frac{TP + TN}{TP + TN + FP + FN}
+$$
 
 "Of all samples, how many did we get right?"
 
@@ -51,7 +53,9 @@ Problem: misleading with imbalanced data (99% negative $\to$ always predict nega
 
 **Precision**
 
-$$\text{Prec} = \frac{TP}{TP + FP}$$
+$$
+\text{Prec} = \frac{TP}{TP + FP}
+$$
 
 "Of those we predicted positive, how many are actually positive?"
 
@@ -59,7 +63,9 @@ High precision = few false alarms.
 
 **Recall (Sensitivity)**
 
-$$\text{Rec} = \frac{TP}{TP + FN}$$
+$$
+\text{Rec} = \frac{TP}{TP + FN}
+$$
 
 "Of all actual positives, how many did we find?"
 
@@ -67,7 +73,9 @@ High recall = few missed detections.
 
 **F1 Score** (harmonic mean of precision and recall):
 
-$$F_1 = 2 \cdot \frac{\text{Prec} \cdot \text{Rec}}{\text{Prec} + \text{Rec}}$$
+$$
+F_1 = 2 \cdot \frac{\text{Prec} \cdot \text{Rec}}{\text{Prec} + \text{Rec}}
+$$
 
 ---
 
@@ -75,11 +83,15 @@ $$F_1 = 2 \cdot \frac{\text{Prec} \cdot \text{Rec}}{\text{Prec} + \text{Rec}}$$
 
 **True Positive Rate** = Recall:
 
-$$\text{TPR} = \frac{TP}{TP + FN}$$
+$$
+\text{TPR} = \frac{TP}{TP + FN}
+$$
 
 **False Positive Rate**:
 
-$$\text{FPR} = \frac{FP}{FP + TN}$$
+$$
+\text{FPR} = \frac{FP}{FP + TN}
+$$
 
 By varying the classification threshold, we get different (FPR, TPR) pairs $\to$ **ROC curve**.
 
@@ -126,13 +138,17 @@ Given two vectors $\mathbf{x}, \mathbf{y} \in \mathbb{R}^n$:
 
 **Manhattan Distance** (L1)
 
-$$d_{\text{Manhattan}}(\mathbf{x}, \mathbf{y}) = \|\mathbf{x} - \mathbf{y}\|_1 = \sum_{i=1}^n |x_i - y_i|$$
+$$
+d_{\text{Manhattan}}(\mathbf{x}, \mathbf{y}) = \|\mathbf{x} - \mathbf{y}\|_1 = \sum_{i=1}^n |x_i - y_i|
+$$
 
 "City block distance" — how far you walk in a grid.
 
 **Euclidean Distance** (L2)
 
-$$d_{\text{Euclid}}(\mathbf{x}, \mathbf{y}) = \|\mathbf{x} - \mathbf{y}\|_2 = \sqrt{\sum_{i=1}^n (x_i - y_i)^2}$$
+$$
+d_{\text{Euclid}}(\mathbf{x}, \mathbf{y}) = \|\mathbf{x} - \mathbf{y}\|_2 = \sqrt{\sum_{i=1}^n (x_i - y_i)^2}
+$$
 
 Straight-line distance — the most intuitive.
 
@@ -148,7 +164,9 @@ Straight-line distance — the most intuitive.
 
 Instead of measuring distance, measure the **angle** between two vectors:
 
-$$\cos\theta = \frac{\mathbf{x} \cdot \mathbf{y}}{\|\mathbf{x}\|_2 \cdot \|\mathbf{y}\|_2} = \frac{\sum_{i=1}^n x_i y_i}{\sqrt{\sum x_i^2} \cdot \sqrt{\sum y_i^2}}$$
+$$
+\cos\theta = \frac{\mathbf{x} \cdot \mathbf{y}}{\|\mathbf{x}\|_2 \cdot \|\mathbf{y}\|_2} = \frac{\sum_{i=1}^n x_i y_i}{\sqrt{\sum x_i^2} \cdot \sqrt{\sum y_i^2}}
+$$
 
 | $\cos\theta$ | Meaning                              |
 | ------------ | ------------------------------------ |
@@ -176,17 +194,23 @@ How much "information" does an event carry?
 - "It snowed in summer" $\to$ unexpected, high information
 **Information** of an event with probability $p$:
 
-$$I(x) = -\log_2 p(x)$$
+$$
+I(x) = -\log_2 p(x)
+$$
 
 Low probability $\to$ high information.
 
 **Entropy** — the expected information of a distribution (average "surprise"):
 
-$$H(X) = -\sum_{x} P(x) \log_2 P(x) = E_P[-\log P(x)]$$
+$$
+H(X) = -\sum_{x} P(x) \log_2 P(x) = E_P[-\log P(x)]
+$$
 
 **Example**: fair coin, $P(H) = P(T) = 0.5$
 
-$$H = -0.5\log_2 0.5 - 0.5\log_2 0.5 = 1 \text{ bit}$$
+$$
+H = -0.5\log_2 0.5 - 0.5\log_2 0.5 = 1 \text{ bit}
+$$
 
 A biased coin ($P(H)=0.99$): $H \approx 0.08$ bits — much less uncertainty.
 
@@ -196,11 +220,15 @@ A biased coin ($P(H)=0.99$): $H \approx 0.08$ bits — much less uncertainty.
 
 Measures the average number of bits needed to encode data from distribution $P$ using a code optimized for distribution $Q$:
 
-$$H(P, Q) = -\sum_{x} P(x) \log Q(x)$$
+$$
+H(P, Q) = -\sum_{x} P(x) \log Q(x)
+$$
 
 **Relationship to entropy**:
 
-$$H(P, Q) = H(P) + D_{\text{KL}}(P \| Q)$$
+$$
+H(P, Q) = H(P) + D_{\text{KL}}(P \| Q)
+$$
 
 where $D_{\text{KL}}(P \| Q)$ is the KL divergence (next slide).
 
@@ -216,7 +244,9 @@ When $Q \neq P$: $H(P, Q) > H(P)$ — extra bits wasted due to mismatch.
 
 **Kullback-Leibler divergence** measures how different distribution $Q$ is from distribution $P$:
 
-$$D_{\text{KL}}(P \| Q) = \sum_{x} P(x) \log \frac{P(x)}{Q(x)} = E_P\left[\log \frac{P(x)}{Q(x)}\right]$$
+$$
+D_{\text{KL}}(P \| Q) = \sum_{x} P(x) \log \frac{P(x)}{Q(x)} = E_P\left[\log \frac{P(x)}{Q(x)}\right]
+$$
 
 Properties:
 
@@ -237,7 +267,9 @@ Properties:
 
 A **loss function** $L(\hat{y}, y)$ quantifies the penalty for a wrong prediction:
 
-$$\text{Goal: } \min_{\mathbf{w}} \frac{1}{N} \sum_{i=1}^{N} L(f(\mathbf{x}_i; \mathbf{w}), y_i)$$
+$$
+\text{Goal: } \min_{\mathbf{w}} \frac{1}{N} \sum_{i=1}^{N} L(f(\mathbf{x}_i; \mathbf{w}), y_i)
+$$
 
 The loss function must be:
 
@@ -257,7 +289,9 @@ The loss function must be:
 
 For regression, the most common loss:
 
-$$L_{\text{MSE}} = \frac{1}{N} \sum_{i=1}^{N} (\hat{y}_i - y_i)^2$$
+$$
+L_{\text{MSE}} = \frac{1}{N} \sum_{i=1}^{N} (\hat{y}_i - y_i)^2
+$$
 
 **Properties**:
 
@@ -277,11 +311,15 @@ Maximizing the log-likelihood $\log P(y \mid \mathbf{x})$ under Gaussian noise i
 
 For **binary classification** ($y \in \{0, 1\}$), with model output $\hat{p} = P(y{=}1 \mid \mathbf{x})$:
 
-$$L_{\text{BCE}} = -\frac{1}{N}\sum_{i=1}^{N} \left[y_i \log \hat{p}_i + (1-y_i)\log(1-\hat{p}_i)\right]$$
+$$
+L_{\text{BCE}} = -\frac{1}{N}\sum_{i=1}^{N} \left[y_i \log \hat{p}_i + (1-y_i)\log(1-\hat{p}_i)\right]
+$$
 
 For **multi-class classification** ($y \in \{1, \ldots, C\}$), with $\hat{p}_c = P(y{=}c \mid \mathbf{x})$:
 
-$$L_{\text{CE}} = -\frac{1}{N}\sum_{i=1}^{N} \sum_{c=1}^{C} \mathbb{1}[y_i = c] \log \hat{p}_{i,c}$$
+$$
+L_{\text{CE}} = -\frac{1}{N}\sum_{i=1}^{N} \sum_{c=1}^{C} \mathbb{1}[y_i = c] \log \hat{p}_{i,c}
+$$
 
 > **Intuition**
 > - If true label is class 1, loss = $-\log \hat{p}_1$
@@ -295,7 +333,9 @@ Cross-entropy loss is the standard for classification. Combined with softmax out
 
 The connections between the concepts we've covered:
 
-$$L_{\text{CE}} = H(P, Q) = H(P) + D_{\text{KL}}(P \| Q)$$
+$$
+L_{\text{CE}} = H(P, Q) = H(P) + D_{\text{KL}}(P \| Q)
+$$
 
 | Symbol | Meaning | Role |
 |------|------|------|
@@ -326,11 +366,15 @@ All are different ways of quantifying "how different are two things?"
 
 Given a loss function $L(\mathbf{w})$, find $\mathbf{w}^*$ that minimizes it:
 
-$$\mathbf{w}^* = \arg\min_{\mathbf{w}} L(\mathbf{w})$$
+$$
+\mathbf{w}^* = \arg\min_{\mathbf{w}} L(\mathbf{w})
+$$
 
 **Gradient descent** iteratively moves in the direction of steepest descent:
 
-$$\mathbf{w}_{t+1} = \mathbf{w}_t - \eta \nabla_{\mathbf{w}} L(\mathbf{w}_t)$$
+$$
+\mathbf{w}_{t+1} = \mathbf{w}_t - \eta \nabla_{\mathbf{w}} L(\mathbf{w}_t)
+$$
 
 - $\nabla_{\mathbf{w}} L$: gradient — points uphill, so we go **opposite**
 - $\eta$: learning rate — controls step size
@@ -362,13 +406,17 @@ In modern deep learning, **automatic differentiation** (autodiff) is used exclus
 
 Apply differentiation rules directly to the expression:
 
-$$f(x) = x^2 + \sin x \quad \xrightarrow{\text{symbolic}} \quad f'(x) = 2x + \cos x$$
+$$
+f(x) = x^2 + \sin x \quad \xrightarrow{\text{symbolic}} \quad f'(x) = 2x + \cos x
+$$
 
 **How it works**: a table of rules (sum, product, chain, etc.) applied recursively to the expression tree.
 
 **Problem**: expression swell.
 
-$$f(x) = x^{100} \quad \to \quad f'(x) = 100x^{99}$$
+$$
+f(x) = x^{100} \quad \to \quad f'(x) = 100x^{99}
+$$
 
 For complex expressions, the derivative can be exponentially larger than the original.
 
@@ -388,13 +436,17 @@ The derivative appears automatically as the $\epsilon$-coefficient!
 
 **Example**: $f(x) = x^2$
 
-$$f(a + \epsilon) = (a + \epsilon)^2 = a^2 + 2a\epsilon + \epsilon^2 = a^2 + 2a\epsilon$$
+$$
+f(a + \epsilon) = (a + \epsilon)^2 = a^2 + 2a\epsilon + \epsilon^2 = a^2 + 2a\epsilon
+$$
 
 So $f(a) = a^2$ and $f'(a) = 2a$ — exactly correct.
 
 **Example**: $f(x) = x^3$, evaluate at $x = 2$:
 
-$$(2 + \epsilon)^3 = 8 + 12\epsilon + 6\epsilon^2 + \epsilon^3 = 8 + 12\epsilon$$
+$$
+(2 + \epsilon)^3 = 8 + 12\epsilon + 6\epsilon^2 + \epsilon^3 = 8 + 12\epsilon
+$$
 
 $f(2) = 8$, $f'(2) = 12$ ✓
 
@@ -435,11 +487,15 @@ For ML, we have many parameters ($d$ large) but one loss (scalar output). **Back
 
 **Forward pass**: compute all intermediate values
 
-$$z_1 = w_1 x, \quad z_2 = z_1 + w_2, \quad L = z_2^2$$
+$$
+z_1 = w_1 x, \quad z_2 = z_1 + w_2, \quad L = z_2^2
+$$
 
 **Backward pass**: apply chain rule from output to inputs
 
-$$\frac{\partial L}{\partial z_2} = 2z_2, \quad \frac{\partial L}{\partial z_1} = \frac{\partial L}{\partial z_2} \cdot 1, \quad \frac{\partial L}{\partial w_1} = \frac{\partial L}{\partial z_1} \cdot x$$
+$$
+\frac{\partial L}{\partial z_2} = 2z_2, \quad \frac{\partial L}{\partial z_1} = \frac{\partial L}{\partial z_2} \cdot 1, \quad \frac{\partial L}{\partial w_1} = \frac{\partial L}{\partial z_1} \cdot x
+$$
 
 One forward pass + one backward pass $\to$ **all** gradients, regardless of parameter count.
 
@@ -467,7 +523,9 @@ These problems motivate **practical optimizers**.
 
 Instead of computing the full gradient, use a **mini-batch** of $B$ samples:
 
-$$\mathbf{w}_{t+1} = \mathbf{w}_t - \eta \cdot \frac{1}{B}\sum_{i \in \mathcal{B}} \nabla_{\mathbf{w}} L(\mathbf{x}_i, y_i; \mathbf{w}_t)$$
+$$
+\mathbf{w}_{t+1} = \mathbf{w}_t - \eta \cdot \frac{1}{B}\sum_{i \in \mathcal{B}} \nabla_{\mathbf{w}} L(\mathbf{x}_i, y_i; \mathbf{w}_t)
+$$
 
 **Advantages**:
 
@@ -476,7 +534,9 @@ $$\mathbf{w}_{t+1} = \mathbf{w}_t - \eta \cdot \frac{1}{B}\sum_{i \in \mathcal{B
 - Enables online / streaming learning
 **SGD with Momentum**: add a "velocity" term to smooth updates:
 
-$$\mathbf{v}_t = \beta \mathbf{v}_{t-1} + \nabla L(\mathbf{w}_t), \quad \mathbf{w}_{t+1} = \mathbf{w}_t - \eta \mathbf{v}_t$$
+$$
+\mathbf{v}_t = \beta \mathbf{v}_{t-1} + \nabla L(\mathbf{w}_t), \quad \mathbf{w}_{t+1} = \mathbf{w}_t - \eta \mathbf{v}_t
+$$
 
 Accelerates in consistent gradient directions, dampens oscillations.
 
@@ -488,17 +548,25 @@ Adam combines **momentum** and **adaptive learning rates**:
 
 Maintain two running averages:
 
-$$m_t = \beta_1 m_{t-1} + (1-\beta_1) g_t \quad \text{(1st moment — mean)}$$
+$$
+m_t = \beta_1 m_{t-1} + (1-\beta_1) g_t \quad \text{(1st moment — mean)}
+$$
 
-$$v_t = \beta_2 v_{t-1} + (1-\beta_2) g_t^2 \quad \text{(2nd moment — variance)}$$
+$$
+v_t = \beta_2 v_{t-1} + (1-\beta_2) g_t^2 \quad \text{(2nd moment — variance)}
+$$
 
 Bias correction (since $m_0 = v_0 = 0$):
 
-$$\hat{m}_t = \frac{m_t}{1 - \beta_1^t}, \quad \hat{v}_t = \frac{v_t}{1 - \beta_2^t}$$
+$$
+\hat{m}_t = \frac{m_t}{1 - \beta_1^t}, \quad \hat{v}_t = \frac{v_t}{1 - \beta_2^t}
+$$
 
 Update rule:
 
-$$\mathbf{w}_{t+1} = \mathbf{w}_t - \eta \cdot \frac{\hat{m}_t}{\sqrt{\hat{v}_t} + \epsilon}$$
+$$
+\mathbf{w}_{t+1} = \mathbf{w}_t - \eta \cdot \frac{\hat{m}_t}{\sqrt{\hat{v}_t} + \epsilon}
+$$
 
 **Why Adam works well**:
 

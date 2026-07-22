@@ -38,13 +38,17 @@ In the real world, we can never directly observe the state of interest — we ca
 
 **Joint probability factorization** — the starting point for all inference:
 
-$$p(x, y) = p(x|y) \cdot p(y) = p(y|x) \cdot p(x)$$
+$$
+p(x, y) = p(x|y) \cdot p(y) = p(y|x) \cdot p(x)
+$$
 
 This equation tells us: the joint relationship between two variables can be decomposed as "conditional x marginal." This is the bridge connecting **observations** and **latent states**.
 
 **Marginalization** — when some variables are "nuisance variables," we need to "integrate them out":
 
-$$p(x) = \sum_y p(x, y) = \sum_y p(x|y) \cdot p(y)$$
+$$
+p(x) = \sum_y p(x, y) = \sum_y p(x|y) \cdot p(y)
+$$
 
 **Why marginalization?** Because ultimately we care about the total probability of the data $p(m)$, not which intermediate state $s$ it passed through.
 
@@ -54,7 +58,9 @@ $$p(x) = \sum_y p(x, y) = \sum_y p(x|y) \cdot p(y)$$
 
 **Bayes' rule** combines the above tools to perform the inversion from "data to belief":
 
-$$\boxed{p(s|m) = \frac{p(m|s) \cdot p(s)}{p(m)} = \frac{p(m|s) \cdot p(s)}{\sum_{s'} p(m|s') \cdot p(s')}}$$
+$$
+\boxed{p(s|m) = \frac{p(m|s) \cdot p(s)}{p(m)} = \frac{p(m|s) \cdot p(s)}{\sum_{s'} p(m|s') \cdot p(s')}}
+$$
 
 | Term         | Name         | Why we need it                                       |
 | ------------ | ------------ | ---------------------------------------------------- |
@@ -79,7 +85,9 @@ Bayes' rule gives us the value of $p(s=+1|m)$ — but this absolute number alone
 
 **Solution**: Directly compare the posteriors of the two hypotheses — look at the **ratio** (odds) rather than absolute probabilities.
 
-$$\text{Posterior odds} = \frac{p(s=+1|m)}{p(s=-1|m)}$$
+$$
+\text{Posterior odds} = \frac{p(s=+1|m)}{p(s=-1|m)}
+$$
 
 - Odds > 1 → $s=+1$ is more likely
 - Odds < 1 → $s=-1$ is more likely
@@ -89,7 +97,9 @@ $$\text{Posterior odds} = \frac{p(s=+1|m)}{p(s=-1|m)}$$
 
 **A key mathematical simplification**: When taking the ratio, the normalization constant $p(m)$ **cancels out** exactly:
 
-$$\frac{p(s=+1|m)}{p(s=-1|m)} = \frac{p(m|s=+1) \cdot p(s=+1) / \cancel{p(m)}}{p(m|s=-1) \cdot p(s=-1) / \cancel{p(m)}} = \frac{p(m|s=+1)}{p(m|s=-1)} \cdot \frac{p(s=+1)}{p(s=-1)}$$
+$$
+\frac{p(s=+1|m)}{p(s=-1|m)} = \frac{p(m|s=+1) \cdot p(s=+1) / \cancel{p(m)}}{p(m|s=-1) \cdot p(s=-1) / \cancel{p(m)}} = \frac{p(m|s=+1)}{p(m|s=-1)} \cdot \frac{p(s=+1)}{p(s=-1)}
+$$
 
 This means we **do not need to compute** the troublesome marginal probability $p(m) = \sum_{s'} p(m|s')p(s')$ — the likelihood ratio and prior odds suffice.
 
@@ -105,7 +115,9 @@ Using Bayes' rule directly with multiple observations encounters two problems; t
 
 **Decomposition of log-odds**:
 
-$$\underbrace{\log \frac{p(s=+1|m)}{p(s=-1|m)}}_{\text{log posterior odds}} = \underbrace{\log \frac{p(m|s=+1)}{p(m|s=-1)}}_{\text{log likelihood ratio}} + \underbrace{\log \frac{p(s=+1)}{p(s=-1)}}_{\text{log prior odds}}$$
+$$
+\underbrace{\log \frac{p(s=+1|m)}{p(s=-1|m)}}_{\text{log posterior odds}} = \underbrace{\log \frac{p(m|s=+1)}{p(m|s=-1)}}_{\text{log likelihood ratio}} + \underbrace{\log \frac{p(s=+1)}{p(s=-1)}}_{\text{log prior odds}}
+$$
 
 **Core insight**: In log-odds space, evidence accumulates in an **additive fashion**. Each new observation shifts the log posterior by one log-likelihood-ratio amount. This is why "more data → more certainty" is mathematically natural.
 
@@ -121,13 +133,17 @@ Bayesian inference tells us what we should **believe**, but knowing probabilitie
 
 **Expected utility**: Quantifying the "expected benefit" of each action:
 
-$$\mathbb{E}[U(a)] = \sum_s U(s, a) \cdot P(s)$$
+$$
+\mathbb{E}[U(a)] = \sum_s U(s, a) \cdot P(s)
+$$
 
 where $U(s, a)$ is the **utility** of taking action $a$ in state $s$ (a numerical quantification of benefit/cost).
 
 **Optimal decision**: Choose the action that maximizes expected utility:
 
-$$a^* = \arg\max_a \sum_s U(s, a) \cdot P(s)$$
+$$
+a^* = \arg\max_a \sum_s U(s, a) \cdot P(s)
+$$
 
 **Core significance**: Bayesian decision theory unifies **inference** (what to believe) and **decision-making** (what to do) in a single framework. First use Bayes' rule to obtain the posterior, then use the utility function to make the optimal choice.
 
@@ -145,7 +161,9 @@ Real-world continuous variables (such as neural firing rates, measurement errors
 
 **Probability density function**:
 
-$$\mathcal{N}(x; \mu, \sigma^2) = \frac{1}{\sqrt{2\pi\sigma^2}} \exp\left(-\frac{(x - \mu)^2}{2\sigma^2}\right)$$
+$$
+\mathcal{N}(x; \mu, \sigma^2) = \frac{1}{\sqrt{2\pi\sigma^2}} \exp\left(-\frac{(x - \mu)^2}{2\sigma^2}\right)
+$$
 
 **Precision** (inverse of variance): $\kappa = \frac{1}{\sigma^2}$ — measures the "sharpness" of the distribution. Higher precision means more confidence in our estimate.
 
@@ -157,11 +175,15 @@ When we have two pieces of evidence about the same variable (such as prior knowl
 
 **Product of two Gaussians** (likelihood x prior):
 
-$$\mathcal{N}(x; \mu_1, \sigma_1^2) \cdot \mathcal{N}(x; \mu_2, \sigma_2^2) \propto \mathcal{N}(x; \mu_3, \sigma_3^2)$$
+$$
+\mathcal{N}(x; \mu_1, \sigma_1^2) \cdot \mathcal{N}(x; \mu_2, \sigma_2^2) \propto \mathcal{N}(x; \mu_3, \sigma_3^2)
+$$
 
 where:
 
-$$\mu_3 = \frac{\sigma_2^{-2} \mu_1 + \sigma_1^{-2} \mu_2}{\sigma_1^{-2} + \sigma_2^{-2}}, \qquad \sigma_3^{-2} = \sigma_1^{-2} + \sigma_2^{-2}$$
+$$
+\mu_3 = \frac{\sigma_2^{-2} \mu_1 + \sigma_1^{-2} \mu_2}{\sigma_1^{-2} + \sigma_2^{-2}}, \qquad \sigma_3^{-2} = \sigma_1^{-2} + \sigma_2^{-2}
+$$
 
 **Why should we care?**
 
@@ -179,19 +201,27 @@ When we care about two variables simultaneously (e.g., the activity of neuron $i
 
 **Joint distribution**:
 
-$$p(\mathbf{x}) = \mathcal{N}(\mathbf{x}; \boldsymbol{\mu}, \boldsymbol{\Sigma})$$
+$$
+p(\mathbf{x}) = \mathcal{N}(\mathbf{x}; \boldsymbol{\mu}, \boldsymbol{\Sigma})
+$$
 
-$$\boldsymbol{\Sigma} = \begin{bmatrix} \sigma_1^2 & \rho \sigma_1 \sigma_2 \\ \rho \sigma_1 \sigma_2 & \sigma_2^2 \end{bmatrix}$$
+$$
+\boldsymbol{\Sigma} = \begin{bmatrix} \sigma_1^2 & \rho \sigma_1 \sigma_2 \\ \rho \sigma_1 \sigma_2 & \sigma_2^2 \end{bmatrix}
+$$
 
 where $\rho = \frac{\text{Cov}(X_1, X_2)}{\sigma_1 \sigma_2}$ is the **correlation coefficient**, measuring the degree to which the two variables "co-vary."
 
 **Marginalization** — when we care about only one variable, "integrate out" the other:
 
-$$p(x_1) = \int p(x_1, x_2) \, dx_2 = \mathcal{N}(x_1; \mu_1, \sigma_1^2)$$
+$$
+p(x_1) = \int p(x_1, x_2) \, dx_2 = \mathcal{N}(x_1; \mu_1, \sigma_1^2)
+$$
 
 **Conditional distribution** — when we **observe** the value of one variable, our belief about the other:
 
-$$p(x_1 | x_2) = \mathcal{N}\left(x_1; \mu_1 + \rho\frac{\sigma_1}{\sigma_2}(x_2 - \mu_2), \, \sigma_1^2(1-\rho^2)\right)$$
+$$
+p(x_1 | x_2) = \mathcal{N}\left(x_1; \mu_1 + \rho\frac{\sigma_1}{\sigma_2}(x_2 - \mu_2), \, \sigma_1^2(1-\rho^2)\right)
+$$
 
 ---
 
@@ -203,19 +233,25 @@ Given a posterior distribution, we still need a **point estimate** (a single num
 
 **Mean Squared Error (MSE)**:
 
-$$L(\hat{\mu}, \mu) = (\hat{\mu} - \mu)^2 \quad \Rightarrow \quad \hat{\mu}^* = \text{posterior mean } \mathbb{E}[\mu \mid m]$$
+$$
+L(\hat{\mu}, \mu) = (\hat{\mu} - \mu)^2 \quad \Rightarrow \quad \hat{\mu}^* = \text{posterior mean } \mathbb{E}[\mu \mid m]
+$$
 
 MSE penalizes large errors heavily (quadratic); the posterior mean balances all possible values.
 
 **Absolute Error**:
 
-$$L(\hat{\mu}, \mu) = |\hat{\mu} - \mu| \quad \Rightarrow \quad \hat{\mu}^* = \text{posterior median}$$
+$$
+L(\hat{\mu}, \mu) = |\hat{\mu} - \mu| \quad \Rightarrow \quad \hat{\mu}^* = \text{posterior median}
+$$
 
 Absolute error treats all error sizes equally; the median is the most robust measure of central tendency.
 
 **0-1 Loss**:
 
-$$L(\hat{\mu}, \mu) = \mathbb{1}[\hat{\mu} \neq \mu] \quad \Rightarrow \quad \hat{\mu}^* = \text{posterior mode (MAP)}$$
+$$
+L(\hat{\mu}, \mu) = \mathbb{1}[\hat{\mu} \neq \mu] \quad \Rightarrow \quad \hat{\mu}^* = \text{posterior mode (MAP)}
+$$
 
 Only cares about "correct or not," not "how far off," so it picks the most probable value.
 
@@ -223,7 +259,9 @@ Only cares about "correct or not," not "how far off," so it picks the most proba
 
 **Expected loss** (risk):
 
-$$R(\hat{\mu}) = \int L(\hat{\mu}, \mu) \, p(\mu|m) \, d\mu$$
+$$
+R(\hat{\mu}) = \int L(\hat{\mu}, \mu) \, p(\mu|m) \, d\mu
+$$
 
 **Bayesian estimator**: $\hat{\mu}^* = \arg\min_{\hat{\mu}} R(\hat{\mu})$
 
@@ -252,7 +290,9 @@ In many scenarios, data does not all arrive at once but **accumulates gradually*
 
 **Log-likelihood ratio** (LLR): After $T$ observations
 
-$$L_T = \log \frac{p(m_{1:T}|s=+1)}{p(m_{1:T}|s=-1)} = \sum_{t=1}^{T} \underbrace{\log \frac{p(m_t|s=+1)}{p(m_t|s=-1)}}_{\Delta_t}$$
+$$
+L_T = \log \frac{p(m_{1:T}|s=+1)}{p(m_{1:T}|s=-1)} = \sum_{t=1}^{T} \underbrace{\log \frac{p(m_t|s=+1)}{p(m_t|s=-1)}}_{\Delta_t}
+$$
 
 **Recursive form**: $L_T = L_{T-1} + \Delta_t$ — each step only adds the latest evidence contribution, without recomputing the entire sequence.
 
@@ -270,7 +310,9 @@ Suppose a doctor is diagnosing a disease, obtaining an observation $m_t$ after e
 
 **First test A result is positive** ($m_1 = +$):
 
-$$\Delta_1 = \log\frac{p(m_1=+|s=+1)}{p(m_1=+|s=-1)} = \log\frac{0.8}{0.1} = \log 8 \approx 2.08$$
+$$
+\Delta_1 = \log\frac{p(m_1=+|s=+1)}{p(m_1=+|s=-1)} = \log\frac{0.8}{0.1} = \log 8 \approx 2.08
+$$
 
 $\Delta_1 > 0$: this observation **supports disease**. The log-likelihood ratio jumps from $L_0 = 0$ to $L_1 \approx 2.08$.
 
@@ -278,13 +320,17 @@ $\Delta_1 > 0$: this observation **supports disease**. The log-likelihood ratio 
 
 **Second test B result is also positive** ($m_2 = +$):
 
-$$\Delta_2 = \log\frac{0.9}{0.3} = \log 3 \approx 1.10$$
+$$
+\Delta_2 = \log\frac{0.9}{0.3} = \log 3 \approx 1.10
+$$
 
 $L_2 = L_1 + \Delta_2 \approx 3.18$ — evidence accumulates further, leaning more toward disease.
 
 **If test B result is negative** ($m_2 = -$):
 
-$$\Delta_2 = \log\frac{p(m_2=-|s=+1)}{p(m_2=-|s=-1)} = \log\frac{0.1}{0.7} \approx -1.95$$
+$$
+\Delta_2 = \log\frac{p(m_2=-|s=+1)}{p(m_2=-|s=-1)} = \log\frac{0.1}{0.7} \approx -1.95
+$$
 
 $L_2 \approx 2.08 + (-1.95) = 0.13$ — this test **supports health**, pulling the evidence back close to zero.
 
@@ -296,7 +342,9 @@ $L_2 \approx 2.08 + (-1.95) = 0.13$ — this test **supports health**, pulling t
 
 **Note: SPRT accumulates the likelihood ratio, not posterior odds.** Recall the decomposition of Bayes' rule from W3D2:
 
-$$\underbrace{\frac{p(s=+1|m)}{p(s=-1|m)}}_{\text{posterior odds}} = \underbrace{\frac{p(m|s=+1)}{p(m|s=-1)}}_{\text{likelihood ratio}} \times \underbrace{\frac{p(s=+1)}{p(s=-1)}}_{\text{prior odds}}$$
+$$
+\underbrace{\frac{p(s=+1|m)}{p(s=-1|m)}}_{\text{posterior odds}} = \underbrace{\frac{p(m|s=+1)}{p(m|s=-1)}}_{\text{likelihood ratio}} \times \underbrace{\frac{p(s=+1)}{p(s=-1)}}_{\text{prior odds}}
+$$
 
 The prior odds are determined and fixed before the experiment begins, and do not need to be recalculated at each step. SPRT only needs to accumulate the data evidence (likelihood ratio), and then uses thresholds to absorb the effects of the prior and target error rates.
 
@@ -306,7 +354,9 @@ The prior odds are determined and fixed before the experiment begins, and do not
 
 **Why can the joint likelihood decompose into a product of single-step likelihoods?** Key assumption: **given the latent state $s$, observations are conditionally independent** — i.e., $m_t$ depends only on the current state $s$, not on previous observations.
 
-$$p(m_{1:T}|s) = \prod_{t=1}^{T} p(m_t|s)$$
+$$
+p(m_{1:T}|s) = \prod_{t=1}^{T} p(m_t|s)
+$$
 
 Taking the log converts the product to a sum — this is where the summation comes from. If there is temporal dependence between observations, this decomposition no longer holds.
 
@@ -316,11 +366,15 @@ Taking the log converts the product to a sum — this is where the summation com
 
 **Decision rule**: Stop when $L_T$ crosses a threshold:
 
-$$\begin{cases} L_T \geq \theta_A & \Rightarrow \text{accept } s = +1 \\ L_T \leq \theta_B & \Rightarrow \text{accept } s = -1 \\ \theta_B < L_T < \theta_A & \Rightarrow \text{continue sampling} \end{cases}$$
+$$
+\begin{cases} L_T \geq \theta_A & \Rightarrow \text{accept } s = +1 \\ L_T \leq \theta_B & \Rightarrow \text{accept } s = -1 \\ \theta_B < L_T < \theta_A & \Rightarrow \text{continue sampling} \end{cases}
+$$
 
 **Relationship between thresholds and target error rate $\alpha$**:
 
-$$\theta_A = \log\frac{1-\alpha}{\alpha}, \qquad \theta_B = \log\frac{\alpha}{1-\alpha}$$
+$$
+\theta_A = \log\frac{1-\alpha}{\alpha}, \qquad \theta_B = \log\frac{\alpha}{1-\alpha}
+$$
 
 **Where did the prior go?** The above thresholds implicitly assume **prior odds of 1** ($p(s=+1) = p(s=-1) = 0.5$). If the prior is unequal, the threshold needs to be adjusted by adding $\log\frac{p(s=+1)}{p(s=-1)}$.
 
@@ -347,7 +401,9 @@ SPRT is in discrete time, but the brain's decision process is continuous. The **
 
 **Decomposition of each evidence step**:
 
-$$\Delta_t = b + c \cdot \varepsilon_t$$
+$$
+\Delta_t = b + c \cdot \varepsilon_t
+$$
 
 where:
 
@@ -357,7 +413,9 @@ where:
 
 **Cumulative evidence** follows a random walk with drift:
 
-$$L_T \sim \mathcal{N}(b \cdot T, \, c^2 \cdot T)$$
+$$
+L_T \sim \mathcal{N}(b \cdot T, \, c^2 \cdot T)
+$$
 
 Mean grows linearly (signal accumulation), variance also grows linearly (noise accumulation). The **signal-to-noise ratio** improves as $\sqrt{T}$ — this is the mathematical essence of "more data → better decisions."
 
@@ -372,7 +430,9 @@ Mean grows linearly (signal accumulation), variance also grows linearly (noise a
 
 **Analytical accuracy**:
 
-$$P(\text{correct}) = \frac{1}{2} + \frac{1}{2} \operatorname{erf}\left(\frac{\mu}{\sqrt{2} \cdot \sigma / \sqrt{T}}\right)$$
+$$
+P(\text{correct}) = \frac{1}{2} + \frac{1}{2} \operatorname{erf}\left(\frac{\mu}{\sqrt{2} \cdot \sigma / \sqrt{T}}\right)
+$$
 
 **Neuroscience connection**:
 
@@ -400,7 +460,9 @@ Many real-world models contain **variables that cannot be directly observed** (l
 
 **Monotonicity guarantee**:
 
-$$\mathcal{L}(\theta^{(t+1)}) \geq \mathcal{L}(\theta^{(t)})$$
+$$
+\mathcal{L}(\theta^{(t+1)}) \geq \mathcal{L}(\theta^{(t)})
+$$
 
 Each step never makes the likelihood worse — this guarantees the algorithm converges (at least to a local optimum).
 
@@ -412,13 +474,17 @@ For Hidden Markov Models, the E-step needs to compute "the probability of being 
 
 **Forward probability** $\alpha_i(t) = p(y_{1:t}, x_t = i)$ — "the sum of probabilities of all paths from the start to time $t$ and being in state $i$":
 
-$$\alpha_i(t) = p(y_t | x_t = i) \sum_j A_{ji} \cdot \alpha_j(t-1)$$
+$$
+\alpha_i(t) = p(y_t | x_t = i) \sum_j A_{ji} \cdot \alpha_j(t-1)
+$$
 
 Meaning: to reach state $i$, the previous step must have been in some state $j$, then transitioned to $i$, while observing $y_t$.
 
 **Backward probability** $\beta_i(t) = p(y_{t+1:T} | x_t = i)$ — "the sum of probabilities of all paths from state $i$ at time $t$ to generate the remaining observations":
 
-$$\beta_i(t) = \sum_j p(y_{t+1} | x_{t+1} = j) \cdot \beta_j(t+1) \cdot A_{ij}$$
+$$
+\beta_i(t) = \sum_j p(y_{t+1} | x_{t+1} = j) \cdot \beta_j(t+1) \cdot A_{ij}
+$$
 
 ---
 
@@ -426,7 +492,9 @@ $$\beta_i(t) = \sum_j p(y_{t+1} | x_{t+1} = j) \cdot \beta_j(t+1) \cdot A_{ij}$$
 
 The forward probability $\alpha_i(t)$ and backward probability $\beta_i(t)$ each converge on time $t$ from "past" and "future" directions respectively. Multiplying them gives the **posterior marginal probability**:
 
-$$\gamma_i(t) = p(x_t = i | y_{1:T}) = \frac{\alpha_i(t) \cdot \beta_i(t)}{p(Y_{1:T})}$$
+$$
+\gamma_i(t) = p(x_t = i | y_{1:T}) = \frac{\alpha_i(t) \cdot \beta_i(t)}{p(Y_{1:T})}
+$$
 
 - $\alpha_i(t)$: accounts for "how we got here from the past"
 - $\beta_i(t)$: accounts for "how we proceed into the future"
@@ -434,7 +502,9 @@ $$\gamma_i(t) = p(x_t = i | y_{1:T}) = \frac{\alpha_i(t) \cdot \beta_i(t)}{p(Y_{
 
 **Pairwise marginal probability** (joint posterior at adjacent times):
 
-$$\xi_{ij}(t) = p(x_t = i, x_{t+1} = j | y_{1:T})$$
+$$
+\xi_{ij}(t) = p(x_t = i, x_{t+1} = j | y_{1:T})
+$$
 
 $\gamma_i(t)$ and $\xi_{ij}(t)$ are the outputs of the E-step — they are all the "expected counts" needed by the M-step.
 
@@ -446,19 +516,25 @@ Given the expectations computed in the E-step, the M-step has closed-form soluti
 
 **Transition matrix update**:
 
-$$\hat{A}_{ij} = \frac{\sum_t \xi_{ij}(t)}{\sum_t \gamma_i(t)}$$
+$$
+\hat{A}_{ij} = \frac{\sum_t \xi_{ij}(t)}{\sum_t \gamma_i(t)}
+$$
 
 Numerator = "expected number of transitions from $i$ to $j$", denominator = "expected number of times in state $i$."
 
 **Observation parameter update** (e.g., Poisson firing rate):
 
-$$\hat{\lambda}_i = \frac{\sum_t \gamma_i(t) \cdot y_t}{\sum_t \gamma_i(t) \cdot \Delta t}$$
+$$
+\hat{\lambda}_i = \frac{\sum_t \gamma_i(t) \cdot y_t}{\sum_t \gamma_i(t) \cdot \Delta t}
+$$
 
 Numerator = "expected total firing in state $i$", denominator = "expected total time in state $i$."
 
 **Initial state probability**:
 
-$$\hat{\psi}_i = \frac{1}{N_{\text{trials}}} \sum_{\text{trials}} \gamma_i(1)$$
+$$
+\hat{\psi}_i = \frac{1}{N_{\text{trials}}} \sum_{\text{trials}} \gamma_i(1)
+$$
 
 ---
 
@@ -474,13 +550,17 @@ Animals and humans can learn to predict future rewards. **TD learning** provides
 
 **Return** (discounted cumulative reward):
 
-$$G_t = \sum_{k=0}^{\infty} \gamma^k \cdot r_{t+k+1} = r_{t+1} + \gamma \cdot G_{t+1}$$
+$$
+G_t = \sum_{k=0}^{\infty} \gamma^k \cdot r_{t+k+1} = r_{t+1} + \gamma \cdot G_{t+1}
+$$
 
 where $\gamma \in [0,1)$ is the **discount factor** — future rewards are weighted less than immediate rewards. The closer $\gamma$ is to 1, the more "patient" the agent is.
 
 **State value function** — expected return:
 
-$$V^\pi(s) = \mathbb{E}_\pi[G_t | s_t = s]$$
+$$
+V^\pi(s) = \mathbb{E}_\pi[G_t | s_t = s]
+$$
 
 This is the total reward one can expect when in state $s$ following policy $\pi$.
 
@@ -490,7 +570,9 @@ This is the total reward one can expect when in state $s$ following policy $\pi$
 
 Given the value function $V$, we can measure how good our predictions are — the **TD error**:
 
-$$\delta_t = r_{t+1} + \gamma \cdot V(s_{t+1}) - V(s_t)$$
+$$
+\delta_t = r_{t+1} + \gamma \cdot V(s_{t+1}) - V(s_t)
+$$
 
 - $r_{t+1} + \gamma V(s_{t+1})$: **what was actually obtained** (immediate reward + estimate for next state)
 - $V(s_t)$: **what was expected** (current estimate of state value)
@@ -508,15 +590,23 @@ Consider a simple path: $A \to B \to C$ (reaching $C$ gives reward $r=+4$). Disc
 
 **Step 1**: Walk from $A$ to $B$, receive reward $r=0$ (no reward along the way)
 
-$$\delta_1 = r + \gamma V(B) - V(A) = 0 + 0.9 \times 0 - 0 = 0$$
+$$
+\delta_1 = r + \gamma V(B) - V(A) = 0 + 0.9 \times 0 - 0 = 0
+$$
 
-$$V(A) \leftarrow 0 + 0.5 \times 0 = 0 \quad \text{（no change, since no useful information seen yet）}$$
+$$
+V(A) \leftarrow 0 + 0.5 \times 0 = 0 \quad \text{（no change, since no useful information seen yet）}
+$$
 
 **Step 2**: Walk from $B$ to $C$, receive reward $r=+4$
 
-$$\delta_2 = r + \gamma V(C) - V(B) = 4 + 0.9 \times 0 - 0 = 4$$
+$$
+\delta_2 = r + \gamma V(C) - V(B) = 4 + 0.9 \times 0 - 0 = 4
+$$
 
-$$V(B) \leftarrow 0 + 0.5 \times 4 = 2$$
+$$
+V(B) \leftarrow 0 + 0.5 \times 4 = 2
+$$
 
 $V(B)$ updated from 0 to 2 — because starting from $B$ did yield a reward.
 
@@ -524,9 +614,13 @@ $V(B)$ updated from 0 to 2 — because starting from $B$ did yield a reward.
 
 **Here is the key**: Now go back to $A$ and walk $A \to B$ again ($r=0$):
 
-$$\delta = r + \gamma V(B) - V(A) = 0 + 0.9 \times 2 - 0 = 1.8$$
+$$
+\delta = r + \gamma V(B) - V(A) = 0 + 0.9 \times 2 - 0 = 1.8
+$$
 
-$$V(A) \leftarrow 0 + 0.5 \times 1.8 = 0.9$$
+$$
+V(A) \leftarrow 0 + 0.5 \times 1.8 = 0.9
+$$
 
 $V(A)$ updated from 0 to 0.9 — even though no reward was ever directly received from $A$, the value information from $B$ **propagated backward** to $A$. This is the core mechanism of "temporal difference."
 
@@ -536,9 +630,13 @@ $V(A)$ updated from 0 to 0.9 — even though no reward was ever directly receive
 
 **Update rule**:
 
-$$V(s_t) \leftarrow V(s_t) + \alpha \cdot \delta_t$$
+$$
+V(s_t) \leftarrow V(s_t) + \alpha \cdot \delta_t
+$$
 
-$$V(s_t) \leftarrow V(s_t) + \alpha \left[ r_{t+1} + \gamma V(s_{t+1}) - V(s_t) \right]$$
+$$
+V(s_t) \leftarrow V(s_t) + \alpha \left[ r_{t+1} + \gamma V(s_{t+1}) - V(s_t) \right]
+$$
 
 where $\alpha \in (0, 1]$ is the **learning rate** — controlling the step size of each update.
 
@@ -568,13 +666,17 @@ The simplest action selection problem: $K$ "slot machines" (actions), each with 
 
 **Action value function**:
 
-$$q(a) = \mathbb{E}[r_t | a_t = a]$$
+$$
+q(a) = \mathbb{E}[r_t | a_t = a]
+$$
 
 This is the "true quality" of action $a$ — but we do not know it; we can only estimate it through trial.
 
 **$\varepsilon$-greedy policy** — a simple but effective balance:
 
-$$a_t = \begin{cases} \arg\max_a q_t(a) & \text{with probability } 1 - \varepsilon \\ \text{random action} & \text{with probability } \varepsilon \end{cases}$$
+$$
+a_t = \begin{cases} \arg\max_a q_t(a) & \text{with probability } 1 - \varepsilon \\ \text{random action} & \text{with probability } \varepsilon \end{cases}
+$$
 
 - $\varepsilon = 0$: pure greedy, never explore — may get stuck on a suboptimal action
 - $\varepsilon = 1$: pure explore, never exploit — wastes what has already been learned
@@ -586,13 +688,17 @@ $$a_t = \begin{cases} \arg\max_a q_t(a) & \text{with probability } 1 - \varepsil
 
 **Running mean update** (sample average method):
 
-$$q_{t+1}(a) = q_t(a) + \frac{1}{n_t}\left[r_t - q_t(a)\right]$$
+$$
+q_{t+1}(a) = q_t(a) + \frac{1}{n_t}\left[r_t - q_t(a)\right]
+$$
 
 **Why use this form instead of directly averaging?** Because it allows **incremental updates** — no need to store all historical data, just maintain the current estimate and trial count.
 
 **Generalized update** (fixed learning rate):
 
-$$q_{t+1}(a) = q_t(a) + \alpha\left[r_t - q_t(a)\right]$$
+$$
+q_{t+1}(a) = q_t(a) + \alpha\left[r_t - q_t(a)\right]
+$$
 
 - Sample average ($\alpha = 1/n_t$): optimal for stationary environments, equal weight to all historical data
 - Fixed $\alpha$ (e.g., $\alpha = 0.1$): better for non-stationary environments, more weight on recent data
@@ -612,13 +718,17 @@ TD learning solves the **prediction** problem (estimate value given a policy). B
 
 **Action value function** (Q-function) — simultaneously describes "how good a state is" and "how good an action is":
 
-$$Q^\pi(s, a) = \mathbb{E}_\pi[G_t | s_t = s, a_t = a]$$
+$$
+Q^\pi(s, a) = \mathbb{E}_\pi[G_t | s_t = s, a_t = a]
+$$
 
 If we know the optimal $Q^*$, the optimal policy is: in each state, choose the action with the highest $Q$ value.
 
 **Q-learning update** (Watkins & Dayan, 1992):
 
-$$Q(s_t, a_t) \leftarrow Q(s_t, a_t) + \alpha \left[ r_{t+1} + \gamma \max_a Q(s_{t+1}, a) - Q(s_t, a_t) \right]$$
+$$
+Q(s_t, a_t) \leftarrow Q(s_t, a_t) + \alpha \left[ r_{t+1} + \gamma \max_a Q(s_{t+1}, a) - Q(s_t, a_t) \right]
+$$
 
 **Key property — off-policy**: The update target uses $\max_a Q(s_{t+1}, a)$ (greedy action), **not** the action actually taken. This means:
 
@@ -634,7 +744,9 @@ $$Q(s_t, a_t) \leftarrow Q(s_t, a_t) + \alpha \left[ r_{t+1} + \gamma \max_a Q(s
 
 **SARSA update**:
 
-$$Q(s_t, a_t) \leftarrow Q(s_t, a_t) + \alpha \left[ r_{t+1} + \gamma Q(s_{t+1}, a_{t+1}) - Q(s_t, a_t) \right]$$
+$$
+Q(s_t, a_t) \leftarrow Q(s_t, a_t) + \alpha \left[ r_{t+1} + \gamma Q(s_{t+1}, a_{t+1}) - Q(s_t, a_t) \right]
+$$
 
 Note: $a_{t+1}$ is the **action actually to be taken**, not the optimal action.
 
@@ -665,7 +777,9 @@ So far, all methods have been **model-free**: learning value functions directly 
 
 **World model**: A learned representation of the environment, caching observed transitions:
 
-$$\text{Model}(s, a) \rightarrow (r, s')$$
+$$
+\text{Model}(s, a) \rightarrow (r, s')
+$$
 
 "In state $s$, taking action $a$ yields reward $r$ and reaches state $s'$."
 
@@ -725,7 +839,9 @@ $$\text{Model}(s, a) \rightarrow (r, s')$$
 
 **Interventionist definition** (Pearl, 2000):
 
-$$A \text{ causes } B \iff \text{if we forcibly change } A, \text{ then } B \text{ will change accordingly}$$
+$$
+A \text{ causes } B \iff \text{if we forcibly change } A, \text{ then } B \text{ will change accordingly}
+$$
 
 The key phrase is "**forcibly change**" — not "observed $A$ change" but "actively intervened to change $A$."
 
@@ -735,14 +851,18 @@ The key phrase is "**forcibly change**" — not "observed $A$ change" but "activ
 
 **Core distinction**:
 
-$$P(B | A = a) \neq P(B | \text{do}(A = a))$$
+$$
+P(B | A = a) \neq P(B | \text{do}(A = a))
+$$
 
 - $P(B \mid A = a)$: **conditional probability** — observed $A = a$ (may have confounders)
 - $P(B \mid \text{do}(A = a))$: **interventional probability** — force $A = a$ (cuts off confounders)
 
 **Average causal effect**:
 
-$$\delta_{A \rightarrow B} = \mathbb{E}[B \mid \text{do}(A = 1)] - \mathbb{E}[B \mid \text{do}(A = 0)]$$
+$$
+\delta_{A \rightarrow B} = \mathbb{E}[B \mid \text{do}(A = 1)] - \mathbb{E}[B \mid \text{do}(A = 0)]
+$$
 
 **Randomized controlled trial (RCT)** — the gold standard for implementing interventions: randomly assign treatment, break all confounders, difference in group means = causal effect.
 
@@ -764,7 +884,9 @@ For **biological neural networks** (neuron populations in the brain), we have a 
 
 **Neural dynamics model**:
 
-$$\mathbf{x}_{t+1} = \sigma(\mathbf{A} \mathbf{x}_t + \boldsymbol{\varepsilon}_t)$$
+$$
+\mathbf{x}_{t+1} = \sigma(\mathbf{A} \mathbf{x}_t + \boldsymbol{\varepsilon}_t)
+$$
 
 - $\mathbf{x}_t$ — neural activity vector at time $t$
 - $\mathbf{A}$ — **connectivity matrix** (the causal structure we want to estimate)
@@ -779,7 +901,9 @@ Goal: Recover $\mathbf{A}$ from the observed time series $\{\mathbf{x}_t\}$.
 
 Using the **spontaneous activity fluctuations** of neurons as "natural perturbations":
 
-$$\hat{\delta}_{x^i \rightarrow x^j} = \frac{1}{N} \sum_{t: x_t^i=1} x_{t+1}^j - \frac{1}{N} \sum_{t: x_t^i=0} x_{t+1}^j$$
+$$
+\hat{\delta}_{x^i \rightarrow x^j} = \frac{1}{N} \sum_{t: x_t^i=1} x_{t+1}^j - \frac{1}{N} \sum_{t: x_t^i=0} x_{t+1}^j
+$$
 
 **Intuitive explanation**: When $i$ happens to be active, what is the average activity of $j$ the next moment? When $i$ is inactive? The difference reflects $i$'s causal influence on $j$.
 
@@ -793,7 +917,9 @@ Correlation is a simple, cheap statistic. Under what conditions can it give us t
 
 **Lagged correlation matrix**:
 
-$$\mathbf{R} = \text{corrcoef}\left(\begin{bmatrix} \mathbf{X}_{t+1} \\ \mathbf{X}_t \end{bmatrix}\right)$$
+$$
+\mathbf{R} = \text{corrcoef}\left(\begin{bmatrix} \mathbf{X}_{t+1} \\ \mathbf{X}_t \end{bmatrix}\right)
+$$
 
 The off-diagonal blocks capture temporal dependence — the correlation between $x_t^i$ and $x_{t+1}^j$.
 
@@ -824,11 +950,15 @@ Regression is the most basic tool in statistics. Through a clever transformation
 
 **Solution**: Use the **Logit transform** (inverse of sigmoid) to convert the nonlinear model into a linear one:
 
-$$\sigma^{-1}(x) = \log\frac{x}{1-x}$$
+$$
+\sigma^{-1}(x) = \log\frac{x}{1-x}
+$$
 
 Applying to both sides:
 
-$$\sigma^{-1}(\mathbf{x}_{t+1}) = \mathbf{A} \mathbf{x}_t + \boldsymbol{\varepsilon}_t$$
+$$
+\sigma^{-1}(\mathbf{x}_{t+1}) = \mathbf{A} \mathbf{x}_t + \boldsymbol{\varepsilon}_t
+$$
 
 This becomes a standard **linear regression** problem!
 
@@ -836,7 +966,9 @@ This becomes a standard **linear regression** problem!
 
 Neural connections are typically **sparse** — each neuron is directly connected to only a few others. Ordinary regression would estimate many small nonzero connections (spurious connections caused by noise). Lasso uses an L1 penalty to drive unimportant coefficients to **exactly zero**:
 
-$$\hat{\mathbf{A}} = \arg\min_{\mathbf{A}} \|\sigma^{-1}(\mathbf{Y}) - \mathbf{A}\mathbf{X}\|_2^2 + \lambda \|\mathbf{A}\|_1$$
+$$
+\hat{\mathbf{A}} = \arg\min_{\mathbf{A}} \|\sigma^{-1}(\mathbf{Y}) - \mathbf{A}\mathbf{X}\|_2^2 + \lambda \|\mathbf{A}\|_1
+$$
 
 The larger $\lambda$ is, the more coefficients are shrunk to zero — exactly the sparse structure we expect.
 
@@ -848,17 +980,23 @@ The larger $\lambda$ is, the more coefficients are shrunk to zero — exactly th
 
 If neuron $k$ simultaneously influences $x^i$ and $x^j$ but is not included in the regression:
 
-$$\hat{A}_{ij} \neq A_{ij} \quad \text{（biased estimate）}$$
+$$
+\hat{A}_{ij} \neq A_{ij} \quad \text{（biased estimate）}
+$$
 
 **Intuitive explanation**: Regression sees that $x^i$ and $x^j$ are related and attributes it to $A_{ij}$. But if this relationship is actually caused by $k$ driving both ($k \rightarrow i$ and $k \rightarrow j$), regression will overestimate $A_{ij}$.
 
 **Condition for unbiased regression**:
 
-$$\hat{A}_{ij} = A_{ij} \iff \text{all parents of } x^j \text{ are included as regression variables}$$
+$$
+\hat{A}_{ij} = A_{ij} \iff \text{all parents of } x^j \text{ are included as regression variables}
+$$
 
 **Consequences of partial observation**: When only a subset of neurons is observed:
 
-$$\text{performance} \propto \frac{N_{\text{observed}}}{N_{\text{total}}}$$
+$$
+\text{performance} \propto \frac{N_{\text{observed}}}{N_{\text{total}}}
+$$
 
 The more neurons observed → the better the causal estimate. This is the theoretical basis for "record as many neurons as possible" in experimental design.
 
@@ -884,11 +1022,15 @@ If such a $Z$ exists, we can "bypass" the confounders.
 
 **First stage**: Strip away the part of $X$ that is correlated with confounders, keeping only the part explainable by $Z$:
 
-$$\hat{X} = \alpha \cdot Z$$
+$$
+\hat{X} = \alpha \cdot Z
+$$
 
 **Second stage**: Use the "clean" $\hat{X}$ to estimate the causal effect on $Y$:
 
-$$Y = \beta \cdot \hat{X}$$
+$$
+Y = \beta \cdot \hat{X}
+$$
 
 The coefficient $\beta$ is the **causal effect** of $X$ on $Y$ — unaffected by confounders.
 
@@ -902,7 +1044,9 @@ In neural dynamics, we can exploit **temporal structure** to construct instrumen
 
 **Setup**:
 
-$$x_{t+1}^j = \sigma\left(A_{ij} x_t^i + \underbrace{\sum_{k \neq i} A_{kj} x_t^k}_{\text{confounders}} + \varepsilon_t\right)$$
+$$
+x_{t+1}^j = \sigma\left(A_{ij} x_t^i + \underbrace{\sum_{k \neq i} A_{kj} x_t^k}_{\text{confounders}} + \varepsilon_t\right)
+$$
 
 The term $\sum_{k \neq i} A_{kj} x_t^k$ represents **unobserved common inputs** — it simultaneously affects $x_t^i$ and $x_{t+1}^j$, a classic confounder.
 
@@ -918,7 +1062,9 @@ The term $\sum_{k \neq i} A_{kj} x_t^k$ represents **unobserved common inputs** 
 
 **IV estimation**:
 
-$$\hat{A}_{ij}^{\text{IV}} = \frac{\text{Cov}(x_{t-1}^i, x_{t+1}^j)}{\text{Cov}(x_{t-1}^i, x_t^i)}$$
+$$
+\hat{A}_{ij}^{\text{IV}} = \frac{\text{Cov}(x_{t-1}^i, x_{t+1}^j)}{\text{Cov}(x_{t-1}^i, x_t^i)}
+$$
 
 Even in the presence of confounders, this is **unbiased**!
 
@@ -938,11 +1084,15 @@ When instrumental variable conditions are not met, there is a weaker but more ge
 
 **Null hypothesis** ($H_0$): $x$ does not Granger-cause $y$ — past $x$ does not help predict $y$:
 
-$$y_t = a_0 + a_1 y_{t-1} + \varepsilon_t$$
+$$
+y_t = a_0 + a_1 y_{t-1} + \varepsilon_t
+$$
 
 **Alternative hypothesis** ($H_a$): $x$ Granger-causes $y$ — adding past $x$ improves prediction:
 
-$$y_t = a_0 + a_1 y_{t-1} + b_1 x_{t-1} + \varepsilon_t$$
+$$
+y_t = a_0 + a_1 y_{t-1} + b_1 x_{t-1} + \varepsilon_t
+$$
 
 **Test**: Perform an F-test on $b_1 = 0$. If rejected, then $x$ Granger-causes $y$.
 
@@ -992,12 +1142,22 @@ $$y_t = a_0 + a_1 y_{t-1} + b_1 x_{t-1} + \varepsilon_t$$
 
 ### Key Formulas and Their Significance
 
-$$p(s|m) = \frac{p(m|s) \cdot p(s)}{\sum_{s'} p(m|s') \cdot p(s')} \quad \text{（Bayes' rule: mathematical foundation of belief updating）}$$
+$$
+p(s|m) = \frac{p(m|s) \cdot p(s)}{\sum_{s'} p(m|s') \cdot p(s')} \quad \text{（Bayes' rule: mathematical foundation of belief updating）}
+$$
 
-$$\mu_3 = \frac{\sigma_2^{-2}\mu_1 + \sigma_1^{-2}\mu_2}{\sigma_1^{-2} + \sigma_2^{-2}}, \quad \sigma_3^{-2} = \sigma_1^{-2} + \sigma_2^{-2} \quad \text{（Gaussian product: analytical solution for information fusion）}$$
+$$
+\mu_3 = \frac{\sigma_2^{-2}\mu_1 + \sigma_1^{-2}\mu_2}{\sigma_1^{-2} + \sigma_2^{-2}}, \quad \sigma_3^{-2} = \sigma_1^{-2} + \sigma_2^{-2} \quad \text{（Gaussian product: analytical solution for information fusion）}
+$$
 
-$$\delta_t = r_{t+1} + \gamma V(s_{t+1}) - V(s_t) \quad \text{（TD error: driving signal for learning）}$$
+$$
+\delta_t = r_{t+1} + \gamma V(s_{t+1}) - V(s_t) \quad \text{（TD error: driving signal for learning）}
+$$
 
-$$Q(s,a) \leftarrow Q(s,a) + \alpha[r + \gamma \max_{a'} Q(s',a') - Q(s,a)] \quad \text{（Q-learning: off-policy learning of optimal action values）}$$
+$$
+Q(s,a) \leftarrow Q(s,a) + \alpha[r + \gamma \max_{a'} Q(s',a') - Q(s,a)] \quad \text{（Q-learning: off-policy learning of optimal action values）}
+$$
 
-$$\hat{A}_{ij}^{\text{IV}} = \frac{\text{Cov}(x_{t-1}^i, x_{t+1}^j)}{\text{Cov}(x_{t-1}^i, x_t^i)} \quad \text{（Instrumental variables: estimating causal effects in the presence of confounders）}$$
+$$
+\hat{A}_{ij}^{\text{IV}} = \frac{\text{Cov}(x_{t-1}^i, x_{t+1}^j)}{\text{Cov}(x_{t-1}^i, x_t^i)} \quad \text{（Instrumental variables: estimating causal effects in the presence of confounders）}
+$$

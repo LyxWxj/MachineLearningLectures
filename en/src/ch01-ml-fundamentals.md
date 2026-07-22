@@ -24,7 +24,9 @@ Now we know the **tools**. Let's ask: **what exactly is machine learning?**
 
 **Traditional Programming**
 
-$$\text{Rules} + \text{Data} \xrightarrow{\text{program}} \text{Output}$$
+$$
+\text{Rules} + \text{Data} \xrightarrow{\text{program}} \text{Output}
+$$
 
 Human writes explicit rules:
 
@@ -39,7 +41,9 @@ else:
 
 **Machine Learning**
 
-$$\text{Data} + \text{Output} \xrightarrow{\text{learning}} \text{Rules (Model)}$$
+$$
+\text{Data} + \text{Output} \xrightarrow{\text{learning}} \text{Rules (Model)}
+$$
 
 Machine discovers rules from examples:
 
@@ -57,7 +61,9 @@ $\rightarrow$ learns the mapping automatically
 
 Machine learning is about learning a **function** $f$ from data:
 
-$$f: \mathbf{x} \rightarrow y$$
+$$
+f: \mathbf{x} \rightarrow y
+$$
 
 where:
 
@@ -106,7 +112,9 @@ Predict house price from features:
 | 120 | 3 | 230 |
 | ? | ? | **?** |
 
-$$\hat{y} = f(\mathbf{x}) = \mathbf{w}^T\mathbf{x} + b$$
+$$
+\hat{y} = f(\mathbf{x}) = \mathbf{w}^T\mathbf{x} + b
+$$
 
 **Classification**: $y \in \{1, 2, \ldots, C\}$ (discrete)
 
@@ -117,7 +125,9 @@ Classify email as spam or not:
 | contains "free", "winner"    | spam     |
 | contains "meeting", "report" | not spam |
 
-$$P(y = c \mid \mathbf{x}) = \text{softmax}(\mathbf{w}_c^T\mathbf{x} + b_c)$$
+$$
+P(y = c \mid \mathbf{x}) = \text{softmax}(\mathbf{w}_c^T\mathbf{x} + b_c)
+$$
 
 ---
 
@@ -255,7 +265,9 @@ graph LR
 - Process: iteratively update $\mathbf{w}$ to minimize loss
 - Output: learned parameters $\mathbf{w}^*$
 
-$$\mathbf{w}^* = \arg\min_{\mathbf{w}} \frac{1}{N}\sum_{i=1}^{N} L(f(\mathbf{x}_i; \mathbf{w}), y_i)$$
+$$
+\mathbf{w}^* = \arg\min_{\mathbf{w}} \frac{1}{N}\sum_{i=1}^{N} L(f(\mathbf{x}_i; \mathbf{w}), y_i)
+$$
 
 **Inference** (prediction phase)
 
@@ -345,7 +357,9 @@ This is the ultimate goal of machine learning — not to memorize training data,
 
 Recall:
 
-$$E[(y - \hat{f}(\mathbf{x}))^2] = \text{Bias}^2 + \text{Variance} + \text{Irreducible Noise}$$
+$$
+E[(y - \hat{f}(\mathbf{x}))^2] = \text{Bias}^2 + \text{Variance} + \text{Irreducible Noise}
+$$
 
 | | Bias | Variance |
 |------|------|------|

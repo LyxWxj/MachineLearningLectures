@@ -24,7 +24,9 @@
 
 **传统编程（Traditional Programming）**
 
-$$\text{Rules} + \text{Data} \xrightarrow{\text{program}} \text{Output}$$
+$$
+\text{Rules} + \text{Data} \xrightarrow{\text{program}} \text{Output}
+$$
 
 人类编写明确的规则：
 
@@ -39,7 +41,9 @@ else:
 
 **机器学习（Machine Learning）**
 
-$$\text{Data} + \text{Output} \xrightarrow{\text{learning}} \text{Rules (Model)}$$
+$$
+\text{Data} + \text{Output} \xrightarrow{\text{learning}} \text{Rules (Model)}
+$$
 
 机器从示例中发现规则：
 
@@ -57,7 +61,9 @@ $\rightarrow$ 自动学习映射关系
 
 机器学习是从数据中学习一个**函数** $f$：
 
-$$f: \mathbf{x} \rightarrow y$$
+$$
+f: \mathbf{x} \rightarrow y
+$$
 
 其中：
 
@@ -109,7 +115,9 @@ $$f: \mathbf{x} \rightarrow y$$
 | 120        | 3      | 230                   |
 | ?          | ?      | **?**                 |
 
-$$\hat{y} = f(\mathbf{x}) = \mathbf{w}^T\mathbf{x} + b$$
+$$
+\hat{y} = f(\mathbf{x}) = \mathbf{w}^T\mathbf{x} + b
+$$
 
 **分类（Classification）**：$y \in \{1, 2, \ldots, C\}$（离散值）
 
@@ -120,7 +128,9 @@ $$\hat{y} = f(\mathbf{x}) = \mathbf{w}^T\mathbf{x} + b$$
 | 包含 "free"、"winner"    | 垃圾邮件   |
 | 包含 "meeting"、"report" | 非垃圾邮件 |
 
-$$P(y = c \mid \mathbf{x}) = \text{softmax}(\mathbf{w}_c^T\mathbf{x} + b_c)$$
+$$
+P(y = c \mid \mathbf{x}) = \text{softmax}(\mathbf{w}_c^T\mathbf{x} + b_c)
+$$
 
 ---
 
@@ -262,7 +272,9 @@ graph LR
 - 过程：迭代更新 $\mathbf{w}$ 以最小化损失
 - 输出：学习到的参数 $\mathbf{w}^*$
 
-$$\mathbf{w}^* = \arg\min_{\mathbf{w}} \frac{1}{N}\sum_{i=1}^{N} L(f(\mathbf{x}_i; \mathbf{w}), y_i)$$
+$$
+\mathbf{w}^* = \arg\min_{\mathbf{w}} \frac{1}{N}\sum_{i=1}^{N} L(f(\mathbf{x}_i; \mathbf{w}), y_i)
+$$
 
 **推理（Inference）**（预测阶段）
 
@@ -365,7 +377,9 @@ $$\mathbf{w}^* = \arg\min_{\mathbf{w}} \frac{1}{N}\sum_{i=1}^{N} L(f(\mathbf{x}_
 
 回顾：
 
-$$E[(y - \hat{f}(\mathbf{x}))^2] = \text{Bias}^2 + \text{Variance} + \text{Irreducible Noise}$$
+$$
+E[(y - \hat{f}(\mathbf{x}))^2] = \text{Bias}^2 + \text{Variance} + \text{Irreducible Noise}
+$$
 
 |            | 偏差（Bias）         | 方差（Variance）               |
 | ---------- | -------------------- | ------------------------------ |

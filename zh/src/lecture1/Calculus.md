@@ -4,11 +4,15 @@
 
 **极限 (Limit)** 描述了当 $x$ 无限接近某一点 $a$ 时，$f(x)$ 所趋近的值：
 
-$$\lim_{x \to a} f(x) = L$$
+$$
+\lim_{x \to a} f(x) = L
+$$
 
 形式化定义：对于任意 $\varepsilon > 0$，存在 $\delta > 0$，使得
 
-$$0 < |x - a| < \delta \implies |f(x) - L| < \varepsilon$$
+$$
+0 < |x - a| < \delta \implies |f(x) - L| < \varepsilon
+$$
 
 > **直觉理解**
 > 通过选择 $x$ 足够接近 $a$（但 $x \neq a$），我们可以使 $f(x)$ 任意接近 $L$。
@@ -19,19 +23,29 @@ $$0 < |x - a| < \delta \implies |f(x) - L| < \varepsilon$$
 
 **直接代入法** (Direct Substitution)（当函数连续时）：
 
-$$\lim_{x \to 2} (x^2 + 1) = 2^2 + 1 = 5$$
+$$
+\lim_{x \to 2} (x^2 + 1) = 2^2 + 1 = 5
+$$
 
 **不定式** (Indeterminate Form) $\frac{0}{0}$ —— 因式分解并约分：
 
-$$\lim_{x \to 1} \frac{x^2 - 1}{x - 1} = \lim_{x \to 1} \frac{(x-1)(x+1)}{x-1} = \lim_{x \to 1}(x+1) = 2$$
+$$
+\lim_{x \to 1} \frac{x^2 - 1}{x - 1} = \lim_{x \to 1} \frac{(x-1)(x+1)}{x-1} = \lim_{x \to 1}(x+1) = 2
+$$
 
 **重要极限** (Important Limits)：
 
-$$\lim_{x \to 0} \frac{\sin x}{x} = 1$$
+$$
+\lim_{x \to 0} \frac{\sin x}{x} = 1
+$$
 
-$$\lim_{x \to 0} \frac{e^x - 1}{x} = 1$$
+$$
+\lim_{x \to 0} \frac{e^x - 1}{x} = 1
+$$
 
-$$\lim_{x \to \infty}\left(1 + \frac{1}{x}\right)^x = e$$
+$$
+\lim_{x \to \infty}\left(1 + \frac{1}{x}\right)^x = e
+$$
 
 ---
 
@@ -39,15 +53,23 @@ $$\lim_{x \to \infty}\left(1 + \frac{1}{x}\right)^x = e$$
 
 **1. 线性性** (Linearity)：
 
-$$\lim_{x \to a} [f(x) + g(x)] = \lim_{x \to a} f(x) + \lim_{x \to a} g(x)$$
+$$
+\lim_{x \to a} [f(x) + g(x)] = \lim_{x \to a} f(x) + \lim_{x \to a} g(x)
+$$
 
-$$\lim_{x \to a} [c \cdot f(x)] = c \cdot \lim_{x \to a} f(x)$$
+$$
+\lim_{x \to a} [c \cdot f(x)] = c \cdot \lim_{x \to a} f(x)
+$$
 
 **2. 乘积与商** (Product and Quotient)：
 
-$$\lim_{x \to a} [f(x) \cdot g(x)] = \lim_{x \to a} f(x) \cdot \lim_{x \to a} g(x)$$
+$$
+\lim_{x \to a} [f(x) \cdot g(x)] = \lim_{x \to a} f(x) \cdot \lim_{x \to a} g(x)
+$$
 
-$$\lim_{x \to a} \frac{f(x)}{g(x)} = \frac{\displaystyle\lim_{x \to a} f(x)}{\displaystyle\lim_{x \to a} g(x)} \quad \text{(if } \lim_{x \to a} g(x) \neq 0\text{)}$$
+$$
+\lim_{x \to a} \frac{f(x)}{g(x)} = \frac{\displaystyle\lim_{x \to a} f(x)}{\displaystyle\lim_{x \to a} g(x)} \quad \text{(if } \lim_{x \to a} g(x) \neq 0\text{)}
+$$
 
 **3. 夹逼定理** (Squeeze Theorem)：若在 $a$ 附近有 $g(x) \leq f(x) \leq h(x)$，且 $\lim_{x \to a} g(x) = \lim_{x \to a} h(x) = L$，则 $\lim_{x \to a} f(x) = L$。
 
@@ -57,7 +79,9 @@ $$\lim_{x \to a} \frac{f(x)}{g(x)} = \frac{\displaystyle\lim_{x \to a} f(x)}{\di
 
 函数 $f$ 在点 $a$ 处**连续 (Continuous)**，当且仅当：
 
-$$\boxed{\lim_{x \to a} f(x) = f(a)}$$
+$$
+\boxed{\lim_{x \to a} f(x) = f(a)}
+$$
 
 这需要满足**三个条件**：
 
@@ -129,19 +153,27 @@ $\lim_{x \to a} f(x) = \pm\infty$ 或不存在
 
 函数 $f$ 在点 $a$ 处**可导 (Differentiable)**，当且仅当导数存在：
 
-$$f'(a) = \lim_{\Delta x \to 0} \frac{f(a + \Delta x) - f(a)}{\Delta x} \quad \text{存在}$$
+$$
+f'(a) = \lim_{\Delta x \to 0} \frac{f(a + \Delta x) - f(a)}{\Delta x} \quad \text{存在}
+$$
 
 **关键关系**：
 
-$$\text{在 } a \text{ 处可导} \implies \text{在 } a \text{ 处连续}$$
+$$
+\text{在 } a \text{ 处可导} \implies \text{在 } a \text{ 处连续}
+$$
 
 **但反之不成立！** 函数可以在 $a$ 处连续但不可导。
 
 **为什么？** 若 $f'(a)$ 存在，则：
 
-$$\lim_{\Delta x \to 0}[f(a+\Delta x) - f(a)] = \lim_{\Delta x \to 0} \frac{f(a+\Delta x) - f(a)}{\Delta x} \cdot \Delta x = f'(a) \cdot 0 = 0$$
+$$
+\lim_{\Delta x \to 0}[f(a+\Delta x) - f(a)] = \lim_{\Delta x \to 0} \frac{f(a+\Delta x) - f(a)}{\Delta x} \cdot \Delta x = f'(a) \cdot 0 = 0
+$$
 
-$$\implies \lim_{\Delta x \to 0} f(a+\Delta x) = f(a) \implies \text{连续}$$
+$$
+\implies \lim_{\Delta x \to 0} f(a+\Delta x) = f(a) \implies \text{连续}
+$$
 
 ---
 
@@ -156,8 +188,12 @@ $$\implies \lim_{\Delta x \to 0} f(a+\Delta x) = f(a) \implies \text{连续}$$
 **$f(x) = |x|$** 在 $x = 0$ 处：
 - **连续**：$\lim_{x \to 0}|x| = 0 = f(0)$ ✓
 - **不可导**：左导数与右导数不相等：
-$$f'_-(0) = \lim_{\Delta x \to 0^-}\frac{|\Delta x|}{\Delta x} = -1$$
-$$f'_+(0) = \lim_{\Delta x \to 0^+}\frac{|\Delta x|}{\Delta x} = +1$$
+$$
+f'_-(0) = \lim_{\Delta x \to 0^-}\frac{|\Delta x|}{\Delta x} = -1
+$$
+$$
+f'_+(0) = \lim_{\Delta x \to 0^+}\frac{|\Delta x|}{\Delta x} = +1
+$$
 尖锐的**角点 (Corner)** 意味着不存在唯一的切线。
 
 ---
@@ -247,13 +283,17 @@ $\lim_{x\to a}f(x)=L$
 
 导数**定义**为一个极限：
 
-$$f'(x) = \lim_{\Delta x \to 0} \frac{f(x + \Delta x) - f(x)}{\Delta x}$$
+$$
+f'(x) = \lim_{\Delta x \to 0} \frac{f(x + \Delta x) - f(x)}{\Delta x}
+$$
 
 **联系**：没有极限，我们就无法严格定义导数。极限捕捉了 " 瞬时变化率 " 的概念——即割线上两点合并为一点时，切线的斜率。
 
 **示例**：从第一性原理推导 $f(x) = x^2$ 的导数：
 
-$$f'(x) = \lim_{\Delta x \to 0} \frac{(x+\Delta x)^2 - x^2}{\Delta x} = \lim_{\Delta x \to 0} \frac{2x\Delta x + (\Delta x)^2}{\Delta x} = \lim_{\Delta x \to 0}(2x + \Delta x) = 2x$$
+$$
+f'(x) = \lim_{\Delta x \to 0} \frac{(x+\Delta x)^2 - x^2}{\Delta x} = \lim_{\Delta x \to 0} \frac{2x\Delta x + (\Delta x)^2}{\Delta x} = \lim_{\Delta x \to 0}(2x + \Delta x) = 2x
+$$
 
 ---
 
@@ -261,11 +301,15 @@ $$f'(x) = \lim_{\Delta x \to 0} \frac{(x+\Delta x)^2 - x^2}{\Delta x} = \lim_{\D
 
 对于函数 $y=f(x)$，在点 $x$ 处的导数为：
 
-$$f'(x) = \lim_{\Delta x \to 0} \frac{f(x + \Delta x) - f(x)}{\Delta x} = \frac{dy}{dx}$$
+$$
+f'(x) = \lim_{\Delta x \to 0} \frac{f(x + \Delta x) - f(x)}{\Delta x} = \frac{dy}{dx}
+$$
 
 **示例**：$f(x) = x^3/3 - x$
 
-$$f'(x) = \frac{d}{dx}\left(\frac{x^3}{3} - x\right) = x^2 - 1$$
+$$
+f'(x) = \frac{d}{dx}\left(\frac{x^3}{3} - x\right) = x^2 - 1
+$$
 
 $\frac{df}{dx}$ 的符号表示当 $x$ 增大时 $f$ 是否增大。
 
@@ -275,31 +319,45 @@ $\frac{df}{dx}$ 的符号表示当 $x$ 增大时 $f$ 是否增大。
 
 ### 直觉理解 (Intuition)
 
-$$x_1 = x_0 - \beta f'(x_0)$$
+$$
+x_1 = x_0 - \beta f'(x_0)
+$$
 
 - 若 $f'(x_0) > 0$：$f$ 递增，$x_1 < x_0$（向左移动）$\Rightarrow$ $f$ 减小
 - 若 $f'(x_0) < 0$：$f$ 递减，$x_1 > x_0$（向右移动）$\Rightarrow$ $f$ 减小
 - 无论如何，$x_1$ 都朝着使 $f$ 减小的方向移动
 
-$$\boxed{f(x_0) \geq f(x_1)}$$
+$$
+\boxed{f(x_0) \geq f(x_1)}
+$$
 
 ### 推导（泰勒展开）(Derivation - Taylor Expansion)
 
-$$x_1 = x_0 - \beta f'(x_0)$$
+$$
+x_1 = x_0 - \beta f'(x_0)
+$$
 
-$$f(x_1) \approx f(x_0) + f'(x_0)(x_1 - x_0)$$
+$$
+f(x_1) \approx f(x_0) + f'(x_0)(x_1 - x_0)
+$$
 
 代入 $x_1 - x_0 = -\beta f'(x_0)$：
 
-$$f(x_1) \approx f(x_0) - \beta\left(f'(x_0)\right)^2$$
+$$
+f(x_1) \approx f(x_0) - \beta\left(f'(x_0)\right)^2
+$$
 
 由于 $\beta > 0$ 且 $\left(f'(x_0)\right)^2 \geq 0$：
 
-$$\boxed{f(x_1) \leq f(x_0)}$$
+$$
+\boxed{f(x_1) \leq f(x_0)}
+$$
 
 **泰勒展开** (Taylor Expansion)：对于在点 $a$ 附近的光滑函数 $f$：
 
-$$f(x) = f(a) + f'(a)(x-a) + \frac{f''(a)}{2!}(x-a)^2 + \cdots+\frac{f^{(n)}(a)}{n!}(x-a)^n+o((x-a)^n)$$
+$$
+f(x) = f(a) + f'(a)(x-a) + \frac{f''(a)}{2!}(x-a)^2 + \cdots+\frac{f^{(n)}(a)}{n!}(x-a)^n+o((x-a)^n)
+$$
 
 当 $a=0$ 时，$f(x) = f(0) + f'(0)(x) + \frac{f''(0)}{2!}(x)^2 + \cdots+\frac{f^{(n)}(0)}{n!}(x)^n+o((x)^n)$
 
@@ -322,7 +380,9 @@ $$f(x) = f(a) + f'(a)(x-a) + \frac{f''(a)}{2!}(x-a)^2 + \cdots+\frac{f^{(n)}(a)}
 
 <TaylorExpansion type="poly6" />
 <TaylorExpansion type="ln" />
-$$f(x) = f(a) + f'(a)(x-a) + \frac{f''(a)}{2!}(x-a)^2 + \cdots+\frac{f^{(n)}(a)}{n!}(x-a)^n+o((x-a)^n)$$
+$$
+f(x) = f(a) + f'(a)(x-a) + \frac{f''(a)}{2!}(x-a)^2 + \cdots+\frac{f^{(n)}(a)}{n!}(x-a)^n+o((x-a)^n)
+$$
 
 ---
 
@@ -330,7 +390,9 @@ $$f(x) = f(a) + f'(a)(x-a) + \frac{f''(a)}{2!}(x-a)^2 + \cdots+\frac{f^{(n)}(a)}
 
 <TaylorExpansion type="exp" />
 <TaylorExpansion type="sin" />
-$$f(x) = f(a) + f'(a)(x-a) + \frac{f''(a)}{2!}(x-a)^2 + \cdots+\frac{f^{(n)}(a)}{n!}(x-a)^n+o((x-a)^n)$$
+$$
+f(x) = f(a) + f'(a)(x-a) + \frac{f''(a)}{2!}(x-a)^2 + \cdots+\frac{f^{(n)}(a)}{n!}(x-a)^n+o((x-a)^n)
+$$
 
 ---
 
@@ -358,7 +420,9 @@ $$f(x) = f(a) + f'(a)(x-a) + \frac{f''(a)}{2!}(x-a)^2 + \cdots+\frac{f^{(n)}(a)}
 
 **链式法则 (Chain Rule)** 对于神经网络中的反向传播 (Backpropagation) 至关重要。它计算复合函数的导数：逐层反向传播梯度。
 
-$$\frac{\partial L}{\partial w_1} = \frac{\partial L}{\partial y} \cdot \frac{\partial y}{\partial z} \cdot \frac{\partial z}{\partial w_1}$$
+$$
+\frac{\partial L}{\partial w_1} = \frac{\partial L}{\partial y} \cdot \frac{\partial y}{\partial z} \cdot \frac{\partial z}{\partial w_1}
+$$
 
 ---
 
@@ -382,11 +446,17 @@ $$\frac{\partial L}{\partial w_1} = \frac{\partial L}{\partial y} \cdot \frac{\p
 
 <GradientDescentLR />
 **函数**：
-$$f(x) = (x - 2)^2 + 1$$
+$$
+f(x) = (x - 2)^2 + 1
+$$
 **梯度** (Gradient)：
-$$f'(x) = 2(x - 2)$$
+$$
+f'(x) = 2(x - 2)
+$$
 **更新规则**：
-$$x_{n+1} = x_n - \eta \cdot f'(x_n)$$
+$$
+x_{n+1} = x_n - \eta \cdot f'(x_n)
+$$
 **尝试用滑块调整 $\eta$** 并观察：
 **权衡** (Tradeoff)：小的 $\eta$ 安全但缓慢。大的 $\eta$ 快速但有风险。在机器学习训练中，选择合适的学习率 (Learning Rate) 至关重要。
 
@@ -396,9 +466,13 @@ $$x_{n+1} = x_n - \eta \cdot f'(x_n)$$
 
 <GradientDescentMulti />
 **函数**：
-$$f(x) = x^4 - 4x^3 + 2x^2 + 4x$$
+$$
+f(x) = x^4 - 4x^3 + 2x^2 + 4x
+$$
 **梯度**：
-$$f'(x) = 4x^3 - 12x^2 + 4x + 4$$
+$$
+f'(x) = 4x^3 - 12x^2 + 4x + 4
+$$
 **临界点** (Critical Points)（$f'(x) = 0$ 处）：
 
 | 点                | 类型         |
@@ -413,7 +487,9 @@ $$f'(x) = 4x^3 - 12x^2 + 4x + 4$$
 
 对于多元函数 (Multivariable Function) $f(x_1, x_2, \ldots, x_n)$，偏导数是**仅有一个变量变化**时的变化率：
 
-$$\frac{\partial f}{\partial x_i} = \lim_{\Delta x_i \to 0} \frac{f(x_1, \ldots, x_i + \Delta x_i, \ldots, x_n) - f(x_1, \ldots, x_n)}{\Delta x_i}$$
+$$
+\frac{\partial f}{\partial x_i} = \lim_{\Delta x_i \to 0} \frac{f(x_1, \ldots, x_i + \Delta x_i, \ldots, x_n) - f(x_1, \ldots, x_n)}{\Delta x_i}
+$$
 
 示例：
 
@@ -423,11 +499,15 @@ $$
 
 **梯度 (Gradient)** 是所有偏导数组成的向量：
 
-$$\nabla f = \left[\frac{\partial f}{\partial x_1}, \frac{\partial f}{\partial x_2}, \ldots, \frac{\partial f}{\partial x_n}\right]$$
+$$
+\nabla f = \left[\frac{\partial f}{\partial x_1}, \frac{\partial f}{\partial x_2}, \ldots, \frac{\partial f}{\partial x_n}\right]
+$$
 
 梯度指向**最陡上升** (Steepest Ascent) 的方向。在机器学习中，我们沿**相反**方向更新参数以最小化损失函数：
 
-$$\mathbf{w} \leftarrow \mathbf{w} - \eta \nabla L(\mathbf{w})$$
+$$
+\mathbf{w} \leftarrow \mathbf{w} - \eta \nabla L(\mathbf{w})
+$$
 
 其中 $\eta$ 是学习率 (Learning Rate)。
 
@@ -437,7 +517,9 @@ $$\mathbf{w} \leftarrow \mathbf{w} - \eta \nabla L(\mathbf{w})$$
 
 **二阶导数**是导数的导数，衡量变化率本身如何变化：
 
-$$f''(x) = \frac{d^2 f}{dx^2} = \frac{d}{dx}\left(\frac{df}{dx}\right) = \lim_{\Delta x \to 0} \frac{f'(x + \Delta x) - f'(x)}{\Delta x}$$
+$$
+f''(x) = \frac{d^2 f}{dx^2} = \frac{d}{dx}\left(\frac{df}{dx}\right) = \lim_{\Delta x \to 0} \frac{f'(x + \Delta x) - f'(x)}{\Delta x}
+$$
 
 **几何意义**：$f''(x)$ 描述函数的**凹凸性** (Concavity)。
 
@@ -455,11 +537,15 @@ $f'(x) = x^2 - 1, \quad f''(x) = 2x$
 
 在点 $a$ 附近的**二阶泰勒展开** (Second-Order Taylor Expansion)：
 
-$$f(x) \approx f(a) + f'(a)(x-a) + \frac{f''(a)}{2}(x-a)^2$$
+$$
+f(x) \approx f(a) + f'(a)(x-a) + \frac{f''(a)}{2}(x-a)^2
+$$
 
 在临界点 $f'(a) = 0$ 处：
 
-$$f(x) \approx f(a) + \frac{f''(a)}{2}(x-a)^2$$
+$$
+f(x) \approx f(a) + \frac{f''(a)}{2}(x-a)^2
+$$
 
 - 若 $f''(a) > 0$：$f(x) \geq f(a)$ → **局部最小值**
 - 若 $f''(a) < 0$：$f(x) \leq f(a)$ → **局部最大值**
@@ -468,7 +554,9 @@ $$f(x) \approx f(a) + \frac{f''(a)}{2}(x-a)^2$$
 - 小的 $f''$ → 平坦区域 → 可以使用较大步长
 这促使了**二阶优化方法** (Second-Order Optimization Methods) 的发展，如牛顿法 (Newton's Method)：
 
-$$x_{n+1} = x_n - \frac{f'(x_n)}{f''(x_n)}$$
+$$
+x_{n+1} = x_n - \frac{f'(x_n)}{f''(x_n)}
+$$
 
 ---
 
@@ -476,13 +564,19 @@ $$x_{n+1} = x_n - \frac{f'(x_n)}{f''(x_n)}$$
 
 对于多元函数 $f(x_1, x_2, \ldots, x_n)$，我们可以对同一变量求两次偏导数：
 
-$$\frac{\partial^2 f}{\partial x_i^2} = \frac{\partial}{\partial x_i}\left(\frac{\partial f}{\partial x_i}\right)$$
+$$
+\frac{\partial^2 f}{\partial x_i^2} = \frac{\partial}{\partial x_i}\left(\frac{\partial f}{\partial x_i}\right)
+$$
 
 **示例**：$f(x, y) = x^2 y + 3xy^2$
 
-$$\frac{\partial f}{\partial x} = 2xy + 3y^2, \quad \frac{\partial^2 f}{\partial x^2} = 2y$$
+$$
+\frac{\partial f}{\partial x} = 2xy + 3y^2, \quad \frac{\partial^2 f}{\partial x^2} = 2y
+$$
 
-$$\frac{\partial f}{\partial y} = x^2 + 6xy, \quad \frac{\partial^2 f}{\partial y^2} = 6x$$
+$$
+\frac{\partial f}{\partial y} = x^2 + 6xy, \quad \frac{\partial^2 f}{\partial y^2} = 6x
+$$
 
 **解释**：$\frac{\partial^2 f}{\partial x_i^2}$ 衡量 $f$ 沿 $x_i$ 方向的凹凸性，同时保持其他变量不变。
 
@@ -492,19 +586,27 @@ $$\frac{\partial f}{\partial y} = x^2 + 6xy, \quad \frac{\partial^2 f}{\partial 
 
 **混合偏导数** (Mixed Partial Derivative) 涉及对**不同变量**求偏导数：
 
-$$\frac{\partial^2 f}{\partial x_j \partial x_i} = \frac{\partial}{\partial x_j}\left(\frac{\partial f}{\partial x_i}\right)$$
+$$
+\frac{\partial^2 f}{\partial x_j \partial x_i} = \frac{\partial}{\partial x_j}\left(\frac{\partial f}{\partial x_i}\right)
+$$
 
 **示例**：$f(x, y) = x^2 y + 3xy^2$
 
-$$\frac{\partial f}{\partial x} = 2xy + 3y^2 \quad \Rightarrow \quad \frac{\partial^2 f}{\partial y \partial x} = \frac{\partial}{\partial y}(2xy + 3y^2) = 2x + 6y$$
+$$
+\frac{\partial f}{\partial x} = 2xy + 3y^2 \quad \Rightarrow \quad \frac{\partial^2 f}{\partial y \partial x} = \frac{\partial}{\partial y}(2xy + 3y^2) = 2x + 6y
+$$
 
-$$\frac{\partial f}{\partial y} = x^2 + 6xy \quad \Rightarrow \quad \frac{\partial^2 f}{\partial x \partial y} = \frac{\partial}{\partial x}(x^2 + 6xy) = 2x + 6y$$
+$$
+\frac{\partial f}{\partial y} = x^2 + 6xy \quad \Rightarrow \quad \frac{\partial^2 f}{\partial x \partial y} = \frac{\partial}{\partial x}(x^2 + 6xy) = 2x + 6y
+$$
 
 **克莱罗定理 (Clairaut's Theorem)（混合偏导数的对称性）**：
 
 若 $f$ 具有连续的二阶偏导数，则：
 
-$$\boxed{\frac{\partial^2 f}{\partial x_j \partial x_i} = \frac{\partial^2 f}{\partial x_i \partial x_j}}$$
+$$
+\boxed{\frac{\partial^2 f}{\partial x_j \partial x_i} = \frac{\partial^2 f}{\partial x_i \partial x_j}}
+$$
 
 求导顺序无关紧要！
 
@@ -514,11 +616,15 @@ $$\boxed{\frac{\partial^2 f}{\partial x_j \partial x_i} = \frac{\partial^2 f}{\p
 
 **海森矩阵**收集了多元函数的所有二阶偏导数：
 
-$$H(f) = \begin{bmatrix} \dfrac{\partial^2 f}{\partial x_1^2} & \dfrac{\partial^2 f}{\partial x_1 \partial x_2} & \cdots & \dfrac{\partial^2 f}{\partial x_1 \partial x_n} \\[6pt] \dfrac{\partial^2 f}{\partial x_2 \partial x_1} & \dfrac{\partial^2 f}{\partial x_2^2} & \cdots & \dfrac{\partial^2 f}{\partial x_2 \partial x_n} \\[6pt] \vdots & \vdots & \ddots & \vdots \\[6pt] \dfrac{\partial^2 f}{\partial x_n \partial x_1} & \dfrac{\partial^2 f}{\partial x_n \partial x_2} & \cdots & \dfrac{\partial^2 f}{\partial x_n^2} \end{bmatrix}$$
+$$
+H(f) = \begin{bmatrix} \dfrac{\partial^2 f}{\partial x_1^2} & \dfrac{\partial^2 f}{\partial x_1 \partial x_2} & \cdots & \dfrac{\partial^2 f}{\partial x_1 \partial x_n} \\[6pt] \dfrac{\partial^2 f}{\partial x_2 \partial x_1} & \dfrac{\partial^2 f}{\partial x_2^2} & \cdots & \dfrac{\partial^2 f}{\partial x_2 \partial x_n} \\[6pt] \vdots & \vdots & \ddots & \vdots \\[6pt] \dfrac{\partial^2 f}{\partial x_n \partial x_1} & \dfrac{\partial^2 f}{\partial x_n \partial x_2} & \cdots & \dfrac{\partial^2 f}{\partial x_n^2} \end{bmatrix}
+$$
 
 **示例**：$f(x, y) = x^2 y + 3xy^2$
 
-$$H = \begin{bmatrix} \dfrac{\partial^2 f}{\partial x^2} & \dfrac{\partial^2 f}{\partial x \partial y} \\[6pt] \dfrac{\partial^2 f}{\partial y \partial x} & \dfrac{\partial^2 f}{\partial y^2} \end{bmatrix} = \begin{bmatrix} 2y & 2x + 6y \\ 2x + 6y & 6x \end{bmatrix}$$
+$$
+H = \begin{bmatrix} \dfrac{\partial^2 f}{\partial x^2} & \dfrac{\partial^2 f}{\partial x \partial y} \\[6pt] \dfrac{\partial^2 f}{\partial y \partial x} & \dfrac{\partial^2 f}{\partial y^2} \end{bmatrix} = \begin{bmatrix} 2y & 2x + 6y \\ 2x + 6y & 6x \end{bmatrix}
+$$
 
 ---
 
@@ -526,11 +632,15 @@ $$H = \begin{bmatrix} \dfrac{\partial^2 f}{\partial x^2} & \dfrac{\partial^2 f}{
 
 在点 $\mathbf{a}$ 附近的**多元二阶泰勒展开** (Multivariable Second-Order Taylor Expansion)：
 
-$$f(\mathbf{x}) \approx f(\mathbf{a}) + \nabla f(\mathbf{a})^T (\mathbf{x} - \mathbf{a}) + \frac{1}{2}(\mathbf{x} - \mathbf{a})^T H(\mathbf{a}) (\mathbf{x} - \mathbf{a})$$
+$$
+f(\mathbf{x}) \approx f(\mathbf{a}) + \nabla f(\mathbf{a})^T (\mathbf{x} - \mathbf{a}) + \frac{1}{2}(\mathbf{x} - \mathbf{a})^T H(\mathbf{a}) (\mathbf{x} - \mathbf{a})
+$$
 
 在临界点 $\nabla f(\mathbf{a}) = \mathbf{0}$ 处：
 
-$$f(\mathbf{x}) \approx f(\mathbf{a}) + \frac{1}{2}(\mathbf{x} - \mathbf{a})^T H(\mathbf{a}) (\mathbf{x} - \mathbf{a})$$
+$$
+f(\mathbf{x}) \approx f(\mathbf{a}) + \frac{1}{2}(\mathbf{x} - \mathbf{a})^T H(\mathbf{a}) (\mathbf{x} - \mathbf{a})
+$$
 
 利用海森矩阵**分类临界点**：
 
@@ -539,7 +649,9 @@ $$f(\mathbf{x}) \approx f(\mathbf{a}) + \frac{1}{2}(\mathbf{x} - \mathbf{a})^T H
 - $H$ **不定** (Indefinite) → 符号混合 → **鞍点** (Saddle Point)
 **在机器学习中**：海森矩阵为优化算法提供信息。牛顿法使用 $H^{-1}$ 来自适应每个方向的步长，在光滑损失曲面上比梯度下降收敛更快。
 
-$$\mathbf{w} \leftarrow \mathbf{w} - H^{-1} \nabla L(\mathbf{w})$$
+$$
+\mathbf{w} \leftarrow \mathbf{w} - H^{-1} \nabla L(\mathbf{w})
+$$
 
 ---
 
@@ -547,7 +659,9 @@ $$\mathbf{w} \leftarrow \mathbf{w} - H^{-1} \nabla L(\mathbf{w})$$
 
 **不定积分**是原函数 (Antiderivative)——所有导数为 $f(x)$ 的函数族：
 
-$$\int f(x)\, dx = F(x) + C$$
+$$
+\int f(x)\, dx = F(x) + C
+$$
 
 其中 $F'(x) = f(x)$，$C$ 为任意常数（因为 $(F(x)+C)' = f(x)$）。
 
@@ -565,11 +679,15 @@ $$\int f(x)\, dx = F(x) + C$$
 
 **1. 线性性（和法则）** (Linearity / Sum Rule)：
 
-$$\int \left(f(x) + g(x)\right) dx = \int f(x)\, dx + \int g(x)\, dx$$
+$$
+\int \left(f(x) + g(x)\right) dx = \int f(x)\, dx + \int g(x)\, dx
+$$
 
 **2. 常数倍法则** (Constant Multiple Rule)：
 
-$$\int C f(x)\, dx = C \int f(x)\, dx$$
+$$
+\int C f(x)\, dx = C \int f(x)\, dx
+$$
 
 等价形式：$\int C f(x)\, dx = \int f(x)\, d(Cx) = C \int f(x)\, dx$
 
@@ -581,17 +699,23 @@ $$\int C f(x)\, dx = C \int f(x)\, dx$$
 
 ### 换元积分法 (Integration by Substitution)
 
-$$\int f'(x)dx=\int df(x)=f(x)+C$$
+$$
+\int f'(x)dx=\int df(x)=f(x)+C
+$$
 
 若 $\int f(x)\, dx = F(x) + C$，则：
 
-$$\boxed{\int f(g(x))\, g'(x)\, dx =\int f(g(x))dg(x)=\int f(u)du=F(u)+C= F(g(x)) + C}$$
+$$
+\boxed{\int f(g(x))\, g'(x)\, dx =\int f(g(x))dg(x)=\int f(u)du=F(u)+C= F(g(x)) + C}
+$$
 
 **示例**：$\int 2x \cos(x^2)\, dx$
 
 令 $u = x^2$，则 $du = 2x\, dx$。
 
-$$\int 2x \cos(x^2)\, dx = \int \cos u\, du = \sin u + C = \sin(x^2) + C$$
+$$
+\int 2x \cos(x^2)\, dx = \int \cos u\, du = \sin u + C = \sin(x^2) + C
+$$
 
 **示例**：$\int e^{3x}\, dx$
 
@@ -607,13 +731,17 @@ $$\int 2x \cos(x^2)\, dx = \int \cos u\, du = \sin u + C = \sin(x^2) + C$$
 
 由乘积法则 $(uv)' = u'v + uv'$，可得：
 
-$$\boxed{\int u\, dv = uv - \int v\, du} or \boxed{\int u\, dv + \int v\, du=uv}$$
+$$
+\boxed{\int u\, dv = uv - \int v\, du} or \boxed{\int u\, dv + \int v\, du=uv}
+$$
 
 **示例**：$\int x e^x\, dx$
 
 令 $u = x$，$dv = e^x dx$。则 $du = dx$，$v = e^x$。
 
-$$\int x e^x\, dx = x e^x - \int e^x\, dx = x e^x - e^x + C = (x-1)e^x + C$$
+$$
+\int x e^x\, dx = x e^x - \int e^x\, dx = x e^x - e^x + C = (x-1)e^x + C
+$$
 
 **练习**：$\int \ln\,x \, dx,\int xe^{-x}\,dx$
 
@@ -628,7 +756,9 @@ const n = ref(8)
 
 **积分**是导数的逆运算，表示在 $[a, b]$ 上的累积量：
 
-$$\int_a^b f(x)\, dx = F(a)-F(b)=\left[F(x)\right]^{b}_{a}=\lim_{n \to \infty} \sum_{i=1}^{n} f(x_i) \Delta x$$
+$$
+\int_a^b f(x)\, dx = F(a)-F(b)=\left[F(x)\right]^{b}_{a}=\lim_{n \to \infty} \sum_{i=1}^{n} f(x_i) \Delta x
+$$
 
 <button class="px-3 py-1 rounded border border-gray-500 hover:bg-gray-400/20 font-mono" @click="n = Math.max(1, n - 1)">-</button>
 
@@ -638,9 +768,13 @@ $$\int_a^b f(x)\, dx = F(a)-F(b)=\left[F(x)\right]^{b}_{a}=\lim_{n \to \infty} \
 
 使用微积分基本定理 (Fundamental Theorem of Calculus) 进行**精确计算**：
 
-$$\int_{0.5}^{2} \left(\frac{x^2}{2} + 0.3\right) dx = \left[\frac{x^3}{6} + 0.3x\right]_{0.5}^{2}$$
+$$
+\int_{0.5}^{2} \left(\frac{x^2}{2} + 0.3\right) dx = \left[\frac{x^3}{6} + 0.3x\right]_{0.5}^{2}
+$$
 
-$$= \underbrace{\left(\frac{2^3}{6} + 0.3 \times 2\right)}_{F(2) = \frac{29}{15} \approx 1.933} - \underbrace{\left(\frac{0.5^3}{6} + 0.3 \times 0.5\right)}_{F(0.5) = \frac{41}{240} \approx 0.171} = \frac{141}{80} \approx 1.7625$$
+$$
+= \underbrace{\left(\frac{2^3}{6} + 0.3 \times 2\right)}_{F(2) = \frac{29}{15} \approx 1.933} - \underbrace{\left(\frac{0.5^3}{6} + 0.3 \times 0.5\right)}_{F(0.5) = \frac{41}{240} \approx 0.171} = \frac{141}{80} \approx 1.7625
+$$
 
 <RiemannChart :a="0.5" :b="2" :n="n" />
 
@@ -652,13 +786,17 @@ $$= \underbrace{\left(\frac{2^3}{6} + 0.3 \times 2\right)}_{F(2) = \frac{29}{15}
 
 **简单示例**：
 
-$$\frac{dy}{dt} = ky$$
+$$
+\frac{dy}{dt} = ky
+$$
 
 其含义为：_$y$ 的变化率与 $y$ 本身成正比。_
 
 **解** (Solutions) 是函数，而非数值：
 
-$$y(t) = Ce^{kt}$$
+$$
+y(t) = Ce^{kt}
+$$
 
 其中 $C$ 是由初始条件 (Initial Conditions) 确定的任意常数。
 
@@ -701,11 +839,17 @@ $$y(t) = Ce^{kt}$$
 4. 积分：$\mu(t)\,y = \int \mu(t)\,g(t)\,dt + C$
 **示例**：$y' + 2y = e^t$
 
-$$\mu(t) = e^{\int 2\,dt} = e^{2t}$$
+$$
+\mu(t) = e^{\int 2\,dt} = e^{2t}
+$$
 
-$$\frac{d}{dt}\!\left[e^{2t}y\right] = e^{2t} \cdot e^t = e^{3t}$$
+$$
+\frac{d}{dt}\!\left[e^{2t}y\right] = e^{2t} \cdot e^t = e^{3t}
+$$
 
-$$e^{2t}y = \frac{1}{3}e^{3t} + C \quad\Rightarrow\quad \boxed{y = \frac{1}{3}e^{t} + Ce^{-2t}}$$
+$$
+e^{2t}y = \frac{1}{3}e^{3t} + C \quad\Rightarrow\quad \boxed{y = \frac{1}{3}e^{t} + Ce^{-2t}}
+$$
 
 ---
 
@@ -727,6 +871,10 @@ $r^2 + ar + b = 0$
 
 **示例**：$y'' + 3y' + 2y = 0$
 
-$$r^2 + 3r + 2 = 0 \;\Rightarrow\; (r+1)(r+2) = 0 \;\Rightarrow\; r_1 = -1,\; r_2 = -2$$
+$$
+r^2 + 3r + 2 = 0 \;\Rightarrow\; (r+1)(r+2) = 0 \;\Rightarrow\; r_1 = -1,\; r_2 = -2
+$$
 
-$$\boxed{y = C_1 e^{-t} + C_2 e^{-2t}}$$
+$$
+\boxed{y = C_1 e^{-t} + C_2 e^{-2t}}
+$$
