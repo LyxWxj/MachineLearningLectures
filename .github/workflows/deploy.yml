@@ -20,15 +20,22 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install mdbook
-        run: |
-          curl -sSL https://github.com/rust-lang/mdBook/releases/download/v0.4.40/mdbook-v0.4.40-x86_64-unknown-linux-gnu.tar.gz | tar xz
-          sudo mv mdbook /usr/local/bin/
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
 
-      - name: Install mdbook-mermaid
+      - name: Cache cargo registry
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            ~/.cargo/bin
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Install mdbook and preprocessors
         run: |
-          curl -sSL https://github.com/badboy/mdbook-mermaid/releases/download/v0.17.0/mdbook-mermaid-v0.17.0-x86_64-unknown-linux-gnu.tar.gz | tar xz
-          sudo mv mdbook-mermaid /usr/local/bin/
+          cargo install mdbook
+          cargo install mdbook-mermaid
 
       - name: Build zh
         run: cd zh && mdbook build
