@@ -44,4 +44,6 @@ src: ./pages/Neuromatch_Notebooks_Week2.md
 src: ./pages/Neuromatch_Markov_Kalman.md
 ---
 
-
+---
+src: ./pages/Neuromatch_Notebooks_Week3.md
+---

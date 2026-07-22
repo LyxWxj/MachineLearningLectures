@@ -87,6 +87,10 @@ When $a$ is complex ($a = \text{real} + i \cdot \text{imag}$), the system oscill
 - Real part → growth/decay rate
 - Imaginary part → oscillation frequency
 
+**Euler's formula**: $e^{i\theta} = \cos\theta + i\sin\theta$
+
+This is why complex eigenvalues produce oscillation: $e^{i \cdot \text{imag} \cdot t}$ traces a circle in the complex plane.
+
 $$x(t) = x_0 e^{(\text{real} + i \cdot \text{imag})t} = x_0 e^{\text{real} \cdot t} \cdot [\cos(\text{imag} \cdot t) + i \sin(\text{imag} \cdot t)]$$
 
 </v-click>
@@ -125,6 +129,120 @@ def system(t, x, a00, a01, a10, a11):
 - Both positive → unstable node (diverge)
 - Mixed signs → saddle point
 - Complex → oscillation (spiral)
+
+</v-click>
+
+---
+
+### Markov Process: Telegraph Process
+
+A two-state Markov process — the **telegraph process** — models a neuron ion channel that switches between **Closed (0)** and **Open (1)** states:
+
+<v-click>
+
+**State transition matrix**:
+
+$$\begin{bmatrix} P(\text{Closed}) \\ P(\text{Open}) \end{bmatrix}_{k+1} = \underbrace{\begin{bmatrix} 1-\mu_{c2o} & \mu_{o2c} \\ \mu_{c2o} & 1-\mu_{o2c} \end{bmatrix}}_{\mathbf{A}} \begin{bmatrix} P(\text{Closed}) \\ P(\text{Open}) \end{bmatrix}_k$$
+
+| Entry | Meaning |
+|-------|---------|
+| $1-\mu_{c2o}$ | Stay closed |
+| $\mu_{c2o}$ | Closed → Open |
+| $\mu_{o2c}$ | Open → Closed |
+| $1-\mu_{o2c}$ | Stay open |
+
+</v-click>
+---
+
+<v-click>
+
+**Simulation via Poisson process**:
+
+```python
+def ion_channel_opening(c2o, o2c, T, dt):
+  t = np.arange(0, T, dt)
+  x = np.zeros_like(t)
+  switch_times = []
+  x[0] = 0
+  myrand = np.random.random_sample(size=len(t))
+  for k in range(len(t)-1):
+    if x[k] == 0 and myrand[k] < c2o*dt:
+      x[k+1:] = 1
+      switch_times.append(k*dt)
+    elif x[k] == 1 and myrand[k] < o2c*dt:
+      x[k+1:] = 0
+      switch_times.append(k*dt)
+  return t, x, switch_times
+```
+
+</v-click>
+
+---
+
+### Probability Propagation
+
+Instead of running many stochastic simulations, we can propagate probabilities **directly** in one pass:
+
+<v-click>
+
+```python
+def simulate_prob_prop(A, x0, dt, T):
+  t = np.arange(0, T, dt)
+  x = x0
+  for k in range(len(t)-1):
+    x_kp1 = np.dot(A, x[-1])      # matrix × state vector
+    x = np.vstack([x, x_kp1])     # append new state
+  return x, t
+```
+
+**Key advantage**: one simulation run gives the full probability trajectory, no repeated sampling needed.
+
+</v-click>
+
+---
+
+### Equilibrium via Eigendecomposition
+
+At equilibrium, probabilities stop changing: $\mathbf{A}\mathbf{x}^* = \mathbf{x}^*$
+
+<v-click>
+
+This is exactly the **eigenvalue equation** with $\lambda = 1$.
+
+```python
+lam, v = np.linalg.eig(A)
+print(f"Eigenvalues: {lam}")
+print(f"Eigenvector 1: {v[:, 0]}")
+print(f"Eigenvector 2: {v[:, 1]}")
+```
+
+</v-click>
+
+<v-click>
+
+**Two eigenvalues**:
+
+| Eigenvalue | Meaning |
+|------------|---------|
+| $\lambda_1 = 1$ | **Stable** — the stationary distribution (eigenvector rescaled to sum to 1) |
+| $\lambda_2 < 1$ | **Decaying** — transient component that vanishes over time |
+
+</v-click>
+---
+
+<v-click>
+
+**Stationary distribution** (rescale eigenvector so probabilities sum to 1):
+
+$$P(\text{Open}) = \frac{\mu_{c2o}}{\mu_{c2o} + \mu_{o2c}} \qquad P(\text{Closed}) = \frac{\mu_{o2c}}{\mu_{c2o} + \mu_{o2c}}$$
+
+For $\mu_{c2o}=0.02,\; \mu_{o2c}=0.1$: $P(\text{Open}) \approx 0.167$ — the channel is open ~16.7% of the time.
+
+</v-click>
+
+<v-click>
+
+**Intuition**: the transition matrix acts like a "mixing" operator. Regardless of the initial state, repeated application always converges to the same ratio — this is the **memoryless** property of Markov processes.
 
 </v-click>
 
