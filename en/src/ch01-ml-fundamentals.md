@@ -49,26 +49,26 @@ Machine discovers rules from examples:
 | 22°C | warm |
 | 10°C | cold |
 
-\(\rightarrow\) learns the mapping automatically
+$\rightarrow$ learns the mapping automatically
 
 ---
 
 ### Formal Definition
 
-Machine learning is about learning a **function** \(f\) from data:
+Machine learning is about learning a **function** $f$ from data:
 
 $$f: \mathbf{x} \rightarrow y$$
 
 where:
 
-- \(\mathbf{x}\): input (features / observations)
-- \(y\): output (prediction / label / structure)
-- \(f\): the **model** — a hypothesis function from a hypothesis space \(\mathcal{H}\)
+- $\mathbf{x}$: input (features / observations)
+- $y$: output (prediction / label / structure)
+- $f$: the **model** — a hypothesis function from a hypothesis space $\mathcal{H}$
 The learning process:
-1. Choose a hypothesis space \(\mathcal{H}\) (e.g., linear functions, neural networks)
-2. Define a **loss function** to measure how wrong \(f\) is
-3. Use an **optimization algorithm** to find the best \(f \in \mathcal{H}\)
-This directly connects Lecture 0: \(f\) is **represented** with linear algebra, **modeled** with probability, and **optimized** with calculus.
+1. Choose a hypothesis space $\mathcal{H}$ (e.g., linear functions, neural networks)
+2. Define a **loss function** to measure how wrong $f$ is
+3. Use an **optimization algorithm** to find the best $f \in \mathcal{H}$
+This directly connects Lecture 0: $f$ is **represented** with linear algebra, **modeled** with probability, and **optimized** with calculus.
 
 ---
 
@@ -80,9 +80,9 @@ All machine learning paradigms share one goal: **learn the underlying data distr
 
 | Paradigm | What to learn | Data available |
 |------|------|------|
-| **Supervised** | \(P(y \mid \mathbf{x})\) — label given input | \((\mathbf{x}, y)\) pairs |
-| **Unsupervised** | \(P(\mathbf{x})\) — structure of input | \(\mathbf{x}\) only, no labels |
-| **Reinforcement** | \(\pi(a \mid s)\) — action given state | reward signal from environment |
+| **Supervised** | $P(y \mid \mathbf{x})$ — label given input | $(\mathbf{x}, y)$ pairs |
+| **Unsupervised** | $P(\mathbf{x})$ — structure of input | $\mathbf{x}$ only, no labels |
+| **Reinforcement** | $\pi(a \mid s)$ — action given state | reward signal from environment |
 
 In all three cases, we are estimating or leveraging a **probability distribution** — the central theme from Lecture 0.
 
@@ -94,13 +94,13 @@ In all three cases, we are estimating or leveraging a **probability distribution
 
 ### Supervised Learning
 
-Given labeled data \(\{(\mathbf{x}_i, y_i)\}_{i=1}^{N}\), learn a mapping \(f: \mathbf{x} \to y\).
+Given labeled data $\{(\mathbf{x}_i, y_i)\}_{i=1}^{N}$, learn a mapping $f: \mathbf{x} \to y$.
 
-**Regression**: \(y \in \mathbb{R}\) (continuous)
+**Regression**: $y \in \mathbb{R}$ (continuous)
 
 Predict house price from features:
 
-| Size (m²) | Rooms | Price (\(\times 10^4\)) |
+| Size (m²) | Rooms | Price ($\times 10^4$) |
 |---|---|---|
 | 80 | 2 | 150 |
 | 120 | 3 | 230 |
@@ -108,7 +108,7 @@ Predict house price from features:
 
 $$\hat{y} = f(\mathbf{x}) = \mathbf{w}^T\mathbf{x} + b$$
 
-**Classification**: \(y \in \{1, 2, \ldots, C\}\) (discrete)
+**Classification**: $y \in \{1, 2, \ldots, C\}$ (discrete)
 
 Classify email as spam or not:
 
@@ -125,12 +125,12 @@ $$P(y = c \mid \mathbf{x}) = \text{softmax}(\mathbf{w}_c^T\mathbf{x} + b_c)$$
 
 | Algorithm | Type | Idea |
 |------|------|------|
-| **Linear Regression** | Regression | Fit a line/plane to data: \(\hat{y} = \mathbf{w}^T\mathbf{x} + b\) |
-| **Logistic Regression** | Classification | Sigmoid maps linear output to probability: \(P(y{=}1) = \sigma(\mathbf{w}^T\mathbf{x})\) |
+| **Linear Regression** | Regression | Fit a line/plane to data: $\hat{y} = \mathbf{w}^T\mathbf{x} + b$ |
+| **Logistic Regression** | Classification | Sigmoid maps linear output to probability: $P(y{=}1) = \sigma(\mathbf{w}^T\mathbf{x})$ |
 | **Decision Tree** | Both | Split feature space into regions with if-else rules |
 | **Neural Network** | Both | Stack layers of linear + nonlinear transformations |
 
-**Common thread**: every supervised algorithm defines a function class \(\mathcal{H}\), a loss function, and an optimization method.
+**Common thread**: every supervised algorithm defines a function class $\mathcal{H}$, a loss function, and an optimization method.
 
 This is exactly what Lecture 2 will formalize: **Metric, Loss, Optimization**.
 
@@ -142,9 +142,9 @@ This is exactly what Lecture 2 will formalize: **Metric, Loss, Optimization**.
 
 ### Unsupervised Learning
 
-Given unlabeled data \(\{\mathbf{x}_i\}_{i=1}^{N}\), discover hidden structure.
+Given unlabeled data $\{\mathbf{x}_i\}_{i=1}^{N}$, discover hidden structure.
 
-No labels \(y\) — the model must find patterns on its own.
+No labels $y$ — the model must find patterns on its own.
 
 **Clustering**: group similar samples
 
@@ -154,7 +154,7 @@ Customer segmentation:
 - Group B: middle-age, high income, occasional buyer
 - Group C: …
 **Dimensionality Reduction**: compress features
-1000-dimensional gene expression \(\to\) 2D visualization
+1000-dimensional gene expression $\to$ 2D visualization
 Preserve the most informative structure.
 
 ---
@@ -165,10 +165,10 @@ Preserve the most informative structure.
 |------|------|------|
 | **K-Means** | Clustering | Iterate: assign points to nearest centroid, update centroids |
 | **PCA** | Dim. Reduction | Find directions of maximum variance via eigendecomposition |
-| **Autoencoder** | Dim. Reduction | Neural network: compress \(\mathbf{x} \to \mathbf{z} \to \hat{\mathbf{x}}\) |
+| **Autoencoder** | Dim. Reduction | Neural network: compress $\mathbf{x} \to \mathbf{z} \to \hat{\mathbf{x}}$ |
 | **GMM** | Clustering | Model data as mixture of Gaussians, fit with EM algorithm |
 
-**Key insight**: unsupervised learning estimates \(P(\mathbf{x})\) or its structure. K-Means implicitly assumes \(P(\mathbf{x})\) is a mixture of spherical clusters; GMM explicitly models it as \(\sum_k \pi_k \mathcal{N}(\boldsymbol{\mu}_k, \boldsymbol{\Sigma}_k)\).
+**Key insight**: unsupervised learning estimates $P(\mathbf{x})$ or its structure. K-Means implicitly assumes $P(\mathbf{x})$ is a mixture of spherical clusters; GMM explicitly models it as $\sum_k \pi_k \mathcal{N}(\boldsymbol{\mu}_k, \boldsymbol{\Sigma}_k)$.
 
 ---
 
@@ -182,21 +182,21 @@ An **agent** interacts with an **environment**, takes **actions**, receives **re
 
 **Agent-Environment Loop**:
 
-1. Agent observes state \(s_t\)
-2. Agent chooses action \(a_t\) via policy \(\pi(a \mid s)\)
-3. Environment returns reward \(r_t\) and new state \(s_{t+1}\)
+1. Agent observes state $s_t$
+2. Agent chooses action $a_t$ via policy $\pi(a \mid s)$
+3. Environment returns reward $r_t$ and new state $s_{t+1}$
 4. Repeat — goal: maximize cumulative reward
 **Key concepts**:
 
 | Concept | Meaning |
 |------|------|
-| **State** \(s\) | Current situation |
-| **Action** \(a\) | What the agent does |
-| **Reward** \(r\) | Feedback signal |
-| **Policy** \(\pi(a \mid s)\) | Strategy: state \(\to\) action |
-| **Value** \(V(s)\) | Expected future reward from state \(s\) |
+| **State** $s$ | Current situation |
+| **Action** $a$ | What the agent does |
+| **Reward** $r$ | Feedback signal |
+| **Policy** $\pi(a \mid s)$ | Strategy: state $\to$ action |
+| **Value** $V(s)$ | Expected future reward from state $s$ |
 
-The agent learns a **policy** \(\pi\) that maximizes \(E\left[\sum_{t=0}^{\infty} \gamma^t r_t\right]\), where \(\gamma \in (0,1)\) discounts future rewards.
+The agent learns a **policy** $\pi$ that maximizes $E\left[\sum_{t=0}^{\infty} \gamma^t r_t\right]$, where $\gamma \in (0,1)$ discounts future rewards.
 
 ---
 
@@ -204,9 +204,9 @@ The agent learns a **policy** \(\pi\) that maximizes \(E\left[\sum_{t=0}^{\infty
 
 | Algorithm | Type | Idea |
 |------|------|------|
-| **Q-Learning** | Value-based | Learn \(Q(s, a)\) = expected reward; act greedily: \(a = \arg\max_a Q(s, a)\) |
+| **Q-Learning** | Value-based | Learn $Q(s, a)$ = expected reward; act greedily: $a = \arg\max_a Q(s, a)$ |
 | **DQN** | Value-based | Q-Learning with neural network as function approximator |
-| **Policy Gradient** | Policy-based | Directly optimize \(\pi(a \mid s)\) by gradient ascent on expected reward |
+| **Policy Gradient** | Policy-based | Directly optimize $\pi(a \mid s)$ by gradient ascent on expected reward |
 | **PPO** | Policy-based | Stable policy gradient with clipped objective |
 
 **Famous applications**:
@@ -239,7 +239,7 @@ graph LR
 
 | Set | Purpose | Analogy |
 |------|------|------|
-| **Training set** (~70%) | Learn model parameters \(\mathbf{w}\) | Study material |
+| **Training set** (~70%) | Learn model parameters $\mathbf{w}$ | Study material |
 | **Validation set** (~15%) | Tune hyperparameters, select model | Practice exam |
 | **Test set** (~15%) | Final unbiased evaluation | Final exam |
 
@@ -252,18 +252,18 @@ graph LR
 **Training** (learning phase)
 
 - Input: training data + loss function + optimizer
-- Process: iteratively update \(\mathbf{w}\) to minimize loss
-- Output: learned parameters \(\mathbf{w}^*\)
+- Process: iteratively update $\mathbf{w}$ to minimize loss
+- Output: learned parameters $\mathbf{w}^*$
 
 $$\mathbf{w}^* = \arg\min_{\mathbf{w}} \frac{1}{N}\sum_{i=1}^{N} L(f(\mathbf{x}_i; \mathbf{w}), y_i)$$
 
 **Inference** (prediction phase)
 
-- Input: new unseen data \(\mathbf{x}_{\text{new}}\)
+- Input: new unseen data $\mathbf{x}_{\text{new}}$
 - Process: forward pass through trained model
-- Output: prediction \(\hat{y} = f(\mathbf{x}_{\text{new}}; \mathbf{w}^*)\)
+- Output: prediction $\hat{y} = f(\mathbf{x}_{\text{new}}; \mathbf{w}^*)$
 No gradient computation, no weight updates.
-This equation — \(\arg\min_{\mathbf{w}} \sum L(\cdot)\) — is exactly what Lecture 2 will dissect: **Loss** defines what to minimize, **Optimization** defines how to minimize it.
+This equation — $\arg\min_{\mathbf{w}} \sum L(\cdot)$ — is exactly what Lecture 2 will dissect: **Loss** defines what to minimize, **Optimization** defines how to minimize it.
 
 ---
 
@@ -275,20 +275,20 @@ This equation — \(\arg\min_{\mathbf{w}} \sum L(\cdot)\) — is exactly what Le
 
 | Term | Symbol | Meaning |
 |------|------|------|
-| **Feature** | \(\mathbf{x} = [x_1, \ldots, x_d]^T\) | Input variables describing a sample |
-| **Label** | \(y\) | Target output (supervised learning only) |
-| **Sample** | \((\mathbf{x}_i, y_i)\) | One data point |
-| **Dataset** | \(\mathcal{D} = \{(\mathbf{x}_i, y_i)\}_{i=1}^N\) | Collection of \(N\) samples |
-| **Model** | \(f(\mathbf{x}; \mathbf{w})\) | Function parameterized by \(\mathbf{w}\) |
-| **Parameters** | \(\mathbf{w}\) | Learned from data (weights, biases) |
+| **Feature** | $\mathbf{x} = [x_1, \ldots, x_d]^T$ | Input variables describing a sample |
+| **Label** | $y$ | Target output (supervised learning only) |
+| **Sample** | $(\mathbf{x}_i, y_i)$ | One data point |
+| **Dataset** | $\mathcal{D} = \{(\mathbf{x}_i, y_i)\}_{i=1}^N$ | Collection of $N$ samples |
+| **Model** | $f(\mathbf{x}; \mathbf{w})$ | Function parameterized by $\mathbf{w}$ |
+| **Parameters** | $\mathbf{w}$ | Learned from data (weights, biases) |
 | **Hyperparameters** | — | Set before training (learning rate, layers, etc.) |
 
 **Example**: image classification
 
-- \(\mathbf{x}\): pixel values of an image (e.g., $224 \times 224 \times 3$)
-- \(y\): class label (e.g., "cat" = 0, "dog" = 1)
-- \(\mathbf{w}\): millions of weights in a CNN
-- hyperparameters: learning rate \(\eta\), number of layers, batch size
+- $\mathbf{x}$: pixel values of an image (e.g., $224 \times 224 \times 3$)
+- $y$: class label (e.g., "cat" = 0, "dog" = 1)
+- $\mathbf{w}$: millions of weights in a CNN
+- hyperparameters: learning rate $\eta$, number of layers, batch size
 
 ---
 
@@ -311,11 +311,11 @@ Model is too **complex** — memorizes noise.
 - Low bias, high variance
 - Great on training, poor on test data
 Example: high-degree polynomial fitting every point.
-**Model complexity** \(\longrightarrow\)
+**Model complexity** $\longrightarrow$
 
 | Underfitting | Sweet spot | Overfitting |
 |---|---|---|
-| \(\leftarrow\) too simple | **just right** | too complex \(\rightarrow\) |
+| $\leftarrow$ too simple | **just right** | too complex $\rightarrow$ |
 
 ---
 
@@ -335,7 +335,7 @@ This is the ultimate goal of machine learning — not to memorize training data,
 | Strategy | How it helps |
 |------|------|
 | More training data | Harder to memorize, forces learning real patterns |
-| Regularization (L1, L2) | Penalize complex models, prefer simpler \(f\) |
+| Regularization (L1, L2) | Penalize complex models, prefer simpler $f$ |
 | Cross-validation | Better estimate of test performance |
 | Early stopping | Stop training before overfitting kicks in |
 
@@ -370,14 +370,14 @@ This tradeoff is why we need a principled way to measure error — which brings 
 
 ### What is ML?
 
-- Learn a function \(f\) from data
-- Data + Output \(\to\) Model
+- Learn a function $f$ from data
+- Data + Output $\to$ Model
 - Replace hand-crafted rules
 
 ### Learning Paradigms
 
-- **Supervised**: learn from \((\mathbf{x}, y)\) pairs
-- **Unsupervised**: discover structure in \(\mathbf{x}\)
+- **Supervised**: learn from $(\mathbf{x}, y)$ pairs
+- **Unsupervised**: discover structure in $\mathbf{x}$
 - **Reinforcement**: learn from reward signals
 
 ### Key Concepts
@@ -391,12 +391,12 @@ This tradeoff is why we need a principled way to measure error — which brings 
 
 ### What's Next: Lecture 2
 
-We now know **what** ML does — learn \(f\) from data.
+We now know **what** ML does — learn $f$ from data.
 
 But two questions remain:
 
-1. **How to measure how good \(f\) is?** \(\to\) **Loss function** \(L(\hat{y}, y)\)
-2. **How to find the best \(f\)?** \(\to\) **Optimization** (gradient descent and beyond)
+1. **How to measure how good $f$ is?** $\to$ **Loss function** $L(\hat{y}, y)$
+2. **How to find the best $f$?** $\to$ **Optimization** (gradient descent and beyond)
 **Lecture 2: Metric, Loss, and Optimization**
 - How to define what "good" means (metrics)
 - How to turn "good" into a differentiable objective (loss)

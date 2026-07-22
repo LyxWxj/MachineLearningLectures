@@ -10,9 +10,9 @@ This slides cover three core topics, from inference with discrete latent states 
 
 | Topic | Model | Latent State Type | Inference Method |
 |------|------|-----------|----------|
-| **Hidden Markov Model (HMM)** | Discrete states + Gaussian observations | Discrete (\(s_t \in \{0,1\}\)) | Forward Inference |
-| **Kalman Filter (1D)** | Continuous states + Gaussian observations | Continuous (\(s_t \in \mathbb{R}\)) | Bayesian Update |
-| **Kalman Filter (2D)** | Multi-dimensional states + smoothing | Continuous (\(s_t \in \mathbb{R}^n\)) | Filtering + Smoothing + EM |
+| **Hidden Markov Model (HMM)** | Discrete states + Gaussian observations | Discrete ($s_t \in \{0,1\}$) | Forward Inference |
+| **Kalman Filter (1D)** | Continuous states + Gaussian observations | Continuous ($s_t \in \mathbb{R}$) | Bayesian Update |
+| **Kalman Filter (2D)** | Multi-dimensional states + smoothing | Continuous ($s_t \in \mathbb{R}^n$) | Filtering + Smoothing + EM |
 
 **Core idea**: We cannot directly observe the hidden states; we can only infer them through noisy measurements. Bayesian inference is the unified framework.
 
@@ -28,19 +28,19 @@ This slides cover three core topics, from inference with discrete latent states 
 
 $$p(s_t | s_{t-1}, s_{t-2}, \ldots, s_1) = p(s_t | s_{t-1})$$
 
-**Markov Chain**: A sequence of states \(\{s_1, s_2, \ldots, s_T\}\) that satisfies the Markov property
+**Markov Chain**: A sequence of states $\{s_1, s_2, \ldots, s_T\}$ that satisfies the Markov property
 
 ```
 s_1 → s_2 → s_3 → ... → s_T
 ```
 
-**Transition Matrix** \(D\): Describes the transition probabilities between states
+**Transition Matrix** $D$: Describes the transition probabilities between states
 
 $$D = \begin{bmatrix} p(s_t=+1|s_{t-1}=+1) & p(s_t=-1|s_{t-1}=+1) \\ p(s_t=+1|s_{t-1}=-1) & p(s_t=-1|s_{t-1}=-1) \end{bmatrix}$$
 
-**State Update**: \(P_t = P_{t-1} D\), where \(P_t = [p(s_t=+1), p(s_t=-1)]\)
+**State Update**: $P_t = P_{t-1} D$, where $P_t = [p(s_t=+1), p(s_t=-1)]$
 
-\(P_{t-1} =[p(s_{t-1}=1),p(s_{t-1}=-1)]\)
+$P_{t-1} =[p(s_{t-1}=1),p(s_{t-1}=-1)]$
 
 ---
 
@@ -58,14 +58,14 @@ Observations:    m_1    m_2    m_3    ...   m_T
 
 | Component | Mathematical Description | Meaning |
 |------|---------|------|
-| **State Transition** | \(p(s_t \| s_{t-1})\) | How states change over time |
-| **Observation Model** | \(p(m_t \| s_t)\) | How states generate observations |
+| **State Transition** | $p(s_t \| s_{t-1})$ | How states change over time |
+| **Observation Model** | $p(m_t \| s_t)$ | How states generate observations |
 
 **Binary HMM Example**:
 
-- Hidden states: \(s_t \in \{+1, -1\}\) (e.g., fish school on left/right)
-- Transition probability: \(p_{\text{switch}}\) (switching probability)
-- Observations: \(m_t | s_t \sim \mathcal{N}(\mu_{s_t}, \sigma^2)\)
+- Hidden states: $s_t \in \{+1, -1\}$ (e.g., fish school on left/right)
+- Transition probability: $p_{\text{switch}}$ (switching probability)
+- Observations: $m_t | s_t \sim \mathcal{N}(\mu_{s_t}, \sigma^2)$
 
 ---
 
@@ -131,7 +131,7 @@ def simulate_prediction_only(model, nstep):
 
 ### Forward Inference
 
-Given an observation sequence \(m_{1:t}\), infer the current hidden state \(s_t\).
+Given an observation sequence $m_{1:t}$, infer the current hidden state $s_t$.
 
 **Recursive Bayesian inference**, with two operations at each step:
 
@@ -139,7 +139,7 @@ Given an observation sequence \(m_{1:t}\), infer the current hidden state \(s_t\
 
 $$\text{today's prior} = p(s_t | m_{1:t-1}) = p(s_{t-1} | m_{1:t-1}) \cdot D$$
 
-**2. Update**: Combine the new observation \(m_t\) to compute the posterior
+**2. Update**: Combine the new observation $m_t$ to compute the posterior
 
 $$\text{posterior} \propto \text{prior} \times \text{likelihood} = p(m_t | s_t) \cdot p(s_t | m_{1:t-1})$$
 
@@ -237,14 +237,14 @@ Core assumption: All distributions are **Gaussian** → mathematically solvable 
 
 $$s_t = D \cdot s_{t-1} + w_t, \quad w_t \sim \mathcal{N}(0, \sigma_p^2)$$
 
-- \(D\): Dynamics parameter (how states evolve)
-- \(w_t\): Process noise (uncertainty in dynamics)
+- $D$: Dynamics parameter (how states evolve)
+- $w_t$: Process noise (uncertainty in dynamics)
 
 **Observation Equation** (Measurement Model):
 
 $$m_t = s_t + \eta_t, \quad \eta_t \sim \mathcal{N}(0, \sigma_m^2)$$
 
-- \(\eta_t\): Measurement noise (sensor uncertainty)
+- $\eta_t$: Measurement noise (sensor uncertainty)
 
 **Complete Model**:
 
@@ -276,7 +276,7 @@ $$\frac{1}{\sigma_{\text{post}}^2} = \frac{1}{\sigma_{\text{prior}}^2} + \frac{1
 
 $$\mu_{\text{post}} = g_{\text{prior}} \cdot \mu_{\text{prior}} + g_{\text{likelihood}} \cdot m_t$$
 
-where \(g = \frac{\text{information}}{\text{total information}}\) is the information weight
+where $g = \frac{\text{information}}{\text{total information}}$ is the information weight
 
 ---
 
@@ -300,7 +300,7 @@ $$K = \frac{\sigma_{\text{prior}}^2}{\sigma_{\text{prior}}^2 + \sigma_m^2}$$
 
 $$\mu_{\text{post}} = \mu_{\text{prior}} + K(m_t - \mu_{\text{prior}})$$
 
-\(K\) close to 1 → trust measurement; \(K\) close to 0 → trust prediction
+$K$ close to 1 → trust measurement; $K$ close to 0 → trust prediction
 
 ---
 
@@ -339,15 +339,15 @@ Each new observation reduces uncertainty.
 
 **2. Steady-state variance**
 
-As \(t \to \infty\), the posterior variance converges to:
+As $t \to \infty$, the posterior variance converges to:
 
 $$\sigma_{\infty}^2 = \frac{\sigma_p^2}{1-D^2} \cdot \frac{1}{\text{SNR}+1}$$
 
-where \(\text{SNR} = \sigma_p^2 / \sigma_m^2\) is the signal-to-noise ratio
+where $\text{SNR} = \sigma_p^2 / \sigma_m^2$ is the signal-to-noise ratio
 
 **3. Estimation error matches posterior variance**
 
-The distribution of the estimation error \(\hat{s}_t - s_t\) matches the posterior distribution \(\mathcal{N}(0, \sigma_t^2)\)!
+The distribution of the estimation error $\hat{s}_t - s_t$ matches the posterior distribution $\mathcal{N}(0, \sigma_t^2)$!
 
 **4. Online algorithm**
 
@@ -357,23 +357,23 @@ Uses only past data and can run in real-time.
 
 ### Factors Affecting Kalman Filter Performance
 
-**Dynamics parameter \(D\)**:
+**Dynamics parameter $D$**:
 
-- \(|D| < 1\): Stable system, states decay to 0
-- \(|D| = 1\): Random walk
-- \(|D| > 1\): Unstable system, states diverge
+- $|D| < 1$: Stable system, states decay to 0
+- $|D| = 1$: Random walk
+- $|D| > 1$: Unstable system, states diverge
 
-**Process noise \(\sigma_p\)**:
+**Process noise $\sigma_p$**:
 
 - Large → fast state changes → uncertain predictions → rely more on measurements
 - Small → slow state changes → accurate predictions → rely more on prior
 
-**Measurement noise \(\sigma_m\)**:
+**Measurement noise $\sigma_m$**:
 
 - Large → unreliable measurements → rely more on predictions
 - Small → reliable measurements → rely more on observations
 
-**Signal-to-noise ratio SNR = \(\sigma_p^2 / \sigma_m^2\)**:
+**Signal-to-noise ratio SNR = $\sigma_p^2 / \sigma_m^2$**:
 
 - High SNR → good filtering performance
 - Low SNR → more time needed for accurate localization
@@ -415,10 +415,10 @@ $$\mathbf{m}_t = H \mathbf{s}_t + \boldsymbol{\eta}_t, \quad \boldsymbol{\eta}_t
 
 | Symbol | Name | Dimension | Meaning |
 |------|------|------|------|
-| \(D\) | State transition matrix | \(n \times n\) | How states evolve |
-| \(Q\) | Process noise covariance | \(n \times n\) | Dynamics uncertainty |
-| \(H\) | Observation matrix | \(m \times n\) | How states map to observations |
-| \(R\) | Observation noise covariance | \(m \times m\) | Measurement uncertainty |
+| $D$ | State transition matrix | $n \times n$ | How states evolve |
+| $Q$ | Process noise covariance | $n \times n$ | Dynamics uncertainty |
+| $H$ | Observation matrix | $m \times n$ | How states map to observations |
+| $R$ | Observation noise covariance | $m \times m$ | Measurement uncertainty |
 
 ---
 
@@ -435,7 +435,7 @@ $$\hat{\Sigma}_t^{\text{pred}} = D \hat{\Sigma}_{t-1} D^\top + Q$$
 **Intuition**:
 
 - Mean propagates through the dynamics matrix
-- Covariance is scaled by \(D\) and augmented by process noise
+- Covariance is scaled by $D$ and augmented by process noise
 
 ---
 
@@ -453,9 +453,9 @@ $$\hat{\mu}_t^{\text{filter}} = \hat{\mu}_t^{\text{pred}} + K_t (\mathbf{m}_t - 
 
 $$\hat{\Sigma}_t^{\text{filter}} = (I - K_t H) \hat{\Sigma}_t^{\text{pred}}$$
 
-**Innovation** \(\mathbf{m}_t - H \hat{\mu}_t^{\text{pred}}\): The difference between actual observation and predicted observation
+**Innovation** $\mathbf{m}_t - H \hat{\mu}_t^{\text{pred}}$: The difference between actual observation and predicted observation
 
-\(K_t\) determines how to trade off between prediction and observation
+$K_t$ determines how to trade off between prediction and observation
 
 ---
 
@@ -500,7 +500,7 @@ $$\hat{\Sigma}_t^{\text{smooth}} = \hat{\Sigma}_t^{\text{filter}} + J_t (\hat{\S
 
 $$J_t = \hat{\Sigma}_t^{\text{filter}} D^\top P_t^{-1}$$
 
-where \(P_t = D \hat{\Sigma}_t^{\text{filter}} D^\top + Q\) is the predicted covariance at time \(t+1\)
+where $P_t = D \hat{\Sigma}_t^{\text{filter}} D^\top + Q$ is the predicted covariance at time $t+1$
 
 ---
 
@@ -508,8 +508,8 @@ where \(P_t = D \hat{\Sigma}_t^{\text{filter}} D^\top + Q\) is the predicted cov
 
 | | Filtering | Smoothing |
 |---|---|---|
-| **Data Used** | \(m_{1:t}\) (past) | \(m_{1:T}\) (all) |
-| **Direction** | Forward (\(t=0 \to T\)) | Backward (\(t=T \to 0\)) |
+| **Data Used** | $m_{1:t}$ (past) | $m_{1:T}$ (all) |
+| **Direction** | Forward ($t=0 \to T$) | Backward ($t=T \to 0$) |
 | **Real-time** | Can run online | Requires batch processing |
 | **Accuracy** | Lower | Higher |
 | **MSE** | Larger | Smaller |
@@ -526,7 +526,7 @@ print(f"Smoothing MSE: {np.mean((state - smoothed_state_means)**2):.3f}")
 
 ### Parameter Learning: EM Algorithm
 
-When we don't know the system parameters \(D, Q, H, R\), we need to learn them from data.
+When we don't know the system parameters $D, Q, H, R$, we need to learn them from data.
 
 **Expectation-Maximization (EM) Algorithm**:
 
@@ -609,9 +609,9 @@ $$\mu_t^{\text{filter}} = \mu_t^{\text{pred}} + K_t (m_t - H\mu_t^{\text{pred}})
 
 | Extension | Problem | Method |
 |------|------|------|
-| Nonlinear dynamics | \(s_t = f(s_{t-1}) + w_t\) | Extended Kalman Filter (EKF) |
+| Nonlinear dynamics | $s_t = f(s_{t-1}) + w_t$ | Extended Kalman Filter (EKF) |
 | Non-Gaussian noise | Heavy-tailed distributions | Particle Filter |
-| Continuous time | \(ds = f(s)dt + \sigma dW\) | Kalman-Bucy Filter |
-| Unknown parameters | \(D, Q, R\) unknown | EM Algorithm |
+| Continuous time | $ds = f(s)dt + \sigma dW$ | Kalman-Bucy Filter |
+| Unknown parameters | $D, Q, R$ unknown | EM Algorithm |
 
 ---

@@ -74,9 +74,9 @@ ISI distributions are typically right-skewed — many short intervals, few long 
 
 Build a simple neuron model and compare its output to real data:
 
-**Linear IF**: \(dV = \alpha \cdot I\), threshold at 1, reset to 0
+**Linear IF**: $dV = \alpha \cdot I$, threshold at 1, reset to 0
 
-**Leaky IF**: \(dV = -\beta V + \alpha \cdot I\) (adds leakage)
+**Leaky IF**: $dV = -\beta V + \alpha \cdot I$ (adds leakage)
 
 **Input**: Poisson spikes — `exc = scipy.stats.poisson.rvs(lambda_exc, size=T)`
 
@@ -97,12 +97,12 @@ for i in range(1, T):
 
 **Shannon entropy**: measures uncertainty in a distribution:
 
-\(H(X) = -\sum_x p(x) \log_2 p(x) \quad \text{(bits)}\)
+$H(X) = -\sum_x p(x) \log_2 p(x) \quad \text{(bits)}$
 
 | Distribution | Entropy |
 | ------------ | ------- |
 | Deterministic (always same value) | 0 bits |
-| Uniform over \(N\) values | \(\log_2 N\) bits |
+| Uniform over $N$ values | $\log_2 N$ bits |
 | Exponential | Maximum for fixed mean |
 
 **Key insight**: exponential ISI distributions maximize entropy for a fixed mean firing rate — they encode the most information per spike for a given energy budget.
@@ -124,7 +124,7 @@ def entropy(pmf):
 
 ### Linear Regression with MSE
 
-The simplest model fitting problem: find the slope \(\theta\) that best fits \(y = \theta x + \epsilon\).
+The simplest model fitting problem: find the slope $\theta$ that best fits $y = \theta x + \epsilon$.
 
 **Mean Squared Error** (objective function):
 
@@ -148,13 +148,13 @@ def mse(x, y, theta):
 
 ### Visual: Fitting a Line to Data
 
-Red line = \(\hat{\theta}\) from the normal equation. It minimizes the sum of squared vertical distances from each blue dot to the line.
+Red line = $\hat{\theta}$ from the normal equation. It minimizes the sum of squared vertical distances from each blue dot to the line.
 
 ---
 
 ### Data as Vectors
 
-Each scatter point is one \((x_i, y_i)\) pair. Collect all points into vectors:
+Each scatter point is one $(x_i, y_i)$ pair. Collect all points into vectors:
 
 $$\mathbf{x} = \begin{bmatrix} x_1 \\ x_2 \\ \vdots \\ x_N \end{bmatrix}, \quad \mathbf{y} = \begin{bmatrix} y_1 \\ y_2 \\ \vdots \\ y_N \end{bmatrix}$$
 
@@ -179,17 +179,17 @@ mse = np.mean(residuals**2)                 # mean squared error
 
 | Symbol | Shape | Meaning |
 | ------ | ----- | ------- |
-| \(\mathbf{x}\) | \((N,)\) | input features |
-| \(\mathbf{y}\) | \((N,)\) | observed targets |
-| \(\hat{\theta}\) | scalar | fitted slope |
-| \(\hat{\mathbf{y}} = \hat{\theta}\mathbf{x}\) | \((N,)\) | predictions (on the line) |
-| \(\mathbf{y} - \hat{\mathbf{y}}\) | \((N,)\) | residuals (errors) |
+| $\mathbf{x}$ | $(N,)$ | input features |
+| $\mathbf{y}$ | $(N,)$ | observed targets |
+| $\hat{\theta}$ | scalar | fitted slope |
+| $\hat{\mathbf{y}} = \hat{\theta}\mathbf{x}$ | $(N,)$ | predictions (on the line) |
+| $\mathbf{y} - \hat{\mathbf{y}}$ | $(N,)$ | residuals (errors) |
 
 ---
 
 ### Linear Regression with MLE
 
-Same problem, probabilistic perspective: assume \(y_i \sim \mathcal{N}(\theta x_i, \sigma^2)\).
+Same problem, probabilistic perspective: assume $y_i \sim \mathcal{N}(\theta x_i, \sigma^2)$.
 
 **Likelihood**:
 
@@ -199,7 +199,7 @@ $$L(\theta) = \prod_{i=1}^N \frac{1}{\sqrt{2\pi\sigma^2}} \exp\!\left(-\frac{(y_
 
 $$\log L(\theta) = -\frac{N}{2}\log(2\pi\sigma^2) - \frac{1}{2\sigma^2}\sum_{i=1}^N (y_i - \theta x_i)^2$$
 
-**Key result**: maximizing log-likelihood \(\Leftrightarrow\) minimizing MSE. They give the same \(\hat{\theta}\)!
+**Key result**: maximizing log-likelihood $\Leftrightarrow$ minimizing MSE. They give the same $\hat{\theta}$!
 
 The probabilistic view adds the ability to compute confidence intervals and do Bayesian inference.
 
@@ -213,19 +213,19 @@ def likelihood(theta, x, y):
 
 ### From Deterministic to Probabilistic
 
-**MSE view**: \(y = \theta x + \epsilon\), noise is just a nuisance.
+**MSE view**: $y = \theta x + \epsilon$, noise is just a nuisance.
 
-**Probabilistic view**: noise is part of the model. Treat \(y\) as a **random variable**:
+**Probabilistic view**: noise is part of the model. Treat $y$ as a **random variable**:
 
 $$y \sim \mathcal{N}(\theta x,\; \sigma^2)$$
 
-This means: for a given \(x\) and \(\theta\), the response \(y\) is not deterministic — it follows a Gaussian distribution centered at \(\theta x\).
+This means: for a given $x$ and $\theta$, the response $y$ is not deterministic — it follows a Gaussian distribution centered at $\theta x$.
 
 $$p(y \mid x, \theta) = \frac{1}{\sqrt{2\pi\sigma^2}} \exp\!\left(-\frac{(y - \theta x)^2}{2\sigma^2}\right)$$
 
-**Why this matters**: instead of just finding one "best" \(\hat{\theta}\), we can now:
+**Why this matters**: instead of just finding one "best" $\hat{\theta}$, we can now:
 
-- Compute **how likely** each \(\hat{\theta}\) is given the data
+- Compute **how likely** each $\hat{\theta}$ is given the data
 - Build **confidence intervals**
 - Do **Bayesian inference**
 
@@ -233,13 +233,13 @@ $$p(y \mid x, \theta) = \frac{1}{\sqrt{2\pi\sigma^2}} \exp\!\left(-\frac{(y - \t
 
 ### Probabilistic Model: Geometric Interpretation
 
-For each \(x\) value, \(y\) is drawn from a Gaussian centered at \(\theta x\):
+For each $x$ value, $y$ is drawn from a Gaussian centered at $\theta x$:
 
-**At \(x = 3\)**: \(y \sim \mathcal{N}(3\theta, \sigma^2)\). The peak of the Gaussian is at $3\theta$.
+**At $x = 3$**: $y \sim \mathcal{N}(3\theta, \sigma^2)$. The peak of the Gaussian is at $3\theta$.
 
-**At \(x = 7\)**: \(y \sim \mathcal{N}(7\theta, \sigma^2)\). The peak shifts to $7\theta$.
+**At $x = 7$**: $y \sim \mathcal{N}(7\theta, \sigma^2)$. The peak shifts to $7\theta$.
 
-The Gaussian "tube" around the line \(y = \theta x\) represents the probability density of \(y\) at each \(x\). Points closer to the line are more likely; points far from the line are unlikely.
+The Gaussian "tube" around the line $y = \theta x$ represents the probability density of $y$ at each $x$. Points closer to the line are more likely; points far from the line are unlikely.
 
 **Code to generate data**:
 
@@ -256,11 +256,11 @@ y = theta_true * x + noise             # y ~ N(1.2x, 1)
 
 ### Single-Point Likelihood
 
-Given one data point \((x, y)\), the **likelihood** of parameter \(\hat{\theta}\) is:
+Given one data point $(x, y)$, the **likelihood** of parameter $\hat{\theta}$ is:
 
 $$\mathcal{L}(\hat{\theta} \mid x, y) = p(y \mid x, \hat{\theta}) = \frac{1}{\sqrt{2\pi}} \exp\!\left(-\frac{(y - \hat{\theta} x)^2}{2}\right)$$
 
-**Example**: \(x = 2.1\), \(y = 3.7\), test \(\hat{\theta} = 1.0\):
+**Example**: $x = 2.1$, $y = 3.7$, test $\hat{\theta} = 1.0$:
 
 $$\mathcal{L}(1.0 \mid 2.1, 3.7) = \frac{1}{\sqrt{2\pi}} \exp\!\left(-\frac{(3.7 - 1.0 \times 2.1)^2}{2}\right) = \frac{1}{\sqrt{2\pi}} e^{-1.28} \approx 0.11$$
 
@@ -272,35 +272,35 @@ def likelihood(theta_hat, x, y, sigma=1):
 likelihood(1.0, 2.1, 3.7)  # ≈ 0.113
 ```
 
-**Interpretation**: if \(\hat{\theta} = 1.0\), the probability of observing \(y = 3.7\) at \(x = 2.1\) is about 11.3%. Not very high — maybe \(\hat{\theta} = 1.0\) isn't the best fit?
+**Interpretation**: if $\hat{\theta} = 1.0$, the probability of observing $y = 3.7$ at $x = 2.1$ is about 11.3%. Not very high — maybe $\hat{\theta} = 1.0$ isn't the best fit?
 
 ---
 
 ### Joint Likelihood: From One Point to All Data
 
-We have \(N\) data points. Assuming noise is **independent** across observations:
+We have $N$ data points. Assuming noise is **independent** across observations:
 
 $$\mathcal{L}(\hat{\theta} \mid \mathbf{x}, \mathbf{y}) = \prod_{i=1}^N p(y_i \mid x_i, \hat{\theta}) = \prod_{i=1}^N \frac{1}{\sqrt{2\pi}} \exp\!\left(-\frac{(y_i - \hat{\theta} x_i)^2}{2}\right)$$
 
-**Problem**: multiplying \(N\) small probabilities → **numerical underflow**.
+**Problem**: multiplying $N$ small probabilities → **numerical underflow**.
 
-Example: \(N = 30\), each likelihood \(\approx 0.3\) → product \(\approx 0.3^{30} \approx 10^{-16}\), which rounds to zero.
+Example: $N = 30$, each likelihood $\approx 0.3$ → product $\approx 0.3^{30} \approx 10^{-16}$, which rounds to zero.
 
 **Solution**: take the log
 
 $$\log \mathcal{L}(\hat{\theta}) = \sum_{i=1}^N \log p(y_i \mid x_i, \hat{\theta}) = -\frac{N}{2}\log(2\pi) - \frac{1}{2}\sum_{i=1}^N (y_i - \hat{\theta} x_i)^2$$
 
-**Key property**: \(\log\) is monotonically increasing, so \(\arg\max \mathcal{L} = \arg\max \log \mathcal{L}\). The \(\hat{\theta}\) that maximizes the likelihood also maximizes the log-likelihood.
+**Key property**: $\log$ is monotonically increasing, so $\arg\max \mathcal{L} = \arg\max \log \mathcal{L}$. The $\hat{\theta}$ that maximizes the likelihood also maximizes the log-likelihood.
 
 ---
 
-### Comparing Different \(\hat{\theta}\) via Log-Likelihood
+### Comparing Different $\hat{\theta}$ via Log-Likelihood
 
-| \(\hat{\theta}\) | \(\log \mathcal{L}\) | Quality |
+| $\hat{\theta}$ | $\log \mathcal{L}$ | Quality |
 | --------------- | ------------------- | ------- |
-| 0.5             | \(-198.3\)            | Poor — line too flat |
-| 1.0             | \(-42.1\)             | Better — closer to truth |
-| 1.2 (true)      | \(-38.7\)             | Best — matches data generation |
+| 0.5             | $-198.3$            | Poor — line too flat |
+| 1.0             | $-42.1$             | Better — closer to truth |
+| 1.2 (true)      | $-38.7$             | Best — matches data generation |
 
 **Code**:
 
@@ -311,7 +311,7 @@ for th in theta_hats:
     print(f"theta={th}, log-likelihood={ll:.2f}")
 ```
 
-**Visual intuition**: for \(\hat{\theta} = 0.5\), the Gaussian "tube" is too flat — most data points are far from the center, giving low likelihood. For \(\hat{\theta} = 1.2\), the tube aligns with the data — high likelihood.
+**Visual intuition**: for $\hat{\theta} = 0.5$, the Gaussian "tube" is too flat — most data points are far from the center, giving low likelihood. For $\hat{\theta} = 1.2$, the tube aligns with the data — high likelihood.
 
 ---
 
@@ -323,11 +323,11 @@ $$\log \mathcal{L}(\theta) = -\frac{N}{2}\log(2\pi) - \frac{1}{2}\sum_{i=1}^N (y
 
 $$\frac{\partial \log \mathcal{L}}{\partial \theta} = \sum_{i=1}^N (y_i - \theta x_i) x_i = 0$$
 
-Expand: \(\sum x_i y_i - \theta \sum x_i^2 = 0\)
+Expand: $\sum x_i y_i - \theta \sum x_i^2 = 0$
 
 $$\boxed{\;\hat{\theta}_{\text{MLE}} = \frac{\sum x_i y_i}{\sum x_i^2} = \frac{\mathbf{x}^T \mathbf{y}}{\mathbf{x}^T \mathbf{x}}\;}$$
 
-**This is the same formula as MSE!** Minimizing MSE and maximizing likelihood give identical \(\hat{\theta}\) when the noise is Gaussian with constant variance.
+**This is the same formula as MSE!** Minimizing MSE and maximizing likelihood give identical $\hat{\theta}$ when the noise is Gaussian with constant variance.
 
 The probabilistic view doesn't change the answer — it changes what we can **do** with the answer (confidence intervals, Bayesian updates, model comparison).
 
@@ -337,32 +337,32 @@ The probabilistic view doesn't change the answer — it changes what we can **do
 
 | Symbol | Meaning |
 | ------ | ------- |
-| \(x\) | input (independent variable) |
-| \(y\) | response (dependent variable) |
-| \(\epsilon \sim \mathcal{N}(0, \sigma^2)\) | Gaussian noise |
-| \(\theta\) | true parameter |
-| \(\hat{\theta}\) | estimated parameter |
-| \(p(y \mid x, \theta)\) | probability of \(y\) given \(x\) and \(\theta\) |
-| \(\mathcal{L}(\theta \mid x, y)\) | likelihood of \(\theta\) given data \((x, y)\) |
-| \(\hat{\theta}_{\text{MLE}}\) | maximum likelihood estimate |
+| $x$ | input (independent variable) |
+| $y$ | response (dependent variable) |
+| $\epsilon \sim \mathcal{N}(0, \sigma^2)$ | Gaussian noise |
+| $\theta$ | true parameter |
+| $\hat{\theta}$ | estimated parameter |
+| $p(y \mid x, \theta)$ | probability of $y$ given $x$ and $\theta$ |
+| $\mathcal{L}(\theta \mid x, y)$ | likelihood of $\theta$ given data $(x, y)$ |
+| $\hat{\theta}_{\text{MLE}}$ | maximum likelihood estimate |
 
-**Key distinction**: \(p(y \mid x, \theta)\) and \(\mathcal{L}(\theta \mid x, y)\) use the **same formula** but ask different questions:
+**Key distinction**: $p(y \mid x, \theta)$ and $\mathcal{L}(\theta \mid x, y)$ use the **same formula** but ask different questions:
 
-- \(p(y \mid x, \theta)\): "how likely is \(y\)?" (data varies, \(\theta\) fixed)
-- \(\mathcal{L}(\theta \mid x, y)\): "how good is \(\hat{\theta}\)?" (\(\theta\) varies, data fixed)
+- $p(y \mid x, \theta)$: "how likely is $y$?" (data varies, $\theta$ fixed)
+- $\mathcal{L}(\theta \mid x, y)$: "how good is $\hat{\theta}$?" ($\theta$ varies, data fixed)
 
 ---
 
 ### Bootstrapping: Quantifying Uncertainty
 
-How confident are we in \(\hat{\theta}\)? **Bootstrapping** estimates uncertainty without distributional assumptions.
+How confident are we in $\hat{\theta}$? **Bootstrapping** estimates uncertainty without distributional assumptions.
 
 **Algorithm**:
 
-1. Resample \(N\) data points **with replacement** from the original dataset
-2. Compute \(\hat{\theta}\) on the resampled data
-3. Repeat \(B\) times (e.g., \(B = 2000\))
-4. The distribution of \(\hat{\theta}^*\) values estimates the sampling distribution
+1. Resample $N$ data points **with replacement** from the original dataset
+2. Compute $\hat{\theta}$ on the resampled data
+3. Repeat $B$ times (e.g., $B = 2000$)
+4. The distribution of $\hat{\theta}^*$ values estimates the sampling distribution
 **95% confidence interval**: the 2.5th and 97.5th percentiles of the bootstrap distribution.
 
 ```python
@@ -380,15 +380,15 @@ ci_95 = np.percentile(theta_boots, [2.5, 97.5])
 
 ### Multiple Linear Regression
 
-Generalize to multiple features: \(\mathbf{y} = X\boldsymbol{\theta} + \boldsymbol{\epsilon}\)
+Generalize to multiple features: $\mathbf{y} = X\boldsymbol{\theta} + \boldsymbol{\epsilon}$
 
-**Design matrix** \(X\): each row is one observation, each column is one feature.
+**Design matrix** $X$: each row is one observation, each column is one feature.
 
 **OLS estimator**:
 
 $$\hat{\boldsymbol{\theta}} = (X^T X)^{-1} X^T \mathbf{y}$$
 
-**Polynomial regression**: features are powers of \(x\)
+**Polynomial regression**: features are powers of $x$
 
 $$X = \begin{bmatrix} 1 & x_1 & x_1^2 \\ 1 & x_2 & x_2^2 \\ \vdots & \vdots & \vdots \end{bmatrix}$$
 
@@ -412,19 +412,19 @@ def ordinary_least_squares(X, y):
 
 ### From Linear to GLM
 
-Linear regression: \(\hat{y} = X\boldsymbol{\theta}\) — output is unbounded.
+Linear regression: $\hat{y} = X\boldsymbol{\theta}$ — output is unbounded.
 
 **Problem**: neural spike counts are non-negative integers. Firing rates are positive. Binary choices are 0/1.
 
-**Solution**: apply a **link function** \(g\) to transform the linear output:
+**Solution**: apply a **link function** $g$ to transform the linear output:
 
 $$g(\hat{y}) = X\boldsymbol{\theta} \quad \Leftrightarrow \quad \hat{y} = g^{-1}(X\boldsymbol{\theta})$$
 
-| Model           | Link function \(g\)   | Inverse \(g^{-1}\) | Output type         |
+| Model           | Link function $g$   | Inverse $g^{-1}$ | Output type         |
 | --------------- | ------------------- | ---------------- | ------------------- |
 | Linear-Gaussian | identity            | identity         | continuous          |
-| Poisson GLM     | \(\log\)              | \(\exp\)           | positive counts     |
-| Logistic        | \(\log\frac{p}{1-p}\) | sigmoid          | probability \([0,1]\) |
+| Poisson GLM     | $\log$              | $\exp$           | positive counts     |
+| Logistic        | $\log\frac{p}{1-p}$ | sigmoid          | probability $[0,1]$ |
 
 ---
 
@@ -432,20 +432,20 @@ $$g(\hat{y}) = X\boldsymbol{\theta} \quad \Leftrightarrow \quad \hat{y} = g^{-1}
 
 The design matrix organizes raw data into a format that the model can use.
 
-**Definition**: The design matrix \(\mathbf{X}\) is a \(T \times d\) matrix where each row is a **feature vector** for one time point, and each column is a feature.
+**Definition**: The design matrix $\mathbf{X}$ is a $T \times d$ matrix where each row is a **feature vector** for one time point, and each column is a feature.
 
-**In neuroscience**: We want to know "how do the stimuli over the past \(d\) time steps influence the current spike?" The design matrix arranges the past \(d\) stimulus values into a row:
+**In neuroscience**: We want to know "how do the stimuli over the past $d$ time steps influence the current spike?" The design matrix arranges the past $d$ stimulus values into a row:
 
 $$\mathbf{X} = \begin{bmatrix} \text{stim}[t_0 - d+1] & \cdots & \text{stim}[t_0 - 1] & \text{stim}[t_0] \\ \text{stim}[t_T - d+1] & \cdots & \text{stim}[t_T - 1] & \text{stim}[t_T] \end{bmatrix}$$
 
-**Zero-padding**: For the earliest time points, we don't have a full \(d\) history — pad with zeros:
+**Zero-padding**: For the earliest time points, we don't have a full $d$ history — pad with zeros:
 
 ```python
 padded_stim = np.concatenate([np.zeros(d - 1), stim])
 # padded_stim = [0, 0, ..., 0, stim[0], stim[1], ..., stim[T-1]]
 ```
 
-**Sliding window extraction**: For each time point \(t\), take a window of length \(d\) and reverse it:
+**Sliding window extraction**: For each time point $t$, take a window of length $d$ and reverse it:
 
 ```python
 for t in range(T):
@@ -456,24 +456,24 @@ for t in range(T):
 
 ### Key Concept: Observations
 
-Observations are the target variable \(\mathbf{y}\) we want to predict.
+Observations are the target variable $\mathbf{y}$ we want to predict.
 
 **In this experiment**:
 
 | Variable | Meaning | Shape |
 |----------|---------|-------|
-| \(\text{stim}[t]\) | Screen luminance (stimulus) at time \(t\) | \((T,)\) |
-| \(\text{spikes}[t]\) | Spike count (response) at time \(t\) | \((T,)\) |
-| \(\mathbf{X}[t]\) | Design matrix row (features) at time \(t\) | \((d,)\) |
+| $\text{stim}[t]$ | Screen luminance (stimulus) at time $t$ | $(T,)$ |
+| $\text{spikes}[t]$ | Spike count (response) at time $t$ | $(T,)$ |
+| $\mathbf{X}[t]$ | Design matrix row (features) at time $t$ | $(d,)$ |
 
 **Key insight**:
 
-- Each row of \(\mathbf{X}\) = "what happened over the past \(d\) time steps" (input features)
-- Each value of \(\mathbf{y}\) = "what happened now" (observation to predict)
+- Each row of $\mathbf{X}$ = "what happened over the past $d$ time steps" (input features)
+- Each value of $\mathbf{y}$ = "what happened now" (observation to predict)
 - The model learns: **what input feature patterns lead to what outputs**
 **Analogy**:
 
-| Prediction Task | Input \(\mathbf{X}\) | Output \(\mathbf{y}\) |
+| Prediction Task | Input $\mathbf{X}$ | Output $\mathbf{y}$ |
 |-----------------|---------------------|----------------------|
 | House price | Area, location, age… | Price |
 | Weather | Past 7 days of temp, humidity… | Tomorrow's temperature |
@@ -489,15 +489,15 @@ The Poisson distribution is the core tool for modeling **count data**.
 
 $$P(Y = k) = \frac{\lambda^k \cdot e^{-\lambda}}{k!}, \quad k = 0, 1, 2, \ldots$$
 
-where \(\lambda > 0\) is the **rate parameter** — the average number of events per unit time/space.
+where $\lambda > 0$ is the **rate parameter** — the average number of events per unit time/space.
 
 **Key properties**:
 
 | Property | Formula | Meaning |
 |----------|---------|---------|
-| Mean | \(\mathbb{E}[Y] = \lambda\) | Average count |
-| Variance | \(\text{Var}(Y) = \lambda\) | Variance equals mean |
-| Support | \(k \in \{0, 1, 2, \ldots\}\) | Non-negative integers |
+| Mean | $\mathbb{E}[Y] = \lambda$ | Average count |
+| Variance | $\text{Var}(Y) = \lambda$ | Variance equals mean |
+| Support | $k \in \{0, 1, 2, \ldots\}$ | Non-negative integers |
 
 ---
 
@@ -526,7 +526,7 @@ The Poisson distribution applies when these conditions hold:
 
 - Spikes are non-negative integers (0, 1, 2, …)
 - Spikes are sparse (mostly 0)
-- Spike variance ≈ mean (\(\text{Var} \approx \text{mean}\))
+- Spike variance ≈ mean ($\text{Var} \approx \text{mean}$)
 - Spikes are approximately independent (over short timescales)
 **4. Shape of the Poisson distribution**
 
@@ -546,7 +546,7 @@ for lam in [1, 3, 5, 10]:
 
 The Linear-Nonlinear-Poisson (LNP) model is one of the most commonly used GLMs in neuroscience.
 
-**Goal**: Given the past \(d\) time bins of stimulus \(\mathbf{x}_t = [\text{stim}[t-d+1], \ldots, \text{stim}[t]]\), predict the spike count \(y_t\) at time \(t\).
+**Goal**: Given the past $d$ time bins of stimulus $\mathbf{x}_t = [\text{stim}[t-d+1], \ldots, \text{stim}[t]]$, predict the spike count $y_t$ at time $t$.
 
 **Step 1: Linear component**
 
@@ -554,9 +554,9 @@ Compute the weighted sum of stimulus and weights:
 
 $$z_t = \mathbf{x}_t^\top \boldsymbol{\theta} + b = \sum_{j=1}^{d} \theta_j \cdot \text{stim}[t-d+j] + b$$
 
-where \(\boldsymbol{\theta}\) is the temporal filter and \(b\) is the bias.
+where $\boldsymbol{\theta}$ is the temporal filter and $b$ is the bias.
 
-**Meaning**: \(z_t\) represents "the combined drive from the past \(d\) time bins of stimulus."
+**Meaning**: $z_t$ represents "the combined drive from the past $d$ time bins of stimulus."
 
 ---
 
@@ -570,9 +570,9 @@ $$\lambda_t = \exp(z_t) = \exp(\mathbf{x}_t^\top \boldsymbol{\theta} + b)$$
 
 | Problem | Solution |
 |---------|----------|
-| Linear output \(z_t\) can be negative | \(\exp(z_t) > 0\), guarantees positive rate |
-| Firing rate should increase with drive | \(\exp\) is monotonically increasing |
-| Small changes in drive produce multiplicative effects | \(\exp\) converts addition to multiplication |
+| Linear output $z_t$ can be negative | $\exp(z_t) > 0$, guarantees positive rate |
+| Firing rate should increase with drive | $\exp$ is monotonically increasing |
+| Small changes in drive produce multiplicative effects | $\exp$ converts addition to multiplication |
 
 ---
 
@@ -600,7 +600,7 @@ $$\mathcal{L}(\boldsymbol{\theta}) = \prod_{t=1}^{T} P(y_t \mid \mathbf{x}_t, \b
 
 $$\log \mathcal{L}(\boldsymbol{\theta}) = \sum_{t=1}^{T} \left[ y_t \log \lambda_t - \lambda_t - \log(y_t!) \right]$$
 
-Drop the constant term \(\log(y_t!)\) that does not depend on \(\boldsymbol{\theta}\):
+Drop the constant term $\log(y_t!)$ that does not depend on $\boldsymbol{\theta}$:
 
 $$\log \mathcal{L}(\boldsymbol{\theta}) = \sum_{t=1}^{T} \left[ y_t \log \lambda_t - \lambda_t \right]$$
 
@@ -610,11 +610,11 @@ $$\log \mathcal{L}(\boldsymbol{\theta}) = \sum_{t=1}^{T} \left[ y_t \log \lambda
 
 **Step 6: Matrix form**
 
-Substituting \(\lambda_t = \exp(\mathbf{x}_t^\top \boldsymbol{\theta})\), express in matrix notation:
+Substituting $\lambda_t = \exp(\mathbf{x}_t^\top \boldsymbol{\theta})$, express in matrix notation:
 
 $$\log \mathcal{L}(\boldsymbol{\theta}) = \mathbf{y}^\top \log(\boldsymbol{\lambda}) - \mathbf{1}^\top \boldsymbol{\lambda}$$
 
-where \(\boldsymbol{\lambda} = \exp(\mathbf{X}\boldsymbol{\theta})\).
+where $\boldsymbol{\lambda} = \exp(\mathbf{X}\boldsymbol{\theta})$.
 
 **Step 7: Negative log-likelihood (objective function)**
 
@@ -674,26 +674,26 @@ Raw Data
 
 | | LG (Linear-Gaussian) | LNP (Poisson) |
 |---|---|---|
-| **Prediction** | \(\hat{y} = X\theta\) | \(\hat{y} = \exp(X\theta)\) |
-| **Output range** | \((-\infty, +\infty)\) | \((0, +\infty)\) |
-| **Noise assumption** | Gaussian \(\epsilon \sim \mathcal{N}(0, \sigma^2)\) | Poisson \(y \sim \text{Poisson}(\lambda)\) |
-| **Fitting** | Closed-form \(\hat{\theta} = (X^TX)^{-1}X^Ty\) | Numerical optimization (no closed form) |
+| **Prediction** | $\hat{y} = X\theta$ | $\hat{y} = \exp(X\theta)$ |
+| **Output range** | $(-\infty, +\infty)$ | $(0, +\infty)$ |
+| **Noise assumption** | Gaussian $\epsilon \sim \mathcal{N}(0, \sigma^2)$ | Poisson $y \sim \text{Poisson}(\lambda)$ |
+| **Fitting** | Closed-form $\hat{\theta} = (X^TX)^{-1}X^Ty$ | Numerical optimization (no closed form) |
 | **Use case** | Continuous prediction | Non-negative integer counts |
 | **Neuroscience** | Stimulus filter estimation | Firing rate modeling |
 
 **Key differences**:
 
 - LG can predict **negative spikes** (unreasonable) ❌
-- LNP guarantees predictions are **always positive** via \(\exp\) ✅
+- LNP guarantees predictions are **always positive** via $\exp$ ✅
 - LNP better matches the **statistical properties** of spike data (counts, sparse, variance ≈ mean)
 
 ---
 
 ### Linear-Gaussian GLM: Spike Filtering
 
-Model: spike count \(y_t\) depends on the stimulus over the past \(d\) time steps.
+Model: spike count $y_t$ depends on the stimulus over the past $d$ time steps.
 
-**Design matrix**: each row contains the \(d\) preceding stimulus values
+**Design matrix**: each row contains the $d$ preceding stimulus values
 
 ```python
 def make_design_matrix(stim, d=25):
@@ -706,9 +706,9 @@ def make_design_matrix(stim, d=25):
     return X
 ```
 
-**Fitting**: same OLS formula \(\hat{\boldsymbol{\theta}} = (X^T X)^{-1} X^T \mathbf{y}\)
+**Fitting**: same OLS formula $\hat{\boldsymbol{\theta}} = (X^T X)^{-1} X^T \mathbf{y}$
 
-**Interpretation**: \(\hat{\boldsymbol{\theta}}\) is the **stimulus filter** — how the neuron integrates stimulus over time. Similar to the Spike-Triggered Average (STA).
+**Interpretation**: $\hat{\boldsymbol{\theta}}$ is the **stimulus filter** — how the neuron integrates stimulus over time. Similar to the Spike-Triggered Average (STA).
 
 ---
 
@@ -716,9 +716,9 @@ def make_design_matrix(stim, d=25):
 
 Spike counts are non-negative integers → use Poisson distribution.
 
-**Model**: \(y_t \sim \text{Poisson}(\lambda_t)\) where \(\lambda_t = \exp(\mathbf{x}_t^T \boldsymbol{\theta})\)
+**Model**: $y_t \sim \text{Poisson}(\lambda_t)$ where $\lambda_t = \exp(\mathbf{x}_t^T \boldsymbol{\theta})$
 
-The \(\exp\) ensures \(\lambda_t > 0\).
+The $\exp$ ensures $\lambda_t > 0$.
 
 **Log-likelihood**:
 
@@ -750,7 +750,7 @@ The previous models (LG, LNP) predict **continuous** or **count** outputs. But m
 | Firing rate | Positive real number | LNP GLM |
 | **Decision decoding** | **Binary (0 or 1)** | **Logistic regression** |
 
-**The problem**: Linear regression can predict probabilities outside \([0, 1]\). Poisson regression predicts counts, not probabilities.
+**The problem**: Linear regression can predict probabilities outside $[0, 1]$. Poisson regression predicts counts, not probabilities.
 
 **The solution**: Logistic regression — a GLM with a **sigmoid link function** and **Bernoulli noise model**.
 
@@ -764,31 +764,31 @@ The core idea: map a linear output to a probability using the **sigmoid** (logis
 
 $$\sigma(z) = \frac{1}{1 + e^{-z}}$$
 
-| \(z\)             | \(\sigma(z)\) | Interpretation              |
+| $z$             | $\sigma(z)$ | Interpretation              |
 | --------------- | ----------- | --------------------------- |
-| \(z \to -\infty\) | \(\to 0\)     | Strong evidence for class 0 |
-| \(z = 0\)         | \(= 0.5\)     | No evidence either way      |
-| \(z \to +\infty\) | \(\to 1\)     | Strong evidence for class 1 |
+| $z \to -\infty$ | $\to 0$     | Strong evidence for class 0 |
+| $z = 0$         | $= 0.5$     | No evidence either way      |
+| $z \to +\infty$ | $\to 1$     | Strong evidence for class 1 |
 
 ---
 
 **Key properties**:
 
-- Output is always in \((0, 1)\) — interpretable as probability
-- Monotonically increasing — larger \(z\) → higher probability of class 1
-- Symmetric: \(\sigma(-z) = 1 - \sigma(z)\)
-- Derivative has a nice form: \(\sigma'(z) = \sigma(z)(1 - \sigma(z))\)
-**In GLM terms**: the sigmoid is the **inverse link function** \(g^{-1}\):
+- Output is always in $(0, 1)$ — interpretable as probability
+- Monotonically increasing — larger $z$ → higher probability of class 1
+- Symmetric: $\sigma(-z) = 1 - \sigma(z)$
+- Derivative has a nice form: $\sigma'(z) = \sigma(z)(1 - \sigma(z))$
+**In GLM terms**: the sigmoid is the **inverse link function** $g^{-1}$:
 
 $$\underbrace{\sigma^{-1}(\hat{y})}_{\text{log-odds}} = \mathbf{x}^\top \boldsymbol{\theta} \quad \Leftrightarrow \quad \hat{y} = \sigma(\mathbf{x}^\top \boldsymbol{\theta})$$
 
-The link function \(g = \sigma^{-1}\) is the **logit** (log-odds): \(g(p) = \log \frac{p}{1-p}\).
+The link function $g = \sigma^{-1}$ is the **logit** (log-odds): $g(p) = \log \frac{p}{1-p}$.
 
 ---
 
 ### Logistic Regression: Bernoulli Likelihood
 
-The output \(y\) is binary (0 or 1), so we use the **Bernoulli distribution**.
+The output $y$ is binary (0 or 1), so we use the **Bernoulli distribution**.
 
 **Model**:
 
@@ -800,8 +800,8 @@ $$P(y_i \mid \hat{y}_i) = \hat{y}_i^{\,y_i} (1 - \hat{y}_i)^{1 - y_i}$$
 
 This is a compact way to write:
 
-- If \(y_i = 1\): probability = \(\hat{y}_i\)
-- If \(y_i = 0\): probability = $1 - \hat{y}_i$
+- If $y_i = 1$: probability = $\hat{y}_i$
+- If $y_i = 0$: probability = $1 - \hat{y}_i$
 **Log-likelihood for all data** (assuming independence):
 
 $$\log \mathcal{L}(\boldsymbol{\theta}) = \sum_{i=1}^N \left[ y_i \log \hat{y}_i + (1 - y_i) \log(1 - \hat{y}_i) \right]$$
@@ -830,13 +830,13 @@ A model that performs perfectly on training data but poorly on new data has **ov
 **When does it happen?**
 When the model has too much **capacity** relative to the amount of data. In neuroscience, this is extremely common:
 
-| Data type | Features (\(d\)) | Samples (\(N\)) | Ratio \(d/N\) |
+| Data type | Features ($d$) | Samples ($N$) | Ratio $d/N$ |
 |-----------|---------------|---------------|-------------|
 | Electrophysiology | ~100 neurons | ~50 trials | ~2 |
 | fMRI | ~10,000 voxels | ~200 trials | ~50 |
 | Calcium imaging | ~500 cells | ~100 time points | ~5 |
 
-When \(d > N\), overfitting is almost guaranteed.
+When $d > N$, overfitting is almost guaranteed.
 
 **Geometric intuition**: In 2D, a single data point can be fit by infinitely many lines. With more features than samples, there are infinitely many weight vectors that achieve zero training error — most of them are meaningless.
 
@@ -882,7 +882,7 @@ cv_scores = cross_val_score(model, X, y, cv=8)
 Regularization reduces overfitting by **constraining the model's freedom**.
 
 > **Intuition**
-> Instead of asking "find the best \(\boldsymbol{\theta}\)", we ask "find the best \(\boldsymbol{\theta}\) **that is small**".
+> Instead of asking "find the best $\boldsymbol{\theta}$", we ask "find the best $\boldsymbol{\theta}$ **that is small**".
 This adds a **penalty** for large weights to the objective function:
 
 $$\text{Objective} = \underbrace{-\log \mathcal{L}(\boldsymbol{\theta})}_{\text{fit the data}} + \underbrace{\Omega(\boldsymbol{\theta})}_{\text{penalty for complexity}}$$
@@ -909,7 +909,7 @@ Regularization **increases bias** (the model can't fit the true function perfect
 
 ---
 
-### \(L_2\) Regularization (Ridge)
+### $L_2$ Regularization (Ridge)
 
 Penalizes the **sum of squared** weights.
 
@@ -917,7 +917,7 @@ Penalizes the **sum of squared** weights.
 
 $$-\log \mathcal{L}'(\boldsymbol{\theta}) = -\log \mathcal{L}(\boldsymbol{\theta}) + \frac{\beta}{2} \sum_j \theta_j^2 = -\log \mathcal{L}(\boldsymbol{\theta}) + \frac{\beta}{2} \|\boldsymbol{\theta}\|_2^2$$
 
-where \(\beta > 0\) is the **regularization strength**.
+where $\beta > 0$ is the **regularization strength**.
 
 **Effect**: All weights are **shrunk toward zero**, but none are exactly zero.
 
@@ -926,11 +926,11 @@ No regularization:    θ = [18.3, -15.7, 12.1, -8.4, ...]   (large values)
 L2 regularization:    θ = [ 0.3,  -0.2,  0.1, -0.1, ...]   (small values)
 ```
 
-**Geometric intuition**: The \(L_2\) constraint region is a **circle** (in 2D) or **hypersphere** (in higher dimensions). The solution is where the likelihood contour first touches the circle — typically at a point where all coordinates are nonzero but small.
+**Geometric intuition**: The $L_2$ constraint region is a **circle** (in 2D) or **hypersphere** (in higher dimensions). The solution is where the likelihood contour first touches the circle — typically at a point where all coordinates are nonzero but small.
 
 ---
 
-### \(L_1\) Regularization (Lasso)
+### $L_1$ Regularization (Lasso)
 
 Penalizes the **sum of absolute** weights.
 
@@ -946,21 +946,21 @@ $$-\log \mathcal{L}'(\boldsymbol{\theta}) = -\log \mathcal{L}(\boldsymbol{\theta
 
 ### Covariance: What Does It Mean?
 
-Given two variables \(x\) and \(y\), **covariance** measures whether they tend to move together:
+Given two variables $x$ and $y$, **covariance** measures whether they tend to move together:
 
 $$\text{Cov}(x, y) = \frac{1}{N} \sum_{i=1}^N (x_i - \bar{x})(y_i - \bar{y})$$
 
 > **Intuition**
-> each term \((x_i - \bar{x})(y_i - \bar{y})\) asks:
+> each term $(x_i - \bar{x})(y_i - \bar{y})$ asks:
 - Both above mean? → **positive** contribution (they rise together)
 - Both below mean? → also **positive** (they fall together)
 - One above, one below? → **negative** (they move opposite)
 
 | Covariance       | Meaning                       | Example             |
 | ---------------- | ----------------------------- | ------------------- |
-| \(\text{Cov} > 0\) | positive — rise/fall together | height & weight     |
-| \(\text{Cov} = 0\) | no linear relationship        | shoe size & IQ      |
-| \(\text{Cov} < 0\) | negative — move opposite      | speed & travel time |
+| $\text{Cov} > 0$ | positive — rise/fall together | height & weight     |
+| $\text{Cov} = 0$ | no linear relationship        | shoe size & IQ      |
+| $\text{Cov} < 0$ | negative — move opposite      | speed & travel time |
 
 ---
 
@@ -980,21 +980,21 @@ Each scatter shows 200 samples from a 2D Gaussian with different covariance.
 
 ### From Covariance to Covariance Matrix
 
-For \(d\) features, the **covariance matrix** captures all pairwise covariances:
+For $d$ features, the **covariance matrix** captures all pairwise covariances:
 
 $$\Sigma = \begin{bmatrix} \text{Var}(x_1) & \text{Cov}(x_1, x_2) & \cdots & \text{Cov}(x_1, x_d) \\ \text{Cov}(x_2, x_1) & \text{Var}(x_2) & \cdots & \text{Cov}(x_2, x_d) \\ \vdots & \vdots & \ddots & \vdots \\ \text{Cov}(x_d, x_1) & \text{Cov}(x_d, x_2) & \cdots & \text{Var}(x_d) \end{bmatrix}$$
 
-**Matrix form** (after mean-centering \(\mathbf{X}\)):
+**Matrix form** (after mean-centering $\mathbf{X}$):
 
 $$\hat{\Sigma} = \frac{1}{N}\mathbf{X}^\top\mathbf{X}$$
 
-Each entry \(\hat{\Sigma}_{ij}\) tells you how feature \(i\) and feature \(j\) co-vary across all samples.
+Each entry $\hat{\Sigma}_{ij}$ tells you how feature $i$ and feature $j$ co-vary across all samples.
 
 **Properties**:
 
-- **Symmetric**: \(\Sigma_{ij} = \Sigma_{ji}\) (covariance is commutative)
-- **Diagonal** = variances: \(\Sigma_{ii} = \text{Var}(x_i) \geq 0\)
-- **Positive semi-definite**: all eigenvalues \(\lambda_i \geq 0\)
+- **Symmetric**: $\Sigma_{ij} = \Sigma_{ji}$ (covariance is commutative)
+- **Diagonal** = variances: $\Sigma_{ii} = \text{Var}(x_i) \geq 0$
+- **Positive semi-definite**: all eigenvalues $\lambda_i \geq 0$
 
 ---
 
@@ -1019,7 +1019,7 @@ The covariance matrix defines a **confidence ellipse** that shows the spread of 
 
 ![cov_ellipse.png](assets/cov_ellipse.png)
 
-**Key insight**: The eigenvectors of \(\Sigma\) are the **axes** of the ellipse; the eigenvalues are the **squared lengths** of those axes.
+**Key insight**: The eigenvectors of $\Sigma$ are the **axes** of the ellipse; the eigenvalues are the **squared lengths** of those axes.
 
 - **Long axis** = direction of maximum variance (1st eigenvector)
 - **Short axis** = direction of minimum variance (2nd eigenvector)
@@ -1037,9 +1037,9 @@ $$\text{Unit circle} \xrightarrow{\;\Sigma\;} \text{Data ellipse}$$
 
 $$\Sigma = V \Lambda V^\top$$
 
-where \(V = [\mathbf{v}_1 \mid \mathbf{v}_2]\) (eigenvectors) and \(\Lambda = \text{diag}(\lambda_1, \lambda_2)\) (eigenvalues).
+where $V = [\mathbf{v}_1 \mid \mathbf{v}_2]$ (eigenvectors) and $\Lambda = \text{diag}(\lambda_1, \lambda_2)$ (eigenvalues).
 
-**Physical analogy**: think of \(\Sigma\) as a **stress tensor** in mechanics:
+**Physical analogy**: think of $\Sigma$ as a **stress tensor** in mechanics:
 
 - Eigenvalues = principal stresses (how much pressure along each axis)
 - Eigenvectors = principal directions (which way the material stretches)
@@ -1049,15 +1049,15 @@ where \(V = [\mathbf{v}_1 \mid \mathbf{v}_2]\) (eigenvectors) and \(\Lambda = \t
 
 ### Covariance vs Correlation
 
-Covariance has units (\(\text{units}_x \times \text{units}_y\)), making it hard to compare across variables. **Correlation** normalizes it:
+Covariance has units ($\text{units}_x \times \text{units}_y$), making it hard to compare across variables. **Correlation** normalizes it:
 
-\(r_{xy} = \frac{\text{Cov}(x, y)}{\sigma_x \cdot \sigma_y} \in [-1, 1]\)
+$r_{xy} = \frac{\text{Cov}(x, y)}{\sigma_x \cdot \sigma_y} \in [-1, 1]$
 
 ![cov_vs_corr.png](assets/cov_vs_corr.png)
 
-**Left**: same correlation (\(r = 0.8\)), but scaling \(x\) by 3× changes the covariance from ~0.7 to ~2.0. Correlation is **scale-invariant**; covariance is not.
+**Left**: same correlation ($r = 0.8$), but scaling $x$ by 3× changes the covariance from ~0.7 to ~2.0. Correlation is **scale-invariant**; covariance is not.
 
-**Right**: correlation \(r\) is always in \([-1, 1]\), making it easy to interpret regardless of the original units.
+**Right**: correlation $r$ is always in $[-1, 1]$, making it easy to interpret regardless of the original units.
 
 ---
 
@@ -1071,10 +1071,10 @@ $$\hat{\Sigma} = \frac{1}{N}\mathbf{X}^\top\mathbf{X}$$
 
 ### Key Properties
 
-- Symmetric (\(\Sigma = \Sigma^\top\))
+- Symmetric ($\Sigma = \Sigma^\top$)
 - Diagonal = variances
 - Off-diagonal = covariances
-- Positive semi-definite (\(\lambda_i \geq 0\))
+- Positive semi-definite ($\lambda_i \geq 0$)
 - Eigenvectors → principal directions
 - Eigenvalues → amount of variance
 **Why it matters**: The covariance matrix is the foundation of PCA. Its eigenvectors give the directions of maximum variance — the "natural axes" of the data.
@@ -1085,11 +1085,11 @@ $$\hat{\Sigma} = \frac{1}{N}\mathbf{X}^\top\mathbf{X}$$
 
 The **eigenvectors** of the covariance matrix define the directions of maximum variance. The **eigenvalues** tell us how much variance each direction captures.
 
-**Definition**: For matrix \(\Sigma\):
+**Definition**: For matrix $\Sigma$:
 
 $$\Sigma \mathbf{w} = \lambda \mathbf{w}$$
 
-where \(\mathbf{w}\) is an eigenvector and \(\lambda\) is the corresponding eigenvalue.
+where $\mathbf{w}$ is an eigenvector and $\lambda$ is the corresponding eigenvalue.
 
 **Geometric meaning**:
 
@@ -1105,20 +1105,20 @@ PCA finds a new coordinate system aligned with the directions of maximum varianc
 
 **Algorithm**:
 
-1. Mean-center the data: \(\mathbf{X} \leftarrow \mathbf{X} - \bar{\mathbf{X}}\)
-2. Compute covariance matrix: \(\hat{\Sigma} = \frac{1}{N}\mathbf{X}^\top\mathbf{X}\)
-3. Find eigenvectors and eigenvalues of \(\hat{\Sigma}\)
+1. Mean-center the data: $\mathbf{X} \leftarrow \mathbf{X} - \bar{\mathbf{X}}$
+2. Compute covariance matrix: $\hat{\Sigma} = \frac{1}{N}\mathbf{X}^\top\mathbf{X}$
+3. Find eigenvectors and eigenvalues of $\hat{\Sigma}$
 4. Sort by eigenvalue (descending)
-5. Project data onto top \(K\) eigenvectors
+5. Project data onto top $K$ eigenvectors
 **Projection** (scores):
 
 $$\mathbf{S} = \mathbf{X} \mathbf{W}_{1:K}$$
 
-where \(\mathbf{W}_{1:K}\) contains the top \(K\) eigenvectors as columns.
+where $\mathbf{W}_{1:K}$ contains the top $K$ eigenvectors as columns.
 
 ---
 
-**Key insight**: PCA is equivalent to finding the **best rank-\(K\) approximation** to the data in the least-squares sense (Eckart-Young theorem).
+**Key insight**: PCA is equivalent to finding the **best rank-$K$ approximation** to the data in the least-squares sense (Eckart-Young theorem).
 
 ![latent_space_plots_pca.png](assets/latent_space_plots_pca.png)
 
@@ -1128,7 +1128,7 @@ where \(\mathbf{W}_{1:K}\) contains the top \(K\) eigenvectors as columns.
 
 ### Variance Explained: How Many Components?
 
-Each eigenvalue \(\lambda_i\) represents the variance captured by the \(i\)-th principal component.
+Each eigenvalue $\lambda_i$ represents the variance captured by the $i$-th principal component.
 
 **Cumulative variance explained**:
 
@@ -1138,7 +1138,7 @@ $$\text{Variance explained}(K) = \frac{\sum_{i=1}^K \lambda_i}{\sum_{i=1}^N \lam
 
 | | Extrinsic | Intrinsic |
 |---|---|---|
-| **Definition** | Number of measured features (\(N\)) | Number of components needed (\(K\)) |
+| **Definition** | Number of measured features ($N$) | Number of components needed ($K$) |
 | **Example (MNIST)** | 784 pixels | ~50–100 components for 90% variance |
 
 **Scree plot**: Plot eigenvalues in descending order. The "elbow" indicates where additional components contribute little variance — this suggests the intrinsic dimensionality.
@@ -1147,15 +1147,15 @@ $$\text{Variance explained}(K) = \frac{\sum_{i=1}^K \lambda_i}{\sum_{i=1}^N \lam
 
 ### PCA Reconstruction: Compressing Data
 
-PCA enables **lossy compression**: store only the top \(K\) components instead of all \(N\) dimensions.
+PCA enables **lossy compression**: store only the top $K$ components instead of all $N$ dimensions.
 
-**Forward (projection)**: \(\mathbf{S} = \mathbf{X} \mathbf{W}\)
+**Forward (projection)**: $\mathbf{S} = \mathbf{X} \mathbf{W}$
 
-**Inverse (reconstruction)**: \(\hat{\mathbf{X}} = \mathbf{S}_{1:K} \mathbf{W}_{1:K}^\top + \bar{\mathbf{X}}\)
+**Inverse (reconstruction)**: $\hat{\mathbf{X}} = \mathbf{S}_{1:K} \mathbf{W}_{1:K}^\top + \bar{\mathbf{X}}$
 
-**Reconstruction quality** depends on \(K\):
+**Reconstruction quality** depends on $K$:
 
-| \(K\) | Variance captured | Quality |
+| $K$ | Variance captured | Quality |
 |-----|-------------------|---------|
 | 1 | Very low | Blob of average intensity |
 | ~20 | Moderate | Blurry digits recognizable |
@@ -1168,15 +1168,15 @@ PCA enables **lossy compression**: store only the top \(K\) components instead o
 
 PCA can remove noise by projecting onto the low-dimensional subspace that captures the signal.
 
-**Idea**: Noise is spread across all dimensions equally, while signal is concentrated in the top components. By keeping only the top \(K\) components, we discard most of the noise.
+**Idea**: Noise is spread across all dimensions equally, while signal is concentrated in the top components. By keeping only the top $K$ components, we discard most of the noise.
 
 **Algorithm**:
 
 1. Find PCA basis from clean data (or noisy data)
 2. Project noisy data onto the PCA basis
-3. Keep only the top \(K\) components
-4. Reconstruct: \(\hat{\mathbf{X}}_{\text{clean}} = \mathbf{S}_{1:K} \mathbf{W}_{1:K}^\top + \bar{\mathbf{X}}\)
-**Key insight**: The optimal \(K\) depends on the noise level:
+3. Keep only the top $K$ components
+4. Reconstruct: $\hat{\mathbf{X}}_{\text{clean}} = \mathbf{S}_{1:K} \mathbf{W}_{1:K}^\top + \bar{\mathbf{X}}$
+**Key insight**: The optimal $K$ depends on the noise level:
 - More noise → fewer components (more aggressive denoising)
 - Less noise → more components (preserve detail)
 **Limitation**: PCA denoising assumes signal lies in a linear subspace. Nonlinear methods (e.g., autoencoders) can be more effective for complex signals.
@@ -1222,17 +1222,17 @@ t-SNE has one key hyperparameter: **perplexity**, which roughly controls the eff
 
 The algorithm has three key steps:
 
-**Step 1 — High-dimensional similarities**: For each pair of points \((x_i, x_j)\), compute a Gaussian-based probability:
+**Step 1 — High-dimensional similarities**: For each pair of points $(x_i, x_j)$, compute a Gaussian-based probability:
 
 $$p_{j|i} = \frac{\exp(-\|x_i - x_j\|^2 / 2\sigma_i^2)}{\sum_{k \neq i} \exp(-\|x_i - x_k\|^2 / 2\sigma_i^2)}$$
 
-"Given point \(i\), what's the probability of picking \(j\) as its neighbor?"
+"Given point $i$, what's the probability of picking $j$ as its neighbor?"
 
 **Step 2 — Low-dimensional similarities**: In the 2D map, use a **t-distribution** (heavy-tailed) instead of Gaussian:
 
 $$q_{ij} = \frac{(1 + \|y_i - y_j\|^2)^{-1}}{\sum_{k \neq l} (1 + \|y_k - y_l\|^2)^{-1}}$$
 
-**Step 3 — Optimize**: Minimize the KL divergence between \(P\) and \(Q\):
+**Step 3 — Optimize**: Minimize the KL divergence between $P$ and $Q$:
 
 $$\text{KL}(P \| Q) = \sum_{i \neq j} p_{ij} \log \frac{p_{ij}}{q_{ij}}$$
 
@@ -1260,7 +1260,7 @@ This solves the **crowding problem**: in high-D, there are many "medium-distance
 
 ### Feedforward Neural Networks
 
-A feedforward network transforms input \(\mathbf{r}\) through a series of **layers** to produce output \(y\).
+A feedforward network transforms input $\mathbf{r}$ through a series of **layers** to produce output $y$.
 
 ![one-layer-network.png](assets/one-layer-network.png)
 
@@ -1268,7 +1268,7 @@ A feedforward network transforms input \(\mathbf{r}\) through a series of **laye
 
 $$\mathbf{h} = \phi(\mathbf{W}^{in} \mathbf{r} + \mathbf{b}^{in}), \quad y = \mathbf{W}^{out} \mathbf{h} + \mathbf{b}^{out}$$
 
-where \(\phi\) is a **nonlinear activation function**.
+where $\phi$ is a **nonlinear activation function**.
 
 ---
 
@@ -1280,9 +1280,9 @@ Nonlinear activations allow the network to compute **arbitrary functions** (univ
 
 **Key concepts**:
 
-- **Width**: number of units per layer (\(M\))
+- **Width**: number of units per layer ($M$)
 - **Depth**: number of hidden layers
-- **Parameters**: all weights \(\mathbf{W}\) and biases \(\mathbf{b}\)
+- **Parameters**: all weights $\mathbf{W}$ and biases $\mathbf{b}$
 
 ---
 
@@ -1298,10 +1298,10 @@ Activation functions introduce nonlinearity into neural networks.
 
 | Function | Formula | Range | Use case |
 |----------|---------|-------|----------|
-| **ReLU** | \(\max(0, x)\) | \([0, \infty)\) | Hidden layers (default) |
-| **Sigmoid** | \(\frac{1}{1+e^{-x}}\) | \((0, 1)\) | Output for binary probability |
-| **Softmax** | \(\frac{e^{x_i}}{\sum_j e^{x_j}}\) | \((0, 1)\), sums to 1 | Output for classification |
-| **PReLU** | \(\max(0, x) + \alpha \min(0, x)\) | \((-\infty, \infty)\) | When ReLU "dies" |
+| **ReLU** | $\max(0, x)$ | $[0, \infty)$ | Hidden layers (default) |
+| **Sigmoid** | $\frac{1}{1+e^{-x}}$ | $(0, 1)$ | Output for binary probability |
+| **Softmax** | $\frac{e^{x_i}}{\sum_j e^{x_j}}$ | $(0, 1)$, sums to 1 | Output for classification |
+| **PReLU** | $\max(0, x) + \alpha \min(0, x)$ | $(-\infty, \infty)$ | When ReLU "dies" |
 
 ---
 
@@ -1320,16 +1320,16 @@ The loss function measures how bad the network's predictions are.
 
 | Loss | Formula | Use case |
 |------|---------|----------|
-| **MSE** | \(\frac{1}{N}\sum(y - \tilde{y})^2\) | Regression (continuous output) |
-| **BCE** | \(-\sum[\tilde{y}\log y + (1-\tilde{y})\log(1-y)]\) | Binary classification |
-| **NLL** | \(-\sum \log p_{\tilde{y}}\) | Multi-class classification |
+| **MSE** | $\frac{1}{N}\sum(y - \tilde{y})^2$ | Regression (continuous output) |
+| **BCE** | $-\sum[\tilde{y}\log y + (1-\tilde{y})\log(1-y)]$ | Binary classification |
+| **NLL** | $-\sum \log p_{\tilde{y}}$ | Multi-class classification |
 
 **Choosing the right loss**:
 
 - Predicting a continuous value → MSE
 - Predicting a probability (0–1) → BCE
 - Predicting a class label → NLL (with softmax)
-**BCE vs MSE for pixel reconstruction**: BCE penalizes confident wrong predictions more heavily (gradient \(\sim 1/\hat{y}\)), making it better for binary-ish data like images.
+**BCE vs MSE for pixel reconstruction**: BCE penalizes confident wrong predictions more heavily (gradient $\sim 1/\hat{y}$), making it better for binary-ish data like images.
 
 ---
 
@@ -1344,8 +1344,8 @@ Training a network = finding parameters that minimize the loss.
 **Gradient descent** iterates three steps:
 
 1. **Forward pass**: compute output and loss
-2. **Backward pass**: compute gradients \(\frac{\partial L}{\partial \theta}\) via **backpropagation**
-3. **Update**: \(\theta \leftarrow \theta - \alpha \frac{\partial L}{\partial \theta}\)
+2. **Backward pass**: compute gradients $\frac{\partial L}{\partial \theta}$ via **backpropagation**
+3. **Update**: $\theta \leftarrow \theta - \alpha \frac{\partial L}{\partial \theta}$
 **Backpropagation** applies the chain rule layer by layer:
 
 $$\frac{\partial L}{\partial \mathbf{W}^{in}} = \frac{\partial L}{\partial \mathbf{h}} \cdot \frac{\partial \mathbf{h}}{\partial \mathbf{W}^{in}}$$
@@ -1366,19 +1366,19 @@ SGD approximates the true gradient using a **random mini-batch** of data.
 
 **Algorithm**:
 
-1. Sample a mini-batch of \(B\) examples from training data
-2. Compute gradient on this mini-batch: \(\mathbf{g} = \frac{1}{B}\sum_{i=1}^B \nabla_\theta L(y_i, f(x_i; \theta))\)
-3. Update: \(\theta \leftarrow \theta - \alpha \mathbf{g}\)
+1. Sample a mini-batch of $B$ examples from training data
+2. Compute gradient on this mini-batch: $\mathbf{g} = \frac{1}{B}\sum_{i=1}^B \nabla_\theta L(y_i, f(x_i; \theta))$
+3. Update: $\theta \leftarrow \theta - \alpha \mathbf{g}$
 4. Repeat until convergence
 **Why SGD works**:
 - Mini-batch gradient is an **unbiased estimate** of the full gradient
-- Much faster per iteration (e.g., \(B=32\) vs \(N=60000\))
+- Much faster per iteration (e.g., $B=32$ vs $N=60000$)
 - Noise helps escape shallow local minima
 **Momentum**: accumulates past gradients to smooth updates:
 
 $$\mathbf{v} \leftarrow \beta \mathbf{v} + \mathbf{g}, \quad \theta \leftarrow \theta - \alpha \mathbf{v}$$
 
-- \(\beta\) (typically 0.9): how much past gradients influence current update
+- $\beta$ (typically 0.9): how much past gradients influence current update
 - Helps accelerate in consistent gradient directions
 - Dampens oscillations in noisy dimensions
 
@@ -1390,20 +1390,20 @@ Adam combines momentum with **adaptive learning rates** per parameter.
 
 **Key idea**: Parameters that receive large gradients get smaller updates (and vice versa). This is achieved by tracking:
 
-- First moment (mean): \(\mathbf{m} \leftarrow \beta_1 \mathbf{m} + (1-\beta_1)\mathbf{g}\)
-- Second moment (variance): \(\mathbf{v} \leftarrow \beta_2 \mathbf{v} + (1-\beta_2)\mathbf{g}^2\)
+- First moment (mean): $\mathbf{m} \leftarrow \beta_1 \mathbf{m} + (1-\beta_1)\mathbf{g}$
+- Second moment (variance): $\mathbf{v} \leftarrow \beta_2 \mathbf{v} + (1-\beta_2)\mathbf{g}^2$
 **Update rule** (with bias correction):
 
 $$\theta \leftarrow \theta - \alpha \frac{\hat{\mathbf{m}}}{\sqrt{\hat{\mathbf{v}}} + \epsilon}$$
 
-where \(\hat{\mathbf{m}} = \frac{\mathbf{m}}{1-\beta_1^t}\), \(\hat{\mathbf{v}} = \frac{\mathbf{v}}{1-\beta_2^t}\) (bias correction for early steps).
+where $\hat{\mathbf{m}} = \frac{\mathbf{m}}{1-\beta_1^t}$, $\hat{\mathbf{v}} = \frac{\mathbf{v}}{1-\beta_2^t}$ (bias correction for early steps).
 
 **Default hyperparameters** (rarely need tuning):
 
-- \(\alpha = 0.001\) (learning rate)
-- \(\beta_1 = 0.9\) (first moment decay)
-- \(\beta_2 = 0.999\) (second moment decay)
-- \(\epsilon = 10^{-8}\) (numerical stability)
+- $\alpha = 0.001$ (learning rate)
+- $\beta_1 = 0.9$ (first moment decay)
+- $\beta_2 = 0.999$ (second moment decay)
+- $\epsilon = 10^{-8}$ (numerical stability)
 **When to use what**:
 
 | Optimizer | Pros | Cons | Use case |
@@ -1420,17 +1420,17 @@ Convolution is a fundamental operation that slides a small **kernel** across dat
 
 **Start simple: 1D moving average**
 
-Given a noisy signal \([3, 5, 2, 8, 1, 4]\), a moving average with window size 3 smooths it:
+Given a noisy signal $[3, 5, 2, 8, 1, 4]$, a moving average with window size 3 smooths it:
 
 $$\text{output}[i] = \frac{1}{3}(x[i-1] + x[i] + x[i+1])$$
 
-This is a convolution with kernel \(f = [\frac{1}{3}, \frac{1}{3}, \frac{1}{3}]\).
+This is a convolution with kernel $f = [\frac{1}{3}, \frac{1}{3}, \frac{1}{3}]$.
 
 **General 1D convolution**:
 
 $$\text{output}[i] = \sum_{k=-K/2}^{K/2} f[k] \cdot x[i+k]$$
 
-The kernel \(f\) is a small array of **learnable weights** that slides across the input.
+The kernel $f$ is a small array of **learnable weights** that slides across the input.
 
 ---
 
@@ -1440,10 +1440,10 @@ The **kernel** determines what feature the convolution detects. Same input, diff
 
 | Kernel | Name | Effect |
 |--------|------|--------|
-| \([1/3, 1/3, 1/3]\) | Moving average | Smooths / low-pass filter |
-| \([-1, 0, 1]\) | Central difference | Detects **edges** (changes) |
-| \([1, -2, 1]\) | Second derivative | Detects **curvature** |
-| \([0, 1, 0]\) | Identity | Returns original signal |
+| $[1/3, 1/3, 1/3]$ | Moving average | Smooths / low-pass filter |
+| $[-1, 0, 1]$ | Central difference | Detects **edges** (changes) |
+| $[1, -2, 1]$ | Second derivative | Detects **curvature** |
+| $[0, 1, 0]$ | Identity | Returns original signal |
 
 **Example: edge detection**
 
@@ -1463,7 +1463,7 @@ The same idea extends to 2D images — the kernel becomes a small matrix.
 
 $$\text{output}(x, y) = \sum_{k_x, k_y} f(k_x, k_y) \cdot I(x+k_x, y+k_y)$$
 
-where \(f\) is a \(K \times K\) kernel and \(I\) is the input image.
+where $f$ is a $K \times K$ kernel and $I$ is the input image.
 
 ---
 
@@ -1471,11 +1471,11 @@ where \(f\) is a \(K \times K\) kernel and \(I\) is the input image.
 
 | Kernel | Size | Effect |
 |--------|------|--------|
-| \(\frac{1}{9}\begin{bmatrix}1&1&1\\1&1&1\\1&1&1\end{bmatrix}\) | 3×3 | Box blur (smooth) |
-| \(\begin{bmatrix}0&-1&0\\-1&4&-1\\0&-1&0\end{bmatrix}\) | 3×3 | Edge detection (Laplacian) |
-| \(\begin{bmatrix}-1&0&1\\-2&0&2\\-1&0&1\end{bmatrix}\) | 3×3 | Sobel (vertical edges) |
-| \(\begin{bmatrix}-1&-2&-1\\0&0&0\\1&2&1\end{bmatrix}\) | 3×3 | Sobel (horizontal edges) |
-| \(\begin{bmatrix}0&0&0\\0&1&0\\0&0&0\end{bmatrix}\) | 3×3 | Identity |
+| $\frac{1}{9}\begin{bmatrix}1&1&1\\1&1&1\\1&1&1\end{bmatrix}$ | 3×3 | Box blur (smooth) |
+| $\begin{bmatrix}0&-1&0\\-1&4&-1\\0&-1&0\end{bmatrix}$ | 3×3 | Edge detection (Laplacian) |
+| $\begin{bmatrix}-1&0&1\\-2&0&2\\-1&0&1\end{bmatrix}$ | 3×3 | Sobel (vertical edges) |
+| $\begin{bmatrix}-1&-2&-1\\0&0&0\\1&2&1\end{bmatrix}$ | 3×3 | Sobel (horizontal edges) |
+| $\begin{bmatrix}0&0&0\\0&1&0\\0&0&0\end{bmatrix}$ | 3×3 | Identity |
 
 ---
 
@@ -1493,14 +1493,14 @@ CNNs extend convolution to **multiple learned kernels** across **multiple layers
 
 **Key ideas**:
 
-- **Local receptive fields**: each unit looks at a small \(K \times K\) patch
+- **Local receptive fields**: each unit looks at a small $K \times K$ patch
 - **Multiple channels**: each channel applies a different kernel → detects different features
 **Parameters**:
 
 | Parameter | Meaning | Effect |
 |-----------|---------|--------|
-| \(K\) (kernel size) | Size of the sliding window | Larger → bigger receptive field |
-| \(C_{out}\) (channels) | Number of different kernels | More → richer features |
+| $K$ (kernel size) | Size of the sliding window | Larger → bigger receptive field |
+| $C_{out}$ (channels) | Number of different kernels | More → richer features |
 | Stride | Step size when sliding | Larger → smaller output |
 | Padding | Zeros around input | Same padding → output = input size |
 
@@ -1558,15 +1558,15 @@ Two directions of modeling neural data:
 
 ### RSA: What is the Response Matrix?
 
-Before computing anything, we need to organize neural data into a **response matrix** \(\mathbf{R}\).
+Before computing anything, we need to organize neural data into a **response matrix** $\mathbf{R}$.
 
-**Setup**: Record \(N\) neurons while presenting \(S\) different stimuli (e.g., images). Each stimulus is repeated multiple trials, then average across trials.
+**Setup**: Record $N$ neurons while presenting $S$ different stimuli (e.g., images). Each stimulus is repeated multiple trials, then average across trials.
 
 $$\mathbf{R} = \begin{bmatrix} r_{1,1} & r_{1,2} & \cdots & r_{1,S} \\ r_{2,1} & r_{2,2} & \cdots & r_{2,S} \\ \vdots & \vdots & \ddots & \vdots \\ r_{N,1} & r_{N,2} & \cdots & r_{N,S} \end{bmatrix}$$
 
 - **Rows** = neurons (what each neuron responds to)
 - **Columns** = stimuli (how each stimulus is represented)
-- \(r_{n,s}\) = average spike count of neuron \(n\) to stimulus \(s\)
+- $r_{n,s}$ = average spike count of neuron $n$ to stimulus $s$
 
 ---
 
@@ -1578,7 +1578,7 @@ Different neurons have wildly different **baseline firing rates**. A high-rate n
 
 $$Z_{n,s} = \frac{R_{n,s} - \bar{r}_n}{\sigma_n}$$
 
-where \(\bar{r}_n\) = mean response of neuron \(n\) across all stimuli, \(\sigma_n\) = standard deviation.
+where $\bar{r}_n$ = mean response of neuron $n$ across all stimuli, $\sigma_n$ = standard deviation.
 
 **What z-score does**:
 
@@ -1592,7 +1592,7 @@ where \(\bar{r}_n\) = mean response of neuron \(n\) across all stimuli, \(\sigma
 
 **Key observation**: Neuron 1 (high-rate) and Neuron 2 (low-rate) look very different in raw counts, but after z-scoring, their **response patterns** (which stimuli drive them more) become comparable.
 
-Neuron 4 (constant, \(\sigma = 0\)) carries no stimulus information — z-scoring makes this obvious (flat line at 0).
+Neuron 4 (constant, $\sigma = 0$) carries no stimulus information — z-scoring makes this obvious (flat line at 0).
 
 ---
 
@@ -1604,12 +1604,12 @@ $$\mathbf{M} = 1 - \frac{1}{N}\mathbf{Z}\mathbf{Z}^\top$$
 
 **What this formula does**:
 
-- \(\mathbf{Z}\mathbf{Z}^\top\) = cosine-like similarity between stimuli (each entry = how similarly the \(N\) neurons respond to stimuli \(s\) and \(s'\))
+- $\mathbf{Z}\mathbf{Z}^\top$ = cosine-like similarity between stimuli (each entry = how similarly the $N$ neurons respond to stimuli $s$ and $s'$)
 - $1 - \text{similarity}$ = dissimilarity
-- \(M_{ss'}\) = how **different** stimuli \(s\) and \(s'\) appear to the brain
+- $M_{ss'}$ = how **different** stimuli $s$ and $s'$ appear to the brain
 **Interpreting the RDM**:
-- Small \(M_{ss'}\) → stimuli \(s\) and \(s'\) evoke similar neural patterns (brain thinks they're similar)
-- Large \(M_{ss'}\) → stimuli evoke very different patterns (brain thinks they're different)
+- Small $M_{ss'}$ → stimuli $s$ and $s'$ evoke similar neural patterns (brain thinks they're similar)
+- Large $M_{ss'}$ → stimuli evoke very different patterns (brain thinks they're different)
 
 ---
 
@@ -1617,9 +1617,9 @@ $$\mathbf{M} = 1 - \frac{1}{N}\mathbf{Z}\mathbf{Z}^\top$$
 
 **RSA workflow**:
 
-1. Collect neural responses → **raw matrix** \(R\) (neurons × stimuli)
-2. Z-score each neuron → **standardized matrix** \(Z\)
-3. Compute \(M = 1 - \frac{1}{N}ZZ^\top\) → **RDM** (stimuli × stimuli)
+1. Collect neural responses → **raw matrix** $R$ (neurons × stimuli)
+2. Z-score each neuron → **standardized matrix** $Z$
+3. Compute $M = 1 - \frac{1}{N}ZZ^\top$ → **RDM** (stimuli × stimuli)
 4. Repeat steps 1–3 for each layer of a deep network
 5. Correlate the brain's RDM with each layer's RDM → which layer matches best?
 **Step 2: Correlate RDMs**
@@ -1649,9 +1649,9 @@ Input (784) → Encoder → Bottleneck (K) → Decoder → Output (784)
 
 ---
 
-**Bottleneck effect**: Forcing information through a small bottleneck (\(K \ll N\)) makes the network learn the most important features — a form of **nonlinear PCA**.
+**Bottleneck effect**: Forcing information through a small bottleneck ($K \ll N$) makes the network learn the most important features — a form of **nonlinear PCA**.
 
-**Latent space visualization**: When \(K=2\), we can plot each input as a point \((z_1, z_2)\) colored by its class. Well-separated clusters indicate good representations.
+**Latent space visualization**: When $K=2$, we can plot each input as a point $(z_1, z_2)$ colored by its class. Well-separated clusters indicate good representations.
 
 **Improving autoencoders**:
 

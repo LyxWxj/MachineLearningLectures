@@ -7,9 +7,9 @@
 # 第一部分 — 基础讲座
 
 - [第0讲：机器学习的数学基础](ch00-math-foundations.md)
-    - [微积分](lecture1/Calculus.md)
-    - [线性代数](lecture1/Linear-Algebra.md)
-    - [概率论](lecture1/Probability.md)
+  - [微积分](lecture1/Calculus.md)
+  - [线性代数](lecture1/Linear-Algebra.md)
+  - [概率论](lecture1/Probability.md)
 - [第1讲：机器学习基础](ch01-ml-fundamentals.md)
 - [第2讲：度量、损失与优化](ch02-metrics-loss-optimization.md)
 - [贝叶斯家族](ch03-bayes-family.md)
