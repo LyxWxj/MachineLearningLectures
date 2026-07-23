@@ -118,7 +118,280 @@ transform = transforms.Compose([
 
 ---
 
-## W2D2：卷积神经网络 (CNN)
+### 6. 归一化层 (Normalization Layers)
+
+归一化层解决的核心问题：**Internal Covariate Shift**——随着训练进行，每层输入的分布不断变化，导致训练不稳定、收敛慢。
+
+#### 6.1 Batch Normalization (BN)
+
+**思想**：对每个 mini-batch 内的每个特征通道，沿 batch 维度归一化。
+
+$$
+\hat{x}_i = \frac{x_i - \mu_B}{\sqrt{\sigma_B^2 + \epsilon}}, \quad y_i = \gamma \hat{x}_i + \beta
+$$
+
+其中 $\mu_B = \frac{1}{m}\sum_{i=1}^m x_i$，$\sigma_B^2 = \frac{1}{m}\sum_{i=1}^m (x_i - \mu_B)^2$
+
+**计算过程**（以线性层为例）：
+
+```python
+# 输入 x: (batch_size, features)
+# 1. 沿 batch 维度计算均值和方差
+mu = x.mean(dim=0)        # (features,)
+var = x.var(dim=0)         # (features,)
+
+# 2. 归一化
+x_hat = (x - mu) / torch.sqrt(var + 1e-5)  # (batch_size, features)
+
+# 3. 仿射变换（可学习参数）
+gamma = nn.Parameter(torch.ones(features))   # 缩放
+beta = nn.Parameter(torch.zeros(features))   # 偏移
+y = gamma * x_hat + beta
+```
+
+**BN 的特点与问题**：
+
+| 优点 | 缺点 |
+|------|------|
+| 加速收敛、允许更大学习率 | 依赖 batch size（太小则统计不稳定） |
+| 有轻微正则化效果（batch 内引入噪声） | 训练和推理行为不同（用 running mean/var） |
+| 缓解梯度消失/爆炸 | 不适用于序列长度可变的任务（RNN） |
+
+```python
+# PyTorch 中的 BatchNorm
+bn = nn.BatchNorm1d(num_features=64)  # 对 64 维特征做 BN
+x = torch.randn(32, 64)  # batch=32, features=64
+y = bn(x)
+print(y.shape)  # torch.Size([32, 64])
+```
+
+#### 6.2 Layer Normalization (LN)
+
+**思想**：对每个样本内部的所有特征维度归一化（不依赖 batch）。
+
+$$
+\hat{x}_i = \frac{x_i - \mu_L}{\sqrt{\sigma_L^2 + \epsilon}}, \quad y_i = \gamma \hat{x}_i + \beta
+$$
+
+其中 $\mu_L = \frac{1}{d}\sum_{j=1}^d x_j$，$\sigma_L^2 = \frac{1}{d}\sum_{j=1}^d (x_j - \mu_L)^2$（在特征维度上计算）
+
+**计算过程**：
+
+```python
+# 输入 x: (batch_size, features)
+# 1. 沿特征维度计算均值和方差（每个样本独立）
+mu = x.mean(dim=-1, keepdim=True)    # (batch_size, 1)
+var = x.var(dim=-1, keepdim=True)     # (batch_size, 1)
+
+# 2. 归一化
+x_hat = (x - mu) / torch.sqrt(var + 1e-5)
+
+# 3. 仿射变换
+y = gamma * x_hat + beta
+```
+
+**LN vs BN 的关键区别**：
+
+```python
+x = torch.randn(32, 64)  # (batch, features)
+
+# BN: 统计量在 batch 维度上计算 → (features,) 个统计量
+bn = nn.BatchNorm1d(64)
+print(bn(x).shape)  # (32, 64)
+
+# LN: 统计量在特征维度上计算 → (batch_size,) 个统计量（每个样本一个）
+ln = nn.LayerNorm(64)
+print(ln(x).shape)  # (32, 64)
+```
+
+| | BatchNorm | LayerNorm |
+|---|---|---|
+| **归一化维度** | 沿 batch 维度 | 沿特征维度 |
+| **依赖 batch size** | ✅ 是 | ❌ 否 |
+| **训练/推理一致性** | ❌ 不同（用 running stats） | ✅ 相同 |
+| **适用场景** | CNN、固定长度输入 | Transformer、RNN、变长序列 |
+
+#### 6.3 RMS Normalization (RMSNorm)
+
+**思想**：去掉均值中心化，只做缩放归一化（更简单、更快）。
+
+$$
+\text{RMS}(x) = \sqrt{\frac{1}{d}\sum_{i=1}^d x_i^2}, \quad \hat{x}_i = \frac{x_i}{\text{RMS}(x)} \cdot \gamma_i
+$$
+
+**与 LayerNorm 的区别**：去掉了减均值和偏置项 $\beta$，计算更简洁。
+
+```python
+class RMSNorm(nn.Module):
+    def __init__(self, dim, eps=1e-6):
+        super().__init__()
+        self.eps = eps
+        self.weight = nn.Parameter(torch.ones(dim))
+
+    def forward(self, x):
+        rms = torch.sqrt(torch.mean(x ** 2, dim=-1, keepdim=True) + self.eps)
+        return x / rms * self.weight
+```
+
+**为什么 RMSNorm 更受欢迎**（在 LLM 中）：
+
+| | LayerNorm | RMSNorm |
+|---|---|---|
+| **计算** | 减均值 + 除标准差 | 只除 RMS |
+| **参数** | $\gamma$ + $\beta$ | 只有 $\gamma$ |
+| **速度** | 较慢 | 更快（省去均值计算） |
+| **效果** | 良好 | 几乎相同甚至更好 |
+
+> LLaMA、Gemma 等现代大语言模型普遍使用 RMSNorm 替代 LayerNorm。
+
+#### 6.4 实验：归一化与初始化的交互
+
+![初始权重尺度对训练的影响](../../assets/image.png)
+
+**图 1：初始权重尺度对训练的决定性作用**
+
+以 ReLU 网络为例，展示不同初始方差 $\sigma^2$ 的效果：
+- 方差过大（$\sigma^2 = 3/n$）→ 激活值和梯度爆炸（NaN）
+- 方差过小（$\sigma^2 = 1/n$）→ 梯度消失，模型"毫无进展"
+- 合适方差（$\sigma^2 = 2/n$，即 Kaiming 初始化）→ 网络正常工作
+
+![初始化影响贯穿训练全程](../../assets/image-1.png)
+
+**图 2：初始化的影响贯穿训练全程**
+
+即使网络被训练到 MNIST 5% 错误率，不同初始化导致的激活范数、梯度范数、权重方差的差异**在训练结束后依然保留**。初始化不是"训练几轮就自动修复"的问题。
+
+![归一化的修复作用](../../assets/image-2.png)
+
+**图 3：归一化的修复作用及其副作用**
+
+Layer Normalization 能消除不同初始化带来的尺度差异，强制各层激活范数相近。但在标准全连接网络中，这样做反而让网络**更难训练到低损失**——因为样本的相对范数本身也是有用的判别特征，抹平这些信息不利于学习。
+
+![L2 正则化的反思](../../assets/image-3.png)
+
+**图 4：对 L2 正则化（权重衰减）有效性的反思**
+
+由于初始化的历史影响在训练后依然保留，不同初始化导致模型最终的权重幅度截然不同。这表明**参数幅度可能并不是衡量模型复杂度的良好代理指标**——用权重衰减来控制复杂度，可能受初始化干扰太大。
+
+> **核心结论**：
+> 1. 初始化的方差选择是**生死攸关**的——选错了模型根本无法训练
+> 2. 初始化的影响**不会被训练消除**，会贯穿整个训练过程
+> 3. 归一化能修复尺度问题，但可能**牺牲部分表达能力**
+> 4. L2 正则化的效果可能被初始化干扰，需要谨慎使用
+---
+
+### 7. 权重初始化 (Weight Initialization)
+
+**为什么初始化很重要？**
+
+- 初始化太大 → 激活值爆炸、梯度爆炸
+- 初始化太小 → 激活值消失、梯度消失
+- 好的初始化：让每层的输出方差保持稳定
+
+#### 7.1 Xavier Initialization (Glorot Initialization)
+
+**目标**：让前向传播和反向传播中，每层输出的方差保持不变。
+
+**推导**：对于线性层 $y = Wx$，假设 $x$ 和 $W$ 独立且均值为 0：
+
+$$
+\text{Var}(y) = n_{\text{in}} \cdot \text{Var}(W) \cdot \text{Var}(x)
+$$
+
+要让 $\text{Var}(y) = \text{Var}(x)$，需要：
+
+$$
+\text{Var}(W) = \frac{1}{n_{\text{in}}}
+$$
+
+同时考虑反向传播（梯度从 $y$ 传回 $x$），需要 $\text{Var}(W) = \frac{1}{n_{\text{out}}}$。
+
+**折中方案**：
+
+$$
+W \sim \mathcal{N}\left(0, \frac{2}{n_{\text{in}} + n_{\text{out}}}\right) \quad \text{或} \quad W \sim \mathcal{U}\left(-\sqrt{\frac{6}{n_{\text{in}} + n_{\text{out}}}}, \sqrt{\frac{6}{n_{\text{in}} + n_{\text{out}}}}\right)
+$$
+
+```python
+# PyTorch 中的 Xavier 初始化
+linear = nn.Linear(256, 128)
+nn.init.xavier_uniform_(linear.weight)   # 均匀分布
+nn.init.xavier_normal_(linear.weight)    # 正态分布
+
+print(f"fan_in={linear.weight.shape[1]}, fan_out={linear.weight.shape[0]}")
+# fan_in=256, fan_out=128
+print(f"std={torch.sqrt(torch.tensor(2.0 / (256 + 128))):.4f}")
+# std=0.0722
+```
+
+**适用场景**：Sigmoid、Tanh 激活函数（输出均值为 0 附近）。
+
+#### 7.2 Kaiming Initialization (He Initialization)
+
+**问题**：ReLU 会将一半的激活值置零，导致方差减半。Xavier 没有考虑这一点。
+
+**推导**：对于 ReLU 激活，$\text{Var}(\text{ReLU}(x)) = \frac{1}{2}\text{Var}(x)$，所以：
+
+$$
+\text{Var}(y) = \frac{1}{2} n_{\text{in}} \cdot \text{Var}(W) \cdot \text{Var}(x)
+$$
+
+要让 $\text{Var}(y) = \text{Var}(x)$：
+
+$$
+\text{Var}(W) = \frac{2}{n_{\text{in}}}
+$$
+
+$$
+W \sim \mathcal{N}\left(0, \frac{2}{n_{\text{in}}}\right) \quad \text{或} \quad W \sim \mathcal{U}\left(-\sqrt{\frac{6}{n_{\text{in}}}}, \sqrt{\frac{6}{n_{\text{in}}}}\right)
+$$
+
+```python
+# PyTorch 中的 Kaiming 初始化
+linear = nn.Linear(256, 128)
+nn.init.kaiming_uniform_(linear.weight, mode='fan_in', nonlinearity='relu')
+nn.init.kaiming_normal_(linear.weight, mode='fan_in', nonlinearity='relu')
+
+print(f"fan_in={linear.weight.shape[1]}")
+# fan_in=256
+print(f"std={torch.sqrt(torch.tensor(2.0 / 256)):.4f}")
+# std=0.0884
+```
+
+**`mode` 参数**：
+
+```python
+# fan_in: 保持前向传播方差稳定（常用）
+nn.init.kaiming_normal_(w, mode='fan_in', nonlinearity='relu')
+
+# fan_out: 保持反向传播方差稳定
+nn.init.kaiming_normal_(w, mode='fan_out', nonlinearity='relu')
+```
+
+**适用场景**：ReLU 及其变体（Leaky ReLU、PReLU 等）。
+
+#### 7.3 Xavier vs Kaiming 对比
+
+| | Xavier | Kaiming |
+|---|---|---|
+| **方差** | $\frac{2}{n_{\text{in}} + n_{\text{out}}}$ | $\frac{2}{n_{\text{in}}}$ |
+| **适用激活** | Sigmoid, Tanh | ReLU, Leaky ReLU |
+| **核心思想** | 前向+反向方差折中 | 考虑 ReLU 的半区置零 |
+| **PyTorch** | `xavier_uniform_`, `xavier_normal_` | `kaiming_uniform_`, `kaiming_normal_` |
+
+```python
+# 实际使用示例
+def init_weights(m):
+    if isinstance(m, nn.Linear):
+        nn.init.kaiming_normal_(m.weight, nonlinearity='relu')
+        if m.bias is not None:
+            nn.init.zeros_(m.bias)
+
+model = MyNet()
+model.apply(init_weights)  # 递归应用到所有子模块
+```
+
+> **现代实践**：PyTorch 的 `nn.Linear` 默认使用 Kaiming 初始化（`fan_in` 模式），通常不需要手动设置。但对于自定义层或特殊架构，理解初始化原理仍然很重要。
 
 ---
 

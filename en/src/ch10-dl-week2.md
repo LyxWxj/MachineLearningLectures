@@ -118,7 +118,281 @@ transform = transforms.Compose([
 
 ---
 
-## W2D2: Convolutional Neural Networks (CNN)
+### 6. Normalization Layers
+
+The core problem normalization layers solve: **Internal Covariate Shift** — as training progresses, the distribution of each layer's input keeps changing, leading to unstable training and slow convergence.
+
+#### 6.1 Batch Normalization (BN)
+
+**Idea**: For each feature channel, normalize across the batch dimension.
+
+$$
+\hat{x}_i = \frac{x_i - \mu_B}{\sqrt{\sigma_B^2 + \epsilon}}, \quad y_i = \gamma \hat{x}_i + \beta
+$$
+
+where $\mu_B = \frac{1}{m}\sum_{i=1}^m x_i$, $\sigma_B^2 = \frac{1}{m}\sum_{i=1}^m (x_i - \mu_B)^2$
+
+**Computation process** (for a linear layer):
+
+```python
+# Input x: (batch_size, features)
+# 1. Compute mean and variance along batch dimension
+mu = x.mean(dim=0)        # (features,)
+var = x.var(dim=0)         # (features,)
+
+# 2. Normalize
+x_hat = (x - mu) / torch.sqrt(var + 1e-5)  # (batch_size, features)
+
+# 3. Affine transform (learnable parameters)
+gamma = nn.Parameter(torch.ones(features))   # scale
+beta = nn.Parameter(torch.zeros(features))   # shift
+y = gamma * x_hat + beta
+```
+
+**BN characteristics and issues**:
+
+| Advantages | Disadvantages |
+|---|---|
+| Faster convergence, allows larger learning rate | Depends on batch size (unstable when too small) |
+| Slight regularization effect (noise within batch) | Different behavior during training vs inference (uses running mean/var) |
+| Mitigates vanishing/exploding gradients | Not suitable for variable-length sequences (RNN) |
+
+```python
+# BatchNorm in PyTorch
+bn = nn.BatchNorm1d(num_features=64)  # BN on 64-dim features
+x = torch.randn(32, 64)  # batch=32, features=64
+y = bn(x)
+print(y.shape)  # torch.Size([32, 64])
+```
+
+#### 6.2 Layer Normalization (LN)
+
+**Idea**: Normalize across all feature dimensions within each sample (independent of batch).
+
+$$
+\hat{x}_i = \frac{x_i - \mu_L}{\sqrt{\sigma_L^2 + \epsilon}}, \quad y_i = \gamma \hat{x}_i + \beta
+$$
+
+where $\mu_L = \frac{1}{d}\sum_{j=1}^d x_j$, $\sigma_L^2 = \frac{1}{d}\sum_{j=1}^d (x_j - \mu_L)^2$ (computed over feature dimension)
+
+**Computation process**:
+
+```python
+# Input x: (batch_size, features)
+# 1. Compute mean and variance along feature dimension (per sample)
+mu = x.mean(dim=-1, keepdim=True)    # (batch_size, 1)
+var = x.var(dim=-1, keepdim=True)     # (batch_size, 1)
+
+# 2. Normalize
+x_hat = (x - mu) / torch.sqrt(var + 1e-5)
+
+# 3. Affine transform
+y = gamma * x_hat + beta
+```
+
+**Key difference between LN and BN**:
+
+```python
+x = torch.randn(32, 64)  # (batch, features)
+
+# BN: statistics computed along batch dimension → (features,) statistics
+bn = nn.BatchNorm1d(64)
+print(bn(x).shape)  # (32, 64)
+
+# LN: statistics computed along feature dimension → (batch_size,) statistics (one per sample)
+ln = nn.LayerNorm(64)
+print(ln(x).shape)  # (32, 64)
+```
+
+| | BatchNorm | LayerNorm |
+|---|---|---|
+| **Normalization dim** | Along batch dimension | Along feature dimension |
+| **Depends on batch size** | ✅ Yes | ❌ No |
+| **Train/inference consistency** | ❌ Different (uses running stats) | ✅ Same |
+| **Use cases** | CNN, fixed-length inputs | Transformer, RNN, variable-length sequences |
+
+#### 6.3 RMS Normalization (RMSNorm)
+
+**Idea**: Remove mean centering, only do scaling normalization (simpler, faster).
+
+$$
+\text{RMS}(x) = \sqrt{\frac{1}{d}\sum_{i=1}^d x_i^2}, \quad \hat{x}_i = \frac{x_i}{\text{RMS}(x)} \cdot \gamma_i
+$$
+
+**Difference from LayerNorm**: Removes mean subtraction and bias term $\beta$, simpler computation.
+
+```python
+class RMSNorm(nn.Module):
+    def __init__(self, dim, eps=1e-6):
+        super().__init__()
+        self.eps = eps
+        self.weight = nn.Parameter(torch.ones(dim))
+
+    def forward(self, x):
+        rms = torch.sqrt(torch.mean(x ** 2, dim=-1, keepdim=True) + self.eps)
+        return x / rms * self.weight
+```
+
+**Why RMSNorm is preferred** (in LLMs):
+
+| | LayerNorm | RMSNorm |
+|---|---|---|
+| **Computation** | Subtract mean + divide by std | Only divide by RMS |
+| **Parameters** | $\gamma$ + $\beta$ | Only $\gamma$ |
+| **Speed** | Slower | Faster (skips mean computation) |
+| **Effect** | Good | Nearly identical or even better |
+
+> Modern LLMs like LLaMA, Gemma universally use RMSNorm instead of LayerNorm.
+
+#### 6.4 Experiment: Normalization and Initialization Interaction
+
+![Impact of initial weight scale on training](../../assets/image.png)
+
+**Figure 1: Decisive role of initial weight scale on training**
+
+Using ReLU networks as an example, showing the effect of different initial variance $\sigma^2$:
+- Too large variance ($\sigma^2 = 3/n$) → activation and gradient explosion (NaN)
+- Too small variance ($\sigma^2 = 1/n$) → gradient vanishing, "no progress"
+- Appropriate variance ($\sigma^2 = 2/n$, i.e., Kaiming initialization) → network works normally
+
+![Initialization effects persist throughout training](../../assets/image-1.png)
+
+**Figure 2: Initialization effects persist throughout training**
+
+Even after training the network to 5% error on MNIST, the differences in activation norms, gradient norms, and weight variances caused by different initializations **still persist after training**. Initialization is not something that "automatically fixes itself after a few epochs."
+
+![Normalization's fix and side effects](../../assets/image-2.png)
+
+**Figure 3: Normalization's fix and its side effects**
+
+Layer Normalization eliminates scale differences from different initializations, forcing similar activation norms across layers. But in standard fully connected networks, this actually makes the network **harder to train to low loss** — because the relative norms of samples themselves are useful discriminative features, and flattening this information hurts learning.
+
+![Reflection on L2 regularization](../../assets/image-3.png)
+
+**Figure 4: Reflection on L2 regularization (weight decay) effectiveness**
+
+Since initialization's historical influence persists after training, different initializations lead to drastically different final weight magnitudes. This suggests that **parameter magnitude may not be a good proxy for model complexity** — using weight decay to control complexity may be more affected by initialization than commonly assumed.
+
+> **Core conclusions**:
+> 1. The choice of initialization variance is **life-or-death** — choose wrong and the model cannot train at all
+> 2. Initialization effects **are not eliminated by training** and persist throughout the entire training process
+> 3. Normalization can fix scale issues, but may **sacrifice some expressive power**
+> 4. L2 regularization effects can be disrupted by initialization and should be used with caution
+
+---
+
+### 7. Weight Initialization
+
+**Why does initialization matter?**
+
+- Too large → activation explosion, gradient explosion
+- Too small → activation vanishing, gradient vanishing
+- Good initialization: keeps output variance stable across layers
+
+#### 7.1 Xavier Initialization (Glorot Initialization)
+
+**Goal**: Keep the variance of each layer's output stable during both forward and backward propagation.
+
+**Derivation**: For a linear layer $y = Wx$, assuming $x$ and $W$ are independent with zero mean:
+
+$$
+\text{Var}(y) = n_{\text{in}} \cdot \text{Var}(W) \cdot \text{Var}(x)
+$$
+
+To keep $\text{Var}(y) = \text{Var}(x)$:
+
+$$
+\text{Var}(W) = \frac{1}{n_{\text{in}}}
+$$
+
+Also considering backward propagation (gradients from $y$ back to $x$), we need $\text{Var}(W) = \frac{1}{n_{\text{out}}}$.
+
+**Compromise**:
+
+$$
+W \sim \mathcal{N}\left(0, \frac{2}{n_{\text{in}} + n_{\text{out}}}\right) \quad \text{or} \quad W \sim \mathcal{U}\left(-\sqrt{\frac{6}{n_{\text{in}} + n_{\text{out}}}}, \sqrt{\frac{6}{n_{\text{in}} + n_{\text{out}}}}\right)
+$$
+
+```python
+# Xavier initialization in PyTorch
+linear = nn.Linear(256, 128)
+nn.init.xavier_uniform_(linear.weight)   # uniform distribution
+nn.init.xavier_normal_(linear.weight)    # normal distribution
+
+print(f"fan_in={linear.weight.shape[1]}, fan_out={linear.weight.shape[0]}")
+# fan_in=256, fan_out=128
+print(f"std={torch.sqrt(torch.tensor(2.0 / (256 + 128))):.4f}")
+# std=0.0722
+```
+
+**Use cases**: Sigmoid, Tanh activations (output centered around 0).
+
+#### 7.2 Kaiming Initialization (He Initialization)
+
+**Problem**: ReLU zeros out half of the activations, halving the variance. Xavier doesn't account for this.
+
+**Derivation**: For ReLU activation, $\text{Var}(\text{ReLU}(x)) = \frac{1}{2}\text{Var}(x)$, so:
+
+$$
+\text{Var}(y) = \frac{1}{2} n_{\text{in}} \cdot \text{Var}(W) \cdot \text{Var}(x)
+$$
+
+To keep $\text{Var}(y) = \text{Var}(x)$:
+
+$$
+\text{Var}(W) = \frac{2}{n_{\text{in}}}
+$$
+
+$$
+W \sim \mathcal{N}\left(0, \frac{2}{n_{\text{in}}}\right) \quad \text{or} \quad W \sim \mathcal{U}\left(-\sqrt{\frac{6}{n_{\text{in}}}}, \sqrt{\frac{6}{n_{\text{in}}}}\right)
+$$
+
+```python
+# Kaiming initialization in PyTorch
+linear = nn.Linear(256, 128)
+nn.init.kaiming_uniform_(linear.weight, mode='fan_in', nonlinearity='relu')
+nn.init.kaiming_normal_(linear.weight, mode='fan_in', nonlinearity='relu')
+
+print(f"fan_in={linear.weight.shape[1]}")
+# fan_in=256
+print(f"std={torch.sqrt(torch.tensor(2.0 / 256)):.4f}")
+# std=0.0884
+```
+
+**`mode` parameter**:
+
+```python
+# fan_in: keeps forward propagation variance stable (common)
+nn.init.kaiming_normal_(w, mode='fan_in', nonlinearity='relu')
+
+# fan_out: keeps backward propagation variance stable
+nn.init.kaiming_normal_(w, mode='fan_out', nonlinearity='relu')
+```
+
+**Use cases**: ReLU and its variants (Leaky ReLU, PReLU, etc.).
+
+#### 7.3 Xavier vs Kaiming Comparison
+
+| | Xavier | Kaiming |
+|---|---|---|
+| **Variance** | $\frac{2}{n_{\text{in}} + n_{\text{out}}}$ | $\frac{2}{n_{\text{in}}}$ |
+| **Suitable activations** | Sigmoid, Tanh | ReLU, Leaky ReLU |
+| **Core idea** | Forward + backward variance compromise | Accounts for ReLU's half-region zeroing |
+| **PyTorch** | `xavier_uniform_`, `xavier_normal_` | `kaiming_uniform_`, `kaiming_normal_` |
+
+```python
+# Practical usage example
+def init_weights(m):
+    if isinstance(m, nn.Linear):
+        nn.init.kaiming_normal_(m.weight, nonlinearity='relu')
+        if m.bias is not None:
+            nn.init.zeros_(m.bias)
+
+model = MyNet()
+model.apply(init_weights)  # recursively apply to all submodules
+```
+
+> **Modern practice**: PyTorch's `nn.Linear` uses Kaiming initialization by default (`fan_in` mode), so manual setup is usually unnecessary. But understanding initialization principles remains important for custom layers or special architectures.
 
 ---
 
