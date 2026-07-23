@@ -1,37 +1,37 @@
-# 深度学习基础 — 第一周
+# Deep Learning Fundamentals — Week 1
 
-PyTorch · 梯度下降 · 多层感知机 · 优化
-
----
-
-## 总览
-
-第一周是深度学习的**地基**——从张量操作到梯度下降，从线性模型到多层感知机，最后落脚于优化算法：
-
-| 日       | 主题               | 核心技能                                                             |
-| -------- | ------------------ | -------------------------------------------------------------------- |
-| **W1D1** | PyTorch 基础       | 张量创建与操作、GPU 加速、数据加载、构建第一个神经网络               |
-| **W1D2** | 线性深度学习       | 梯度下降、计算图、反向传播、PyTorch Autograd、nn.Module 训练循环     |
-| **W1D3** | 多层感知机 (MLP)   | 万能逼近定理、ReLU 基函数、MLP 架构、交叉熵损失、螺旋数据集分类     |
-| **W1D4** | 优化               | SGD、动量、RMSprop、病态条件、非凸性、过参数化、小批量训练           |
-
-**贯穿主题**：深度学习 = 参数化函数族 + 损失函数 + 基于梯度的优化。
+PyTorch · Gradient Descent · Multilayer Perceptron · Optimization
 
 ---
 
-## W1D1：PyTorch 基础
+## Overview
+
+Week 1 is the **foundation** of deep learning — from tensor operations to gradient descent, from linear models to multilayer perceptrons, and finally to optimization algorithms:
+
+| Day      | Topic              | Core Skills                                                                   |
+| -------- | ------------------ | ----------------------------------------------------------------------------- |
+| **W1D1** | PyTorch Basics     | Tensor creation and operations, GPU acceleration, data loading, building a first neural network |
+| **W1D2** | Linear Deep Learning | Gradient descent, computation graphs, backpropagation, PyTorch Autograd, nn.Module training loop |
+| **W1D3** | Multilayer Perceptron (MLP) | Universal approximation theorem, ReLU basis functions, MLP architecture, cross-entropy loss, spiral dataset classification |
+| **W1D4** | Optimization       | SGD, momentum, RMSprop, ill-conditioning, non-convexity, over-parameterization, mini-batch training |
+
+**Recurring theme**: Deep learning = parametric function family + loss function + gradient-based optimization.
 
 ---
 
-### 1. 张量：深度学习的基本数据结构
+## W1D1: PyTorch Basics
 
-**张量**（Tensor）是 NumPy `ndarray` 的 GPU 加速版本，同时支持自动微分。
+---
+
+### 1. Tensors: The Fundamental Data Structure of Deep Learning
+
+A **Tensor** is a GPU-accelerated version of NumPy `ndarray` that also supports automatic differentiation.
 
 ```python
 import torch
 import numpy as np
 
-# 从 Python 列表创建
+# Create from Python list
 a = torch.tensor([1, 2, 3])
 print(a)
 # tensor([1, 2, 3])
@@ -40,19 +40,19 @@ print(a.shape)
 print(a.dtype)
 # torch.int64
 
-# 从 NumPy 数组创建
+# Create from NumPy array
 b = torch.tensor(np.ones([2, 3]))
 print(b)
 # tensor([[1., 1., 1.],
 #         [1., 1., 1.]], dtype=torch.float64)
 
-# 指定 dtype
+# Specify dtype
 c = torch.tensor([1, 2, 3], dtype=torch.float32)
 print(c.dtype)
 # torch.float32
 ```
 
-#### 常用构造器
+#### Common Constructors
 
 ```python
 torch.zeros(3, 4)
@@ -73,36 +73,36 @@ torch.linspace(0, 1, 5)
 # tensor([0.0000, 0.2500, 0.5000, 0.7500, 1.0000])
 ```
 
-#### 随机张量
+#### Random Tensors
 
 ```python
-torch.rand(2, 3)    # 均匀分布 U(0,1)
+torch.rand(2, 3)    # Uniform distribution U(0,1)
 # tensor([[0.4963, 0.7682, 0.0885],
 #         [0.1320, 0.3074, 0.6341]])
 
-torch.randn(2, 3)   # 标准正态 N(0,1)
+torch.randn(2, 3)   # Standard normal N(0,1)
 # tensor([[ 0.3452, -0.2197,  0.5612],
 #         [-0.1345,  0.7892, -0.4567]])
 
-torch.randint(0, 10, (2, 3))  # 整数均匀分布
+torch.randint(0, 10, (2, 3))  # Integer uniform distribution
 # tensor([[3, 7, 1],
 #         [9, 4, 6]])
 ```
 
-#### 可复现性
+#### Reproducibility
 
 ```python
 torch.manual_seed(42)
 x = torch.rand(3)
 print(x)
-# tensor([0.8823, 0.9150, 0.3829])  — 每次运行都相同
+# tensor([0.8823, 0.9150, 0.3829])  — same on every run
 ```
 
 ---
 
-### 2. 张量的基本操作
+### 2. Basic Tensor Operations
 
-#### 2.1 索引与切片
+#### 2.1 Indexing and Slicing
 
 ```python
 x = torch.arange(12).reshape(3, 4)
@@ -112,63 +112,63 @@ print(x)
 #         [ 8,  9, 10, 11]])
 # shape: torch.Size([3, 4])
 
-print(x[0, :])      # 第 0 行
+print(x[0, :])      # Row 0
 # tensor([0, 1, 2, 3])
 # shape: torch.Size([4])
 
-print(x[:, 1])      # 第 1 列
+print(x[:, 1])      # Column 1
 # tensor([1, 5, 9])
 # shape: torch.Size([3])
 
-print(x[1:3, 0:2])  # 子矩阵
+print(x[1:3, 0:2])  # Submatrix
 # tensor([[4, 5],
 #         [8, 9]])
 # shape: torch.Size([2, 2])
 
-print(x[-1])         # 最后一行
+print(x[-1])         # Last row
 # tensor([ 8,  9, 10, 11])
 # shape: torch.Size([4])
 ```
 
-#### 2.2 形状变换
+#### 2.2 Reshaping
 
 ```python
 x = torch.arange(12)
 print(x.shape)
 # torch.Size([12])
 
-# reshape: 改变形状
+# reshape: change shape
 y = x.reshape(3, 4)
 print(y.shape)
 # torch.Size([3, 4])
 
-# view: 同 reshape，但要求内存连续
+# view: same as reshape, but requires contiguous memory
 z = x.view(3, 4)
 print(z.shape)
 # torch.Size([3, 4])
 
-# flatten: 展平为 1D
+# flatten: flatten to 1D
 w = y.flatten()
 print(w.shape)
 # torch.Size([12])
 
-# unsqueeze: 增加维度
-print(x.unsqueeze(0).shape)   # 在第 0 维增加
+# unsqueeze: add a dimension
+print(x.unsqueeze(0).shape)   # Add at dimension 0
 # torch.Size([1, 12])
-print(x.unsqueeze(-1).shape)  # 在最后增加
+print(x.unsqueeze(-1).shape)  # Add at the end
 # torch.Size([12, 1])
 
-# squeeze: 去掉大小为 1 的维度
+# squeeze: remove dimensions of size 1
 t = torch.randn(1, 3, 1, 5)
 print(t.squeeze().shape)
 # torch.Size([3, 5])
 ```
 
-**`view` vs `reshape`**：`view` 要求张量在内存中连续（contiguous），否则报错；`reshape` 会在需要时自动复制数据。实践中推荐用 `reshape`，除非你明确需要共享内存。
+**`view` vs `reshape`**: `view` requires the tensor to be contiguous in memory, otherwise it raises an error; `reshape` will automatically copy data when needed. In practice, prefer `reshape` unless you explicitly need shared memory.
 
-#### 2.3 切片中的 `:` ：`a[0,:]` vs `a[0]`
+#### 2.3 Slicing with `:` — `a[0,:]` vs `a[0]`
 
-在 PyTorch（和 NumPy）中，`a[0]` 和 `a[0,:]` 在**值**上完全相同，但在**维度处理**上有微妙区别：
+In PyTorch (and NumPy), `a[0]` and `a[0,:]` produce the same **values**, but differ subtly in **dimension handling**:
 
 ```python
 a = torch.arange(12).reshape(3, 4)
@@ -178,108 +178,108 @@ print(a)
 #         [ 8,  9, 10, 11]])
 # shape: torch.Size([3, 4])
 
-# a[0] — 整数索引，会降维
+# a[0] — integer indexing, removes the dimension
 print(a[0])
 # tensor([0, 1, 2, 3])
 print(a[0].shape)
-# torch.Size([4])  — 从 2D 变成 1D
+# torch.Size([4])  — went from 2D to 1D
 
-# a[0,:] — 冒号切片，保留维度
+# a[0,:] — slice indexing, preserves the dimension
 print(a[0, :])
 # tensor([0, 1, 2, 3])
 print(a[0, :].shape)
-# torch.Size([4])  — 同样是 1D
+# torch.Size([4])  — also 1D
 ```
 
-**看起来一样？再看一个关键区别：**
+**Looks the same? Here's the key difference with higher dimensions:**
 
 ```python
-# 对 3D 张量更明显
+# More obvious with 3D tensors
 b = torch.arange(24).reshape(2, 3, 4)
 print(b.shape)
 # torch.Size([2, 3, 4])
 
-# b[0] — 整数索引，dim 0 被"压掉"
+# b[0] — integer indexing, dim 0 is "squeezed out"
 print(b[0].shape)
-# torch.Size([3, 4])  — 降维了！
+# torch.Size([3, 4])  — dimension reduced!
 
-# b[0, :, :] — 冒号切片，保留所有维度
+# b[0, :, :] — slice indexing, preserves all dimensions
 print(b[0, :, :].shape)
-# torch.Size([3, 4])  — 值相同
+# torch.Size([3, 4])  — same values
 
-# 关键区别：b[0, None, :, :] 会在 dim 1 插入新轴
+# Key: b[0, None, :, :] inserts a new axis at dim 1
 print(b[0, None, :, :].shape)
 # torch.Size([1, 3, 4])
 ```
 
-**整数索引 vs 切片索引的规则**：
+**Rules for integer vs slice indexing:**
 
 ```python
-# 整数索引 → 该维度被移除（降维）
+# Integer index → dimension is removed (reduced)
 a = torch.arange(24).reshape(2, 3, 4)
-print(a[0].shape)          # (3, 4)   — dim 0 消失
-print(a[0, 1].shape)       # (4,)     — dim 0,1 消失
-print(a[0, 1, 2].shape)    # ()       — 标量
+print(a[0].shape)          # (3, 4)   — dim 0 gone
+print(a[0, 1].shape)       # (4,)     — dim 0,1 gone
+print(a[0, 1, 2].shape)    # ()       — scalar
 
-# 切片索引 → 该维度被保留（不降维）
-print(a[0:1].shape)        # (1, 3, 4) — dim 0 保留，大小为 1
+# Slice index → dimension is preserved (not reduced)
+print(a[0:1].shape)        # (1, 3, 4) — dim 0 preserved, size 1
 print(a[0:1, :].shape)     # (1, 3, 4)
-print(a[None].shape)       # (1, 2, 3, 4) — 增加一个维度
+print(a[None].shape)       # (1, 2, 3, 4) — adds a new dimension
 ```
 
-**实践意义**：
+**Practical implications:**
 
 ```python
-# 场景：你想对 batch 中的第一个样本做操作
+# Scenario: you want to process one sample from a batch
 a = torch.randn(32, 3, 64, 64)  # (batch, channel, H, W)
 
-# 用 a[0] — 维度变了，后续操作可能出问题
+# Using a[0] — dimension changes, may break downstream ops
 sample = a[0]
-print(sample.shape)  # (3, 64, 64) — 没有 batch 维了！
+print(sample.shape)  # (3, 64, 64) — no batch dim!
 
-# 用 a[0:1] — 保留 batch 维
+# Using a[0:1] — preserves batch dimension
 sample = a[0:1]
-print(sample.shape)  # (1, 3, 64, 64) — 保留 batch 维，可以正常传入模型
+print(sample.shape)  # (1, 3, 64, 64) — batch dim kept, can pass to model
 
-# 或者用 unsqueeze
+# Or use unsqueeze
 sample = a[0].unsqueeze(0)
 print(sample.shape)  # (1, 3, 64, 64)
 ```
 
 ---
 
-#### 2.4 广播 (Broadcasting)
+#### 2.4 Broadcasting
 
-广播是 PyTorch（和 NumPy）在不同形状的张量间执行运算的机制——**无需显式复制数据**。
+Broadcasting is PyTorch's (and NumPy's) mechanism for performing operations between tensors of different shapes — **without explicitly copying data**.
 
-**广播规则**（从右向左对齐）：
+**Broadcasting rules** (aligned from the right):
 
-1. 如果两个张量的维度数不同，在**左边**补 1
-2. 对每个维度，如果大小相同或其中一个是 1，则可以广播
-3. 大小为 1 的维度会被"拉伸"以匹配另一个
+1. If tensors have different numbers of dimensions, pad 1s on the **left**
+2. For each dimension, sizes must be equal or one of them must be 1
+3. Size-1 dimensions are "stretched" to match the other
 
 ```python
-# 示例 1：标量与张量
+# Example 1: scalar with tensor
 a = torch.tensor([1.0, 2.0, 3.0])
 print(a.shape)
 # torch.Size([3])
 
-b = 2.0  # 标量
+b = 2.0  # scalar
 c = a + b
 print(c)
 # tensor([3., 4., 5.])
-# 标量 2.0 被广播到 (3,)
+# scalar 2.0 broadcast to (3,)
 ```
 
 ```python
-# 示例 2：2D + 1D
+# Example 2: 2D + 1D
 A = torch.randn(3, 4)       # (3, 4)
 b = torch.randn(4)           # (4,)
 print((A + b).shape)
 # torch.Size([3, 4])
-# b 从 (4,) → (1,4) → (3,4) 广播
+# b: (4,) → (1,4) → (3,4) broadcast
 
-# 验证
+# Verify
 A = torch.ones(3, 4)
 b = torch.tensor([10, 20, 30, 40.0])
 print(A + b)
@@ -289,14 +289,14 @@ print(A + b)
 ```
 
 ```python
-# 示例 3：两个不同形状
+# Example 3: two different shapes
 A = torch.randn(3, 1)       # (3, 1)
 B = torch.randn(1, 4)       # (1, 4)
 print((A + B).shape)
 # torch.Size([3, 4])
-# A: (3,1) → (3,4)，B: (1,4) → (3,4)
+# A: (3,1) → (3,4), B: (1,4) → (3,4)
 
-# 验证
+# Verify
 A = torch.tensor([[1], [2], [3.0]])
 B = torch.tensor([[10, 20, 30, 40.0]])
 print(A + B)
@@ -306,7 +306,7 @@ print(A + B)
 ```
 
 ```python
-# 示例 4：广播失败
+# Example 4: broadcast failure
 A = torch.randn(3, 4)
 B = torch.randn(3, 5)
 try:
@@ -314,10 +314,10 @@ try:
 except RuntimeError as e:
     print(f"Error: {e}")
 # Error: The size of tensor a (4) must match the size of tensor b (5)
-# dim 1: 4 vs 5 — 都不是 1，无法广播
+# dim 1: 4 vs 5 — neither is 1, cannot broadcast
 ```
 
-**广播的完整示意图**：
+**Broadcast visualization:**
 
 ```python
 # (3, 1) + (1, 4) → (3, 4)
@@ -329,7 +329,7 @@ except RuntimeError as e:
 #               [10, 20, 30, 40],
 #               [10, 20, 30, 40]]
 #
-# 结果:
+# Result:
 # [[11, 21, 31, 41],
 #  [12, 22, 32, 42],
 #  [13, 23, 33, 43]]
@@ -337,9 +337,9 @@ except RuntimeError as e:
 
 ---
 
-#### 2.5 归约操作 (Reduce)：以 `sum` 为例
+#### 2.5 Reduce Operations: `sum` as an Example
 
-归约操作会**减少张量的维度数**（除非使用 `keepdim=True`）。
+Reduce operations **reduce the number of dimensions** (unless `keepdim=True`).
 
 ```python
 x = torch.arange(12).reshape(3, 4)
@@ -350,42 +350,42 @@ print(x)
 # shape: torch.Size([3, 4])
 ```
 
-**全归约：所有维度被压缩**
+**Full reduce: all dimensions collapsed**
 
 ```python
 s = x.sum()
 print(s)
 # tensor(66)
 print(s.shape)
-# torch.Size([])  — 标量
+# torch.Size([])  — scalar
 ```
 
-**单维度归约：指定维度被压缩**
+**Single-dimension reduce: specified dimension collapsed**
 
 ```python
-# 沿 dim=0（行方向）求和 → 压缩 dim 0
+# Along dim=0 (row direction) → compress dim 0
 s0 = x.sum(dim=0)
 print(s0)
 # tensor([12, 15, 18, 21])
 print(s0.shape)
-# torch.Size([4])  — 原来的 (3,4) 变成 (4,)
+# torch.Size([4])  — (3,4) → (4,)
 
-# 沿 dim=1（列方向）求和 → 压缩 dim 1
+# Along dim=1 (column direction) → compress dim 1
 s1 = x.sum(dim=1)
 print(s1)
 # tensor([ 6, 22, 38])
 print(s1.shape)
-# torch.Size([3])  — 原来的 (3,4) 变成 (3,)
+# torch.Size([3])  — (3,4) → (3,)
 ```
 
-**`keepdim=True`：保留被压缩的维度（大小变为 1）**
+**`keepdim=True`: preserve the reduced dimension (size becomes 1)**
 
 ```python
 s0_keep = x.sum(dim=0, keepdim=True)
 print(s0_keep)
 # tensor([[12, 15, 18, 21]])
 print(s0_keep.shape)
-# torch.Size([1, 4])  — 保留了 dim 0，大小为 1
+# torch.Size([1, 4])  — dim 0 preserved, size 1
 
 s1_keep = x.sum(dim=1, keepdim=True)
 print(s1_keep)
@@ -393,26 +393,26 @@ print(s1_keep)
 #         [22],
 #         [38]])
 print(s1_keep.shape)
-# torch.Size([3, 1])  — 保留了 dim 1，大小为 1
+# torch.Size([3, 1])  — dim 1 preserved, size 1
 ```
 
-**为什么 `keepdim` 很重要？—— 广播兼容性**
+**Why `keepdim` matters — broadcast compatibility:**
 
 ```python
 x = torch.arange(12).reshape(3, 4)
 
-# 想让每列减去该列的均值（中心化）
+# Want to center each column (subtract column mean)
 col_mean = x.float().mean(dim=0)
 print(col_mean.shape)
 # torch.Size([4])  — 1D
 
-# x - col_mean 可以广播（(3,4) - (4,) → (3,4)）
-# 这里刚好可以，但更高维时可能出问题
+# x - col_mean broadcasts here: (3,4) - (4,) → (3,4)
+# Works fine, but in higher dimensions it can cause issues
 
-# 更安全的做法：用 keepdim
+# Safer approach: use keepdim
 col_mean = x.float().mean(dim=0, keepdim=True)
 print(col_mean.shape)
-# torch.Size([1, 4])  — 2D，可以正确广播
+# torch.Size([1, 4])  — 2D, broadcasts correctly
 
 centered = x.float() - col_mean
 print(centered)
@@ -421,33 +421,33 @@ print(centered)
 #         [ 4.,  4.,  4.,  4.]])
 ```
 
-**高维归约示例**：
+**Higher-dimensional reduce:**
 
 ```python
 x = torch.randn(2, 3, 4, 5)
 print(x.shape)
 # torch.Size([2, 3, 4, 5])
 
-# 沿 dim=2 求和
+# Along dim=2
 print(x.sum(dim=2).shape)
-# torch.Size([2, 3, 5])  — dim 2 被压缩
+# torch.Size([2, 3, 5])  — dim 2 collapsed
 
-# 沿多个维度求和
+# Along multiple dimensions
 print(x.sum(dim=(0, 2)).shape)
-# torch.Size([3, 5])  — dim 0 和 dim 2 都被压缩
+# torch.Size([3, 5])  — dim 0 and 2 collapsed
 
 # keepdim
 print(x.sum(dim=2, keepdim=True).shape)
-# torch.Size([2, 3, 1, 5])  — dim 2 保留，大小为 1
+# torch.Size([2, 3, 1, 5])  — dim 2 preserved, size 1
 ```
 
-**其他归约操作遵循相同规则**：
+**Other reduce operations follow the same rules:**
 
 ```python
 x = torch.randn(3, 4)
 
 x.mean(dim=0).shape          # torch.Size([4])
-x.max(dim=1).values.shape    # torch.Size([3])  — max 返回 namedtuple
+x.max(dim=1).values.shape    # torch.Size([3])  — max returns namedtuple
 x.min(dim=0).values.shape    # torch.Size([4])
 x.prod(dim=1).shape          # torch.Size([3])
 x.std(dim=0).shape           # torch.Size([4])
@@ -455,11 +455,11 @@ x.std(dim=0).shape           # torch.Size([4])
 
 ---
 
-### 3. 张量的内存布局：layout、stride 与 shape
+### 3. Tensor Memory Layout: Layout, Stride, and Shape
 
-理解张量的内存布局是高效使用 PyTorch 的关键。
+Understanding tensor memory layout is key to using PyTorch efficiently.
 
-#### 3.1 shape、stride、storage
+#### 3.1 Shape, Stride, and Storage
 
 ```python
 x = torch.arange(12).reshape(3, 4)
@@ -468,23 +468,23 @@ print(x)
 #         [ 4,  5,  6,  7],
 #         [ 8,  9, 10, 11]])
 
-print(x.shape)    # 逻辑形状
+print(x.shape)    # Logical shape
 # torch.Size([3, 4])
 
-print(x.stride())  # 步长：沿每个维度移动一个元素需要跳过的内存位置数
+print(x.stride())  # Stride: number of memory positions to skip when moving one element along each dimension
 # (4, 1)
-# 含义：沿 dim 0 移动 1 步 = 跳过 4 个内存位置
-#       沿 dim 1 移动 1 步 = 跳过 1 个内存位置
+# Meaning: moving 1 step along dim 0 = skip 4 memory positions
+#          moving 1 step along dim 1 = skip 1 memory position
 
-print(x.storage())  # 底层一维存储
+print(x.storage())  # Underlying 1D storage
 #  0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
-# 逻辑上是 3×4，物理上是连续的 12 个元素
+# Logically 3x4, physically 12 contiguous elements
 ```
 
-**关键公式**：元素 `(i, j)` 在 storage 中的位置 = `i * stride[0] + j * stride[1]`
+**Key formula**: position of element `(i, j)` in storage = `i * stride[0] + j * stride[1]`
 
 ```python
-# 验证
+# Verification
 x = torch.arange(12).reshape(3, 4)
 for i in range(3):
     for j in range(4):
@@ -498,60 +498,60 @@ for i in range(3):
 # ...
 ```
 
-#### 3.2 transpose 不复制数据，只改变 stride
+#### 3.2 Transpose Does Not Copy Data, It Only Changes Stride
 
 ```python
 x = torch.arange(12).reshape(3, 4)
 print(x.shape, x.stride())
 # torch.Size([3, 4])  (4, 1)
 
-y = x.T  # 转置
+y = x.T  # Transpose
 print(y.shape, y.stride())
 # torch.Size([4, 3])  (1, 4)
 
-# 注意：stride 变了！(4,1) → (1,4)
-# 底层 storage 完全相同，没有数据复制
+# Note: stride changed! (4,1) -> (1,4)
+# Underlying storage is identical, no data copy
 print(y.storage().data_ptr() == x.storage().data_ptr())
-# True — 共享同一块内存
+# True — sharing the same memory block
 ```
 
-**非连续张量**：transpose 后的张量不是 contiguous 的
+**Non-contiguous tensors**: a transposed tensor is not contiguous
 
 ```python
 y = x.T
 print(y.is_contiguous())
-# False  — stride (1,4) 不符合行优先的连续布局
+# False  — stride (1,4) does not match row-major contiguous layout
 
-# view 要求 contiguous，会报错
-# y.view(12)  → RuntimeError!
+# view requires contiguous, will raise an error
+# y.view(12)  -> RuntimeError!
 
-# 解决方案
-z = y.contiguous()  # 强制复制为连续内存
+# Solution
+z = y.contiguous()  # Force copy to contiguous memory
 print(z.is_contiguous())
 # True
 print(z.stride())
-# (3, 1)  — 新的 stride
+# (3, 1)  — new stride
 ```
 
-#### 3.3 permute 的 stride 变化
+#### 3.3 Stride Changes with permute
 
 ```python
 x = torch.arange(24).reshape(2, 3, 4)
 print(x.shape, x.stride())
 # torch.Size([2, 3, 4])  (12, 4, 1)
 
-y = x.permute(2, 0, 1)  # 将原来的维度 2,0,1 重排为新维度 0,1,2
+y = x.permute(2, 0, 1)  # Reorder original dimensions 2,0,1 to new dimensions 0,1,2
 print(y.shape, y.stride())
 # torch.Size([4, 2, 3])  (1, 12, 4)
-# stride 也被同样重排了！
+# stride is also reordered accordingly!
 
 print(y.is_contiguous())
 # False
 ```
 
-#### 3.4 `permute` vs `transpose` 详解
+#### 3.4 `permute` vs `transpose` In Depth
 
-**`transpose` 只能交换两个维度，`permute` 可以任意重排所有维度。**
+**`transpose` can only swap two dimensions; `permute` can arbitrarily reorder all dimensions.**
 
 ```python
 x = torch.arange(24).reshape(2, 3, 4)
@@ -559,15 +559,15 @@ print(x.shape)
 # torch.Size([2, 3, 4])
 ```
 
-**transpose：交换指定的两个维度**
+**transpose: swap two specified dimensions**
 
 ```python
-# 交换 dim 0 和 dim 2
+# Swap dim 0 and dim 2
 y = x.transpose(0, 2)
 print(y.shape)
 # torch.Size([4, 3, 2])
 
-# 等价于 permute(2, 1, 0)
+# Equivalent to permute(2, 1, 0)
 y2 = x.permute(2, 1, 0)
 print(y2.shape)
 # torch.Size([4, 3, 2])
@@ -576,16 +576,16 @@ print(torch.equal(y, y2))
 # True
 ```
 
-**transpose 的限制：一次只能交换两个维度**
+**transpose limitation: can only swap two dimensions at a time**
 
 ```python
-# 想把 (2,3,4) → (4,2,3)？transpose 做不到一步完成
-# 需要两次 transpose：
+# Want (2,3,4) → (4,2,3)? transpose can't do it in one step
+# Need two transpose calls:
 y = x.transpose(0, 2).transpose(1, 2)  # (2,3,4) → (4,3,2) → (4,2,3)
 print(y.shape)
 # torch.Size([4, 2, 3])
 
-# permute 一步搞定
+# permute does it in one step
 y2 = x.permute(2, 0, 1)
 print(y2.shape)
 # torch.Size([4, 2, 3])
@@ -594,7 +594,7 @@ print(torch.equal(y, y2))
 # True
 ```
 
-**`x.T` 只是 `transpose(0, 1)` 的缩写**
+**`x.T` is just shorthand for `transpose(0, 1)` (2D) or full reversal (higher-D)**
 
 ```python
 x = torch.arange(6).reshape(2, 3)
@@ -604,92 +604,84 @@ print(x.T.shape)
 print(torch.equal(x.T, x.transpose(0, 1)))
 # True
 
-# 对高维张量，.T 会完全反转所有维度（类似 NumPy）
+# For higher-dimensional tensors, .T reverses all dimensions (like NumPy)
 x = torch.arange(24).reshape(2, 3, 4)
 print(x.T.shape)
-# torch.Size([4, 3, 2])  — 完全反转
+# torch.Size([4, 3, 2])  — full reversal
 
 print(torch.equal(x.T, x.permute(2, 1, 0)))
 # True
 ```
 
-**深入 stride：为什么 transpose 后不连续？**
+**Deep dive into stride: why is a transposed tensor non-contiguous?**
 
 ```python
 x = torch.arange(12).reshape(3, 4)
 print(f"x: shape={x.shape}, stride={x.stride()}")
 # x: shape=torch.Size([3, 4]), stride=(4, 1)
-# 含义：dim0 步长=4，dim1 步长=1
-# 内存布局：[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+# Meaning: dim0 stride=4, dim1 stride=1
+# Memory layout: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
 
 y = x.transpose(0, 1)
 print(f"y: shape={y.shape}, stride={y.stride()}")
 # y: shape=torch.Size([4, 3]), stride=(1, 4)
-# 含义：dim0 步长=1，dim1 步长=4
+# Meaning: dim0 stride=1, dim1 stride=4
 
-# 验证：y[i,j] 在内存中的位置
-# y[0,0] → offset = 0*1 + 0*4 = 0 → 值 0 ✓
-# y[0,1] → offset = 0*1 + 1*4 = 4 → 值 4 ✓
-# y[1,0] → offset = 1*1 + 0*4 = 1 → 值 1 ✓
-# y[1,1] → offset = 1*1 + 1*4 = 5 → 值 5 ✓
+# Verify: where does y[i,j] live in memory?
+# y[0,0] → offset = 0*1 + 0*4 = 0 → value 0 ✓
+# y[0,1] → offset = 0*1 + 1*4 = 4 → value 4 ✓
+# y[1,0] → offset = 1*1 + 0*4 = 1 → value 1 ✓
+# y[1,1] → offset = 1*1 + 1*4 = 5 → value 5 ✓
 
-# 问题：行优先遍历 y 时，相邻元素在内存中不连续
-# y[0,:] = [y[0,0], y[0,1], y[0,2]] → 内存 [0, 4, 8] — 不连续！
-# 这就是 is_contiguous() = False 的原因
+# Problem: row-major traversal of y has non-contiguous memory
+# y[0,:] = [y[0,0], y[0,1], y[0,2]] → memory [0, 4, 8] — not contiguous!
+# That's why is_contiguous() returns False
 ```
 
-**连续性在实际操作中的影响**
+**Contiguity in practice: when does it matter?**
 
 ```python
 x = torch.arange(12).reshape(3, 4)
 y = x.transpose(0, 1)
 
-# view 要求连续 → 报错
+# view requires contiguous → error
 try:
     y.view(12)
 except RuntimeError as e:
     print(f"Error: {e}")
 # Error: view size is not compatible with input tensor's size and stride...
 
-# 解决方案 1：contiguous() — 强制复制
+# Solution 1: contiguous() — forces a copy
 z = y.contiguous()
 print(z.stride())
-# (3, 1)  — 现在连续了
+# (3, 1)  — now contiguous
 z.view(12)  # OK
 
-# 解决方案 2：reshape() — 自动处理
-w = y.reshape(12)  # 自动调用 contiguous() 如果需要
+# Solution 2: reshape() — handles it automatically
+w = y.reshape(12)  # calls contiguous() internally if needed
 print(w)
 # tensor([0, 4, 8, 1, 5, 9, 2, 6, 10, 3, 7, 11])
 ```
 
-**总结**：
+**Summary**:
 
-| 操作         | 复制数据？ | 改变 shape？ | 改变 stride？ | contiguous？ |
-| ------------ | ---------- | ------------ | ------------- | ------------ |
-| `reshape`    | 按需       | ✓            | ✓             | ✓            |
-| `view`       | 不复制     | ✓            | ✓             | 要求已是 ✓   |
-| `transpose`  | 不复制     | ✓（交换2维） | ✓             | 变为 ✗       |
-| `permute`    | 不复制     | ✓（任意重排）| ✓             | 变为 ✗       |
-| `contiguous` | 复制       | 不变         | ✓             | ✓            |
-
-| 操作         | 复制数据？ | 改变 shape？ | 改变 stride？ | contiguous？ |
-| ------------ | ---------- | ------------ | ------------- | ------------ |
-| `reshape`    | 按需       | ✓            | ✓             | ✓            |
-| `view`       | 不复制     | ✓            | ✓             | 要求已是 ✓   |
-| `transpose`  | 不复制     | ✓            | ✓             | 变为 ✗       |
-| `permute`    | 不复制     | ✓            | ✓             | 变为 ✗       |
-| `contiguous` | 复制       | 不变         | ✓             | ✓            |
+| Operation    | Copies Data? | Changes Shape? | Changes Stride? | Contiguous? |
+| ------------ | ------------ | -------------- | --------------- | ----------- |
+| `reshape`    | As needed    | Yes            | Yes             | Yes         |
+| `view`       | No copy      | Yes            | Yes             | Requires already Yes |
+| `transpose`  | No copy      | Yes            | Yes             | Becomes No  |
+| `permute`    | No copy      | Yes            | Yes             | Becomes No  |
+| `contiguous` | Copies       | Unchanged      | Yes             | Yes         |
 
 ---
 
-### 4. 爱因斯坦求和约定 (Einsum) 与 einops
+### 4. Einstein Summation Convention (Einsum) and einops
 
-#### 4.1 `torch.einsum` —— 统一的张量运算语言
+#### 4.1 `torch.einsum` — A Unified Language for Tensor Operations
 
-爱因斯坦求和约定的核心规则：
-- **重复索引 = 求和**
-- **自由索引 = 输出维度**
+The core rules of Einstein summation convention:
+- **Repeated index = summation**
+- **Free index = output dimension**
 
 ```python
 a = torch.tensor([1., 2., 3.])       # shape: (3,)
@@ -698,7 +690,7 @@ A = torch.randn(3, 4)                # shape: (3, 4)
 B = torch.randn(4, 5)                # shape: (4, 5)
 ```
 
-**向量点积**：$c = \sum_i a_i b_i$
+**Vector dot product**: $c = \sum_i a_i b_i$
 
 ```python
 c = torch.einsum('i,i->', a, b)
@@ -708,7 +700,7 @@ print(c.shape)
 # torch.Size([])
 ```
 
-**矩阵-向量乘法**：$y_i = \sum_j A_{ij} x_j$
+**Matrix-vector multiplication**: $y_i = \sum_j A_{ij} x_j$
 
 ```python
 x = torch.randn(4)
@@ -717,16 +709,16 @@ print(y.shape)
 # torch.Size([3])
 ```
 
-**矩阵乘法**：$C_{ij} = \sum_k A_{ik} B_{kj}$
+**Matrix multiplication**: $C_{ij} = \sum_k A_{ik} B_{kj}$
 
 ```python
 C = torch.einsum('ik,kj->ij', A, B)
 print(C.shape)
 # torch.Size([3, 5])
-# 等价于 A @ B
+# Equivalent to A @ B
 ```
 
-**批量矩阵乘法**：$C_{bij} = \sum_k A_{bik} B_{bkj}$
+**Batched matrix multiplication**: $C_{bij} = \sum_k A_{bik} B_{bkj}$
 
 ```python
 A_batch = torch.randn(8, 3, 4)  # batch=8
@@ -736,14 +728,14 @@ print(C_batch.shape)
 # torch.Size([8, 3, 5])
 ```
 
-**转置**：
+**Transpose**:
 
 ```python
 torch.einsum('ij->ji', A).shape
 # torch.Size([4, 3])
 ```
 
-**对角线提取**：
+**Diagonal extraction**:
 
 ```python
 M = torch.randn(4, 4)
@@ -752,7 +744,7 @@ print(d.shape)
 # torch.Size([4])
 ```
 
-**迹**：
+**Trace**:
 
 ```python
 tr = torch.einsum('ii->', M)
@@ -760,7 +752,7 @@ print(tr.shape)
 # torch.Size([])
 ```
 
-**外积**：
+**Outer product**:
 
 ```python
 outer = torch.einsum('i,j->ij', a, b)
@@ -772,18 +764,18 @@ print(outer)
 #         [12., 15., 18.]])
 ```
 
-**多头注意力中的缩放点积**：
+**Scaled dot-product in multi-head attention**:
 
 ```python
 Q = torch.randn(8, 6, 10, 64)  # (batch, heads, seq_len, d_k)
 K = torch.randn(8, 6, 10, 64)
 scores = torch.einsum('bhik,bhkj->bhij', Q, K.transpose(-2, -1))
-# 等价于 Q @ K.transpose(-2, -1)
+# Equivalent to Q @ K.transpose(-2, -1)
 print(scores.shape)
 # torch.Size([8, 6, 10, 10])
 ```
 
-#### 4.2 `einops` 库 —— 更可读的张量操作
+#### 4.2 `einops` Library — More Readable Tensor Operations
 
 ```python
 from einops import rearrange, reduce, repeat
@@ -793,70 +785,70 @@ print(x.shape)
 # torch.Size([2, 3, 4, 5])
 ```
 
-**rearrange：重排维度**
+**rearrange: reorder dimensions**
 
 ```python
-# 转置最后两个维度
+# Transpose the last two dimensions
 y = rearrange(x, 'b c h w -> b c w h')
 print(y.shape)
 # torch.Size([2, 3, 5, 4])
 
-# 合并维度
+# Merge dimensions
 y = rearrange(x, 'b c h w -> (b c) h w')
 print(y.shape)
 # torch.Size([6, 4, 5])
 
-# 拆分维度
+# Split dimensions
 y = rearrange(x, 'b (c1 c2) h w -> b c1 c2 h w', c1=3)
 print(y.shape)
-# torch.Size([2, 3, 1, 4, 5])  — c2 = 3/3 = 1... 实际需要 c1*c2=c
+# torch.Size([2, 3, 1, 4, 5])  — c2 = 3/3 = 1... actually requires c1*c2=c
 
-# 多头注意力中的经典操作
+# Classic operation in multi-head attention
 q = torch.randn(8, 10, 192)  # (batch, seq, heads*d_k)
 q_heads = rearrange(q, 'b t (h k) -> b h t k', h=6)
 print(q_heads.shape)
 # torch.Size([8, 6, 10, 32])  — 192 = 6 * 32
 ```
 
-**reduce：聚合**
+**reduce: aggregation**
 
 ```python
 x = torch.randn(2, 3, 4, 5)
 
 reduce(x, 'b c h w -> b c', 'mean').shape
-# torch.Size([2, 3])  — 对 h,w 求均值
+# torch.Size([2, 3])  — mean over h, w
 
 reduce(x, 'b c h w -> b', 'max').shape
-# torch.Size([2])  — 对 c,h,w 求最大值
+# torch.Size([2])  — max over c, h, w
 
 reduce(x, 'b c h w -> ()', 'sum').shape
-# torch.Size([])  — 全部求和
+# torch.Size([])  — sum over all
 ```
 
-**repeat：重复**
+**repeat: replication**
 
 ```python
 x = torch.randn(1, 3, 4)
 
 repeat(x, '1 c h -> b c h', b=4).shape
-# torch.Size([4, 3, 4])  — 复制 batch 维
+# torch.Size([4, 3, 4])  — replicate batch dim
 
 repeat(x, '1 c h -> 1 c h w', w=5).shape
-# torch.Size([1, 3, 4, 5])  — 在新维度上重复
+# torch.Size([1, 3, 4, 5])  — repeat along a new dimension
 ```
 
 ---
 
-### 5. 矩阵乘法的维度匹配规则
+### 5. Dimension Matching Rules for Matrix Multiplication
 
-#### 5.1 基本规则
+#### 5.1 Basic Rules
 
-`torch.matmul`（或 `@`）的维度匹配：
+`torch.matmul` (or `@`) dimension matching:
 
 ```
-最后一个维度 of A == 倒数第二个维度 of B
+Last dimension of A == Second-to-last dimension of B
 
-(3, 4) @ (4, 5) → (3, 5)
+(3, 4) @ (4, 5) -> (3, 5)
 ```
 
 ```python
@@ -867,69 +859,69 @@ print(C.shape)
 # torch.Size([3, 5])
 ```
 
-#### 5.2 批量矩阵乘法 (Batched MatMul)
+#### 5.2 Batched MatMul
 
-当两个张量都有额外的前导维度时，PyTorch 会**自动广播**：
+When both tensors have additional leading dimensions, PyTorch will **automatically broadcast**:
 
 ```python
-# 情况 1: 两个 3D 张量
-A = torch.randn(8, 3, 4)   # batch=8, 矩阵 3×4
-B = torch.randn(8, 4, 5)   # batch=8, 矩阵 4×5
+# Case 1: Two 3D tensors
+A = torch.randn(8, 3, 4)   # batch=8, matrix 3×4
+B = torch.randn(8, 4, 5)   # batch=8, matrix 4×5
 C = A @ B
 print(C.shape)
-# torch.Size([8, 3, 5])  — 逐 batch 矩阵乘法
+# torch.Size([8, 3, 5])  — per-batch matrix multiplication
 ```
 
-**`A @ B` 等价于逐 batch 循环**：
+**`A @ B` is equivalent to a per-batch loop**:
 
 ```python
 A = torch.randn(8, 3, 4)
 B = torch.randn(8, 4, 5)
 
-# 方式 1：直接 @（向量化，快）
+# Method 1: Direct @ (vectorized, fast)
 C_vec = A @ B
 
-# 方式 2：循环（等价，但慢）
+# Method 2: Loop (equivalent, but slow)
 C_loop = torch.empty(8, 3, 5)
 for i in range(8):
-    C_loop[i] = A[i] @ B[i]  # 每个 batch 独立做 3×4 @ 4×5 → 3×5
+    C_loop[i] = A[i] @ B[i]  # each batch independently: 3×4 @ 4×5 → 3×5
 
 print(torch.allclose(C_vec, C_loop))
-# True  — 结果完全相同
+# True  — results are identical
 
-# 验证形状
+# Verify shapes
 print(C_vec.shape)     # torch.Size([8, 3, 5])
 print(C_loop.shape)    # torch.Size([8, 3, 5])
-print(C_vec[0].shape)  # torch.Size([3, 5])  — 单个 batch 的结果
+print(C_vec[0].shape)  # torch.Size([3, 5])  — single batch result
 ```
 
-**为什么向量化更快**：循环版本在 Python 层面迭代 8 次，每次调用一次矩阵乘法；向量化版本在底层一次完成所有 8 个矩阵乘法（GPU 并行）。
+**Why vectorization is faster**: The loop version iterates 8 times at the Python level, calling matrix multiplication once per iteration; the vectorized version completes all 8 matrix multiplications in one go underneath (GPU parallelism).
 
 ```python
-# 情况 2: 一个 3D，一个 2D — 广播！
+# Case 2: One 3D, one 2D — broadcast!
 A = torch.randn(8, 3, 4)   # batch=8
-B = torch.randn(4, 5)      # 无 batch
+B = torch.randn(4, 5)      # no batch
 C = A @ B
 print(C.shape)
-# torch.Size([8, 3, 5])  — B 被广播到每个 batch
+# torch.Size([8, 3, 5])  — B is broadcast to each batch
 
-# 等价于
+# Equivalent to
 C_loop = torch.empty(8, 3, 5)
 for i in range(8):
-    C_loop[i] = A[i] @ B   # B 在每个 batch 中相同
+    C_loop[i] = A[i] @ B   # B is the same in each batch
 print(torch.allclose(C, C_loop))
 # True
 ```
 
 ```python
-# 情况 3: 两个 4D 张量
+# Case 3: Two 4D tensors
 Q = torch.randn(8, 6, 10, 64)  # (batch, heads, seq, d_k)
 K = torch.randn(8, 6, 10, 64)
 scores = Q @ K.transpose(-2, -1)
 print(scores.shape)
-# torch.Size([8, 6, 10, 10])  — 最后两维做矩阵乘法
+# torch.Size([8, 6, 10, 10])  — matrix multiplication on the last two dims
 
-# 等价于双重循环
+# Equivalent to a double loop
 scores_loop = torch.empty(8, 6, 10, 10)
 for b in range(8):
     for h in range(6):
@@ -938,10 +930,10 @@ print(torch.allclose(scores, scores_loop))
 # True
 ```
 
-#### 5.3 `torch.bmm` —— 严格的批量矩阵乘法
+#### 5.3 `torch.bmm` — Strict Batched Matrix Multiplication
 
 ```python
-# bmm 要求严格的 3D: (batch, n, m) @ (batch, m, p) → (batch, n, p)
+# bmm requires strict 3D: (batch, n, m) @ (batch, m, p) -> (batch, n, p)
 A = torch.randn(32, 10, 64)
 B = torch.randn(32, 64, 20)
 C = torch.bmm(A, B)
@@ -949,35 +941,35 @@ print(C.shape)
 # torch.Size([32, 10, 20])
 ```
 
-**选择建议**：`@` 运算符支持广播，更灵活；`bmm` 更严格，有时更清晰。
+**Recommendation**: The `@` operator supports broadcasting and is more flexible; `bmm` is stricter and sometimes clearer.
 
 ---
 
-### 6. GPU 与设备管理
+### 6. GPU and Device Management
 
 ```python
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 print(device)
-# 'cuda' 或 'cpu'
+# 'cuda' or 'cpu'
 
-# 创建时指定设备
+# Specify device at creation
 x = torch.randn(3, 4, device=device)
 print(x.device)
-# cuda:0  或  cpu
+# cuda:0  or  cpu
 
-# 移动到 GPU
+# Move to GPU
 x = x.to('cuda')
 
-# 移动回 CPU
+# Move back to CPU
 x = x.to('cpu')
 
-# 不同设备的张量不能运算
+# Tensors on different devices cannot be operated on
 a = torch.randn(3, device='cuda')
 b = torch.randn(3, device='cpu')
-# a + b → RuntimeError!
+# a + b -> RuntimeError!
 ```
 
-**设备无关的代码模式**：
+**Device-agnostic code pattern**:
 
 ```python
 DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -987,7 +979,7 @@ data = data.to(DEVICE)
 
 ---
 
-### 7. 数据集与 DataLoader
+### 7. Datasets and DataLoader
 
 ```python
 from torchvision import datasets, transforms
@@ -1013,16 +1005,16 @@ for images, labels in train_loader:
 
 ---
 
-### 8. PyTorch 的接口设计：从 tensor 到 Module
+### 8. PyTorch API Design: From Tensors to Modules
 
 #### 8.1 `torch.tensor` vs `torch.Tensor`
 
 ```python
-# torch.tensor: 推断 dtype，推荐使用
+# torch.tensor: infers dtype, recommended
 a = torch.tensor([1, 2, 3])        # int64
 b = torch.tensor([1.0, 2.0, 3.0])  # float32
 
-# torch.Tensor: 总是 float32
+# torch.Tensor: always float32
 c = torch.Tensor([1, 2, 3])        # float32!
 print(c.dtype)
 # torch.float32
@@ -1030,29 +1022,29 @@ print(c.dtype)
 
 #### 8.2 `nn.Parameter`
 
-`nn.Parameter` 是一个特殊的 Tensor，会被自动注册为模型参数：
+`nn.Parameter` is a special Tensor that is automatically registered as a model parameter:
 
 ```python
 import torch.nn as nn
 
-# 普通 tensor — 不会被 optimizer 追踪
+# Regular tensor — not tracked by optimizer
 w = torch.randn(3, 4)
 
-# Parameter — 会被自动注册
+# Parameter — automatically registered
 w = nn.Parameter(torch.randn(3, 4))
-print(w.requires_grad)  # True（默认）
+print(w.requires_grad)  # True (default)
 print(type(w))          # <class 'torch.nn.parameter.Parameter'>
 ```
 
-**在 Module 中使用**：
+**Usage in Modules**:
 
 ```python
 class MyModule(nn.Module):
     def __init__(self):
         super().__init__()
-        # 这两种方式等价，都会被注册为模型参数
-        self.weight = nn.Parameter(torch.randn(3, 4))  # 手动
-        self.linear = nn.Linear(4, 5)                   # 自动（内部创建 Parameter）
+        # Both are equivalent and registered as model parameters
+        self.weight = nn.Parameter(torch.randn(3, 4))  # Manual
+        self.linear = nn.Linear(4, 5)                   # Automatic (internally creates Parameters)
 
 model = MyModule()
 for name, param in model.named_parameters():
@@ -1066,7 +1058,7 @@ for name, param in model.named_parameters():
 
 ```python
 linear = nn.Linear(in_features=4, out_features=3, bias=True)
-print(linear.weight.shape)  # torch.Size([3, 4])  — 注意是转置的！
+print(linear.weight.shape)  # torch.Size([3, 4])  — note the transposition!
 print(linear.bias.shape)    # torch.Size([3])
 
 x = torch.randn(2, 4)
@@ -1074,20 +1066,20 @@ y = linear(x)
 print(y.shape)
 # torch.Size([2, 3])
 
-# 等价于: y = x @ linear.weight.T + linear.bias
+# Equivalent to: y = x @ linear.weight.T + linear.bias
 ```
 
-#### 8.4 `nn.Module` —— 所有神经网络的基类
+#### 8.4 `nn.Module` — Base Class for All Neural Networks
 
 ```python
 class MyNet(nn.Module):
     def __init__(self, input_dim, hidden_dim, output_dim):
-        super().__init__()  # 必须调用父类构造函数
+        super().__init__()  # Must call parent constructor
         self.fc1 = nn.Linear(input_dim, hidden_dim)
         self.fc2 = nn.Linear(hidden_dim, output_dim)
 
     def forward(self, x):
-        x = torch.relu(self.fc1(x))  # 前向传播
+        x = torch.relu(self.fc1(x))  # Forward pass
         x = self.fc2(x)
         return x
 
@@ -1098,12 +1090,12 @@ print(model)
 #   (fc2): Linear(in_features=128, out_features=10, bias=True)
 # )
 
-# 自动获取所有参数
+# Automatically get all parameters
 print(sum(p.numel() for p in model.parameters()))
 # 100480 + 1290 = 101770
 ```
 
-#### 8.5 `nn.Sequential` —— 顺序容器
+#### 8.5 `nn.Sequential` — Sequential Container
 
 ```python
 model = nn.Sequential(
@@ -1124,19 +1116,19 @@ print(y.shape)
 # torch.Size([32, 10])
 ```
 
-#### 8.6 `nn.ReLU()` vs `F.relu()` —— 两种不同的写法
+#### 8.6 `nn.ReLU()` vs `F.relu()` — Two Different Approaches
 
 ```python
 import torch.nn as nn
 import torch.nn.functional as F
 
-x = torch.randn(2, 3) - 0.5  # 包含正负值
+x = torch.randn(2, 3) - 0.5  # Contains both positive and negative values
 print(x)
 # tensor([[-0.2345,  0.5678, -0.1234],
 #         [ 0.8765, -0.4567,  0.2345]])
 ```
 
-**`nn.ReLU()`：有状态的模块**
+**`nn.ReLU()`: A stateful module**
 
 ```python
 relu_module = nn.ReLU()
@@ -1145,13 +1137,13 @@ print(y)
 # tensor([[0.0000, 0.5678, 0.0000],
 #         [0.8765, 0.0000, 0.2345]])
 
-# 特点：
-# 1. 是 nn.Module 的实例，可以放入 nn.Sequential
-# 2. 可以有额外参数（如 inplace）
-# 3. 在 model.train() / model.eval() 时行为一致（ReLU 没区别，但 Dropout/BN 有）
+# Characteristics:
+# 1. Is an instance of nn.Module, can be placed in nn.Sequential
+# 2. Can have extra parameters (e.g., inplace)
+# 3. Behavior is consistent under model.train() / model.eval() (no difference for ReLU, but there is for Dropout/BN)
 ```
 
-**`F.relu()`：无状态的函数**
+**`F.relu()`: A stateless function**
 
 ```python
 y = F.relu(x)
@@ -1159,49 +1151,49 @@ print(y)
 # tensor([[0.0000, 0.5678, 0.0000],
 #         [0.8765, 0.0000, 0.2345]])
 
-# 特点：
-# 1. 是一个纯函数，不是 Module
-# 2. 不能放入 nn.Sequential
-# 3. 没有可学习参数
+# Characteristics:
+# 1. Is a pure function, not a Module
+# 2. Cannot be placed in nn.Sequential
+# 3. Has no learnable parameters
 ```
 
-**何时用哪个**：
+**When to use which**:
 
 ```python
-# 在 __init__ 中定义（作为网络结构的一部分）→ 用 nn.ReLU()
+# Defined in __init__ (as part of network architecture) -> use nn.ReLU()
 class MyNet(nn.Module):
     def __init__(self):
         super().__init__()
-        self.relu = nn.ReLU()  # 有状态
+        self.relu = nn.ReLU()  # Stateful
 
     def forward(self, x):
         return self.relu(x)
 
-# 在 forward 中临时使用 → 用 F.relu()
+# Used temporarily in forward -> use F.relu()
 class MyNet(nn.Module):
     def __init__(self):
         super().__init__()
         self.fc = nn.Linear(10, 20)
 
     def forward(self, x):
-        return F.relu(self.fc(x))  # 更简洁
+        return F.relu(self.fc(x))  # More concise
 ```
 
-**有区别的激活函数/层**：
+**Layers where it matters**:
 
 ```python
-# Dropout: nn.Dropout vs F.dropout — 行为不同！
-# nn.Dropout 在 eval 模式下不做 dropout
-# F.dropout 总是做 dropout（需要手动传 training 参数）
+# Dropout: nn.Dropout vs F.dropout — behavior differs!
+# nn.Dropout does not apply dropout in eval mode
+# F.dropout always applies dropout (need to pass training argument manually)
 
 # BatchNorm: nn.BatchNorm2d vs F.batch_norm
-# nn.BatchNorm2d 维护 running_mean 和 running_var
-# F.batch_norm 需要手动传入这些统计量
+# nn.BatchNorm2d maintains running_mean and running_var
+# F.batch_norm requires manually passing these statistics
 ```
 
 ---
 
-### 9. 构建第一个神经网络
+### 9. Building a First Neural Network
 
 ```python
 import torch.nn as nn
@@ -1214,7 +1206,7 @@ class SimpleNet(nn.Module):
         self.fc2 = nn.Linear(128, 10)
 
     def forward(self, x):
-        x = x.view(x.size(0), -1)  # 展平: (B, 1, 28, 28) → (B, 784)
+        x = x.view(x.size(0), -1)  # Flatten: (B, 1, 28, 28) -> (B, 784)
         x = F.relu(self.fc1(x))    # (B, 128)
         x = self.fc2(x)            # (B, 10)
         return F.log_softmax(x, dim=1)
@@ -1228,42 +1220,42 @@ print(out.shape)
 
 ---
 
-## W1D2：梯度下降与 Autograd
+## W1D2: Gradient Descent and Autograd
 
 ---
 
-### 1. 梯度的方向
+### 1. The Direction of the Gradient
 
-对于函数 $f(\mathbf{x}): \mathbb{R}^d \to \mathbb{R}$，梯度
+For a function $f(\mathbf{x}): \mathbb{R}^d \to \mathbb{R}$, the gradient
 
 $$
 \nabla f(\mathbf{x}) = \left[\frac{\partial f}{\partial x_1}, \ldots, \frac{\partial f}{\partial x_d}\right]^\top
 $$
 
-总是指向**最速上升**方向。因此 $-\nabla f$ 指向最速下降方向。
+always points in the direction of **steepest ascent**. Therefore $-\nabla f$ points in the direction of steepest descent.
 
 ---
 
-### 2. 梯度下降算法
+### 2. Gradient Descent Algorithm
 
 $$
 \mathbf{w}^{(t+1)} = \mathbf{w}^{(t)} - \eta \, \nabla_{\mathbf{w}} \mathcal{L}\left(\mathbf{w}^{(t)}\right)
 $$
 
 ```python
-# 手动梯度下降
+# Manual gradient descent
 w = torch.tensor([2.0], requires_grad=True)
 lr = 0.1
 
 for step in range(20):
-    loss = (w - 3) ** 2      # 目标：最小化 (w-3)^2
-    loss.backward()           # 计算梯度
+    loss = (w - 3) ** 2      # Goal: minimize (w-3)^2
+    loss.backward()           # Compute gradient
     with torch.no_grad():
-        w -= lr * w.grad      # 更新参数
-    w.grad.zero_()            # 清零梯度
+        w -= lr * w.grad      # Update parameter
+    w.grad.zero_()            # Zero out gradient
 
 print(w.item())
-# ≈ 3.0
+# approximately 3.0
 ```
 
 ---
@@ -1277,49 +1269,49 @@ b = torch.tensor([1.0], requires_grad=True)
 x = torch.tensor([3.0])
 y_true = torch.tensor([10.0])
 
-# 前向传播
+# Forward pass
 y_pred = w * x + b
 loss = (y_true - y_pred) ** 2
 print(f"y_pred = {y_pred.item()}, loss = {loss.item()}")
 # y_pred = 7.0, loss = 9.0
 
-# 反向传播
+# Backward pass
 loss.backward()
 
 print(f"dL/dw = {w.grad.item()}")  # -2 * x * (y_true - y_pred) = -2*3*3 = -18
 print(f"dL/db = {b.grad.item()}")  # -2 * (y_true - y_pred) = -6
 ```
 
-**重要规则**：
+**Important rules**:
 
 ```python
-# 1. 梯度会累积！
+# 1. Gradients accumulate!
 w = torch.tensor([1.0], requires_grad=True)
 (w ** 2).backward()
 (w ** 2).backward()
-print(w.grad)  # tensor([4.]) — 而不是 2！
-# 解决：每次 backward 前调用 optimizer.zero_grad() 或 w.grad.zero_()
+print(w.grad)  # tensor([4.]) — not 2!
+# Solution: call optimizer.zero_grad() or w.grad.zero_() before each backward
 
-# 2. requires_grad 是"传染的"
+# 2. requires_grad is "contagious"
 x = torch.randn(3, requires_grad=True)
 y = x * 2
 z = y.sum()
 print(y.requires_grad)  # True
 print(z.requires_grad)  # True
 
-# 3. .detach() 切断梯度流
+# 3. .detach() cuts off the gradient flow
 y_detached = y.detach()
 print(y_detached.requires_grad)  # False
 
-# 4. torch.no_grad() 上下文
+# 4. torch.no_grad() context
 with torch.no_grad():
-    y = x * 2  # 不追踪梯度
+    y = x * 2  # No gradient tracking
 print(y.requires_grad)  # False
 ```
 
 ---
 
-### 4. nn.Module 训练循环
+### 4. nn.Module Training Loop
 
 ```python
 model = SimpleNet().to(DEVICE)
@@ -1330,22 +1322,22 @@ for epoch in range(num_epochs):
     for batch_x, batch_y in train_loader:
         batch_x, batch_y = batch_x.to(DEVICE), batch_y.to(DEVICE)
 
-        optimizer.zero_grad()          # 1. 清零梯度
-        output = model(batch_x)        # 2. 前向传播
-        loss = loss_fn(output, batch_y) # 3. 计算损失
-        loss.backward()                # 4. 反向传播
-        optimizer.step()               # 5. 更新参数
+        optimizer.zero_grad()          # 1. Zero gradients
+        output = model(batch_x)        # 2. Forward pass
+        loss = loss_fn(output, batch_y) # 3. Compute loss
+        loss.backward()                # 4. Backward pass
+        optimizer.step()               # 5. Update parameters
 ```
 
 ---
 
-## W1D3：多层感知机 (MLP)
+## W1D3: Multilayer Perceptron (MLP)
 
 ---
 
-### 1. 万能逼近定理
+### 1. Universal Approximation Theorem
 
-**定理**（Cybenko 1989, Hornik 1991）：一个具有**单个隐藏层**和足够多神经元的前馈网络，可以以任意精度逼近任何连续函数。
+**Theorem** (Cybenko 1989, Hornik 1991): A feedforward network with a **single hidden layer** and a sufficient number of neurons can approximate any continuous function to arbitrary accuracy.
 
 $$
 f(x) \approx \sum_{i=1}^{N} \alpha_i \, \text{ReLU}(x - b_i)
@@ -1353,7 +1345,7 @@ $$
 
 ---
 
-### 2. 激活函数
+### 2. Activation Functions
 
 ```python
 x = torch.linspace(-3, 3, 7)
@@ -1372,10 +1364,10 @@ print(torch.tanh(x))
 
 ---
 
-### 3. 交叉熵损失
+### 3. Cross-Entropy Loss
 
 ```python
-logits = torch.randn(3, 5)   # 3 个样本，5 个类别
+logits = torch.randn(3, 5)   # 3 samples, 5 classes
 labels = torch.tensor([0, 2, 4])
 
 loss_fn = nn.CrossEntropyLoss()
@@ -1383,62 +1375,62 @@ loss = loss_fn(logits, labels)
 print(f"Cross entropy loss = {loss.item():.4f}")
 ```
 
-**注意**：`nn.CrossEntropyLoss` 内部已包含 softmax，输入应该是 **logits**。
+**Note**: `nn.CrossEntropyLoss` internally includes softmax, so the input should be **logits**.
 
 ---
 
-## W1D4：优化
+## W1D4: Optimization
 
 ---
 
-### 1. SGD vs 动量 vs Adam
+### 1. SGD vs Momentum vs Adam
 
 ```python
 # SGD
 optimizer = torch.optim.SGD(model.parameters(), lr=0.01)
 
-# SGD + 动量
+# SGD + Momentum
 optimizer = torch.optim.SGD(model.parameters(), lr=0.01, momentum=0.9)
 
 # Adam
 optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
 
-# AdamW (权重衰减解耦)
+# AdamW (decoupled weight decay)
 optimizer = torch.optim.AdamW(model.parameters(), lr=1e-3, weight_decay=0.01)
 ```
 
 ---
 
-### 2. 学习率调度
+### 2. Learning Rate Scheduling
 
 ```python
-# 阶梯衰减
+# Step decay
 scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=30, gamma=0.1)
 
-# 余弦退火
+# Cosine annealing
 scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=100)
 
-# 每个 epoch 结束后调用
+# Call at the end of each epoch
 for epoch in range(num_epochs):
     train(...)
     scheduler.step()
 ```
 
-**阶梯衰减 (Step Decay)**：在指定的 milestone 处将学习率乘以 gamma
+**Step Decay**: Multiplies the learning rate by `gamma` at specified milestones
 
-![阶梯衰减](../../assets/step_decay.png)
+![Step Decay](../../assets/step_decay.png)
 
-**余弦退火 (Cosine Annealing)**：学习率按余弦函数从 `lr_max` 平滑衰减到 `lr_min`
+**Cosine Annealing**: Smoothly decays the learning rate from `lr_max` to `lr_min` following a cosine curve
 
-![余弦退火](../../assets/cosine_annealing.png)
+![Cosine Annealing](../../assets/cosine_annealing.png)
 
 ---
 
-## 综合练习：多头缩放点积注意力
+## Comprehensive Exercise: Multi-Head Scaled Dot-Product Attention
 
-这是一个综合性的练习，涵盖张量操作、矩阵乘法、维度变换等多个知识点。
+This is a comprehensive exercise covering tensor operations, matrix multiplication, dimension transformations, and more.
 
-### 数学公式
+### Mathematical Formulation
 
 $$
 \text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^\top}{\sqrt{d_k}}\right) V
@@ -1448,13 +1440,13 @@ $$
 \text{MultiHead}(Q, K, V) = \text{Concat}(\text{head}_1, \ldots, \text{head}_h) W^O
 $$
 
-其中 $\text{head}_i = \text{Attention}(QW_i^Q, KW_i^K, VW_i^V)$
+where $\text{head}_i = \text{Attention}(QW_i^Q, KW_i^K, VW_i^V)$
 
-### 权重矩阵形状详解
+### Weight Matrix Shapes in Detail
 
-设 $d_{\text{model}} = 512$，$h = 8$ 个头，则 $d_k = d_v = d_{\text{model}} / h = 64$。
+Let $d_{\text{model}} = 512$, $h = 8$ heads, then $d_k = d_v = d_{\text{model}} / h = 64$.
 
-**单头投影矩阵**：
+**Per-head projection matrices:**
 
 $$
 W_i^Q \in \mathbb{R}^{d_{\text{model}} \times d_k} = \mathbb{R}^{512 \times 64}
@@ -1468,20 +1460,20 @@ $$
 W_i^V \in \mathbb{R}^{d_{\text{model}} \times d_v} = \mathbb{R}^{512 \times 64}
 $$
 
-**多头合并后的投影矩阵**：
+**Merged output projection matrix:**
 
 $$
 W^O \in \mathbb{R}^{h \cdot d_v \times d_{\text{model}}} = \mathbb{R}^{512 \times 512}
 $$
 
-**PyTorch 中的实际实现**（所有头的投影合并为一个矩阵）：
+**Actual PyTorch implementation** (all heads merged into one matrix):
 
 ```python
 d_model = 512
 num_heads = 8
 d_k = d_model // num_heads  # 64
 
-# 所有头的投影合并：d_model → h * d_k = d_model
+# All heads merged: d_model → h * d_k = d_model
 W_Q = nn.Linear(d_model, num_heads * d_k, bias=False)  # (512, 512)
 W_K = nn.Linear(d_model, num_heads * d_k, bias=False)  # (512, 512)
 W_V = nn.Linear(d_model, num_heads * d_k, bias=False)  # (512, 512)
@@ -1493,73 +1485,73 @@ print(f"W_V weight shape: {W_V.weight.shape}")  # torch.Size([512, 512])
 print(f"W_O weight shape: {W_O.weight.shape}")  # torch.Size([512, 512])
 ```
 
-**完整形状变换流程**（以单个样本为例，省略 batch 维）：
+**Complete shape transformation flow** (single example, batch dim omitted):
 
 ```
-输入 X: (T, d_model) = (T, 512)
+Input X: (T, d_model) = (T, 512)
 
-① 线性投影（所有头合并）
+① Linear projection (all heads merged)
    Q_proj = X @ W_Q^T:  (T, 512) @ (512, 512) → (T, 512)
    K_proj = X @ W_K^T:  (T, 512) @ (512, 512) → (T, 512)
    V_proj = X @ W_V^T:  (T, 512) @ (512, 512) → (T, 512)
 
-② 拆分多头
+② Split into multiple heads
    Q_heads: (T, 512) → (T, 8, 64) → permute → (8, T, 64)
    K_heads: (T, 512) → (T, 8, 64) → permute → (8, T, 64)
    V_heads: (T, 512) → (T, 8, 64) → permute → (8, T, 64)
 
-③ 注意力计算（每个头独立）
+③ Attention computation (each head independently)
    scores = Q_heads @ K_heads^T:
      (8, T, 64) @ (8, 64, T) → (8, T, T)
    weights = softmax(scores / √64):  (8, T, T)
    out = weights @ V_heads:
      (8, T, T) @ (8, T, 64) → (8, T, 64)
 
-④ 合并多头
+④ Merge heads
    out: (8, T, 64) → permute → (T, 8, 64) → reshape → (T, 512)
 
-⑤ 输出投影
+⑤ Output projection
    output = out @ W_O^T:  (T, 512) @ (512, 512) → (T, 512)
 ```
 
-### 逐步实现框架
+### Step-by-Step Implementation Framework
 
-**步骤 1**：线性投影 + 拆分头
+**Step 1**: Linear projection + split heads
 
 ```python
-# 输入: Q, K, V 均为 (B, T, d_model)
+# Input: Q, K, V all of shape (B, T, d_model)
 Q_proj = W_Q(Q)  # (B, T, h*d_k)
 K_proj = W_K(K)  # (B, T, h*d_k)
 V_proj = W_V(V)  # (B, T, h*d_k)
 
 Q_heads = rearrange(Q_proj, 'b t (h k) -> b h t k', h=num_heads)
-# (B, T, h*d_k) → (B, h, T, d_k)
+# (B, T, h*d_k) -> (B, h, T, d_k)
 K_heads = rearrange(K_proj, 'b t (h k) -> b h t k', h=num_heads)
 V_heads = rearrange(V_proj, 'b t (h k) -> b h t k', h=num_heads)
 ```
 
-**步骤 2**：计算注意力分数
+**Step 2**: Compute attention scores
 
 ```python
 scores = Q_heads @ K_heads.transpose(-2, -1)  # (B, h, T, T)
 scores = scores / math.sqrt(d_k)
 ```
 
-**步骤 3**：因果掩码
+**Step 3**: Causal mask
 
 ```python
 mask = torch.triu(torch.ones(T, T), diagonal=1).bool()
 scores = scores.masked_fill(mask, float('-inf'))
 ```
 
-**步骤 4**：Softmax + 加权求和
+**Step 4**: Softmax + weighted sum
 
 ```python
 weights = F.softmax(scores, dim=-1)  # (B, h, T, T)
 out = weights @ V_heads              # (B, h, T, d_k)
 ```
 
-**步骤 5**：合并头 + 输出投影
+**Step 5**: Merge heads + output projection
 
 ```python
 out = rearrange(out, 'b h t k -> b t (h k)')  # (B, T, h*d_k)
@@ -1568,9 +1560,9 @@ out = W_O(out)                                 # (B, T, d_model)
 
 ---
 
-## 参考资料
+## References
 
-- [PyTorch 官方教程](https://pytorch.org/tutorials/)
+- [PyTorch Official Tutorials](https://pytorch.org/tutorials/)
 - [Deep Learning Book (Goodfellow et al.)](https://www.deeplearningbook.org/)
-- [einops 文档](https://einops.rocks/)
+- [einops Documentation](https://einops.rocks/)
 - [The Illustrated Transformer](https://jalammar.github.io/illustrated-transformer/)

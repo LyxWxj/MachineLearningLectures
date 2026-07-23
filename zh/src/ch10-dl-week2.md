@@ -149,6 +149,32 @@ $$
 y[i,j] = \sum_{m=0}^{M-1}\sum_{n=0}^{N-1} w[m,n] \cdot x[i+m, j+n]
 $$
 
+**卷积运算过程示意**：
+
+![卷积运算过程](../../assets/conv_operation.png)
+
+- **输入**：5×5 的矩阵
+- **卷积核**：3×3 的 Laplacian 核（边缘检测）
+- **过程**：卷积核在输入上滑动，每个位置做逐元素相乘再求和
+- **输出**：3×3 的特征图（比输入小，因为没有 padding）
+
+**不同卷积核的效果对比**：
+
+![不同卷积核的效果](../../assets/conv_kernels.png)
+
+**常用卷积核的数值**：
+
+![卷积核数值](../../assets/conv_kernel_values.png)
+
+| 卷积核 | 作用 | 特点 |
+|--------|------|------|
+| **Identity** | 恒等变换 | 输出 = 输入 |
+| **Gaussian** | 高斯模糊 | 权重为正，中心权重最大，用于降噪 |
+| **Sobel X** | 检测垂直边缘 | 水平方向差分 |
+| **Sobel Y** | 检测水平边缘 | 垂直方向差分 |
+| **Laplacian** | 边缘检测 | 二阶导数，对噪声敏感 |
+| **Sharpen** | 锐化 | 增强中心像素，抑制邻域 |
+
 ```python
 # PyTorch 卷积层
 conv = nn.Conv2d(
@@ -179,9 +205,45 @@ $$
 y[i,j] = \max_{(m,n) \in \mathcal{R}_{i,j}} x[m,n]
 $$
 
+**平均池化**：取局部区域的均值
+
+$$
+y[i,j] = \frac{1}{|\mathcal{R}_{i,j}|} \sum_{(m,n) \in \mathcal{R}_{i,j}} x[m,n]
+$$
+
+**最大池化 vs 平均池化**：
+
+![池化对比](../../assets/pooling_comparison.png)
+
+- **最大池化**：保留每个窗口中的最大值（红色高亮），保留最强特征
+- **平均池化**：计算每个窗口的均值，保留整体信息
+
+**池化的步长效果**：
+
+![池化步长](../../assets/pooling_stride.png)
+
+- 2×2 池化 + stride=2：空间尺寸减半（6×6 → 3×3）
+- 窗口不重叠，每个元素只参与一次池化
+
 ```python
-pool = nn.MaxPool2d(kernel_size=2, stride=2)
-# (1, 16, 32, 32) → (1, 16, 16, 16)
+# 最大池化
+max_pool = nn.MaxPool2d(kernel_size=2, stride=2)
+x = torch.randn(1, 16, 32, 32)
+y = max_pool(x)
+print(y.shape)
+# torch.Size([1, 16, 16, 16])  — 空间尺寸减半
+
+# 平均池化
+avg_pool = nn.AvgPool2d(kernel_size=2, stride=2)
+y = avg_pool(x)
+print(y.shape)
+# torch.Size([1, 16, 16, 16])
+
+# 全局平均池化（常用于分类网络的最后一层）
+gap = nn.AdaptiveAvgPool2d(1)  # 输出大小固定为 1×1
+y = gap(x)
+print(y.shape)
+# torch.Size([1, 16, 1, 1])  — 每个通道变成一个标量
 ```
 
 **作用**：降低空间分辨率，增大感受野，提供一定的平移不变性。
@@ -239,62 +301,315 @@ class ResBlock(nn.Module):
 |            | 判别模型           | 生成模型           |
 | ---------- | ------------------ | ------------------ |
 | **目标**   | $p(y \mid x)$      | $p(x)$ 或 $p(x, y)$ |
+| **含义**   | 给定输入 $x$，判断它属于类别 $y$ 的概率有多大 | 学会数据本身的分布，从而能采样生成新数据 |
 | **任务**   | 分类、回归         | 生成新样本、密度估计 |
 | **例子**   | MLP, CNN           | VAE, GAN, Diffusion |
+
+**直觉**：
+- **判别模型**：给一张猫的图片，问"这是猫还是狗？"→ 输出 $p(\text{猫} \mid \text{图片})$
+- **生成模型**：学习"猫图片长什么样"→ 能自己画出一张新的猫图片
 
 ---
 
 ### 2. 自编码器 (Autoencoder)
 
+#### 2.1 核心思想
+
+自编码器是一种**无监督**的神经网络，目标是学习数据的**压缩表示**。
+
 **结构**：编码器 + 瓶颈层 + 解码器
 
 $$
-\mathbf{x} \xrightarrow{\text{encode}} \mathbf{h} \xrightarrow{\text{decode}} \hat{\mathbf{x}}
+\mathbf{x} \xrightarrow{\text{Encoder}} \mathbf{h} \xrightarrow{\text{Decoder}} \hat{\mathbf{x}}
 $$
 
-**损失函数**：重建误差
+- **编码器** $f_\phi$：将高维输入 $\mathbf{x} \in \mathbb{R}^D$ 压缩为低维隐变量 $\mathbf{h} \in \mathbb{R}^d$（$d \ll D$）
+- **解码器** $g_\theta$：从隐变量 $\mathbf{h}$ 重建原始输入 $\hat{\mathbf{x}}$
+- **瓶颈层**：强制网络学习数据的**本质特征**（不能简单复制输入）
+
+#### 2.2 最简单的自编码器
+
+```python
+import torch
+import torch.nn as nn
+
+class AutoEncoder(nn.Module):
+    def __init__(self, input_dim=784, hidden_dim=32):
+        super().__init__()
+        # 编码器：784 → 128 → 32
+        self.encoder = nn.Sequential(
+            nn.Linear(input_dim, 128),
+            nn.ReLU(),
+            nn.Linear(128, hidden_dim),
+            nn.ReLU()
+        )
+        # 解码器：32 → 128 → 784
+        self.decoder = nn.Sequential(
+            nn.Linear(hidden_dim, 128),
+            nn.ReLU(),
+            nn.Linear(128, input_dim),
+            nn.Sigmoid()  # 输出在 [0,1] 范围（适合 MNIST）
+        )
+
+    def forward(self, x):
+        h = self.encoder(x)           # 编码: (B, 784) → (B, 32)
+        x_hat = self.decoder(h)       # 解码: (B, 32) → (B, 784)
+        return x_hat
+
+# 创建模型
+model = AutoEncoder(input_dim=784, hidden_dim=32)
+
+# 查看参数量
+print(f"Encoder params: {sum(p.numel() for p in model.encoder.parameters())}")
+# Encoder params: 101152 = 784*128 + 128 + 128*32 + 32
+
+print(f"Decoder params: {sum(p.numel() for p in model.decoder.parameters())}")
+# Decoder params: 101536 = 32*128 + 128 + 128*784 + 784
+
+print(f"Total: {sum(p.numel() for p in model.parameters())}")
+# Total: 202688
+```
+
+#### 2.3 训练自编码器
+
+```python
+# 训练循环
+optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
+loss_fn = nn.MSELoss()
+
+for epoch in range(num_epochs):
+    for batch_x, _ in train_loader:  # 注意：不需要标签！
+        batch_x = batch_x.view(-1, 784)  # 展平
+
+        x_hat = model(batch_x)            # 前向传播
+        loss = loss_fn(x_hat, batch_x)    # 重建误差
+
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+```
+
+**关键点**：
+- 损失函数是**重建误差**（MSE 或交叉熵）
+- **不需要标签**——这是无监督学习
+- 瓶颈层维度 $d$ 越小，压缩越狠，重建越模糊
+
+#### 2.4 线性自编码器 ≈ PCA
+
+当编码器和解码器都是**线性映射**（无激活函数）时，自编码器学到的子空间与 PCA 相同。
 
 $$
-\mathcal{L} = \|\mathbf{x} - \hat{\mathbf{x}}\|^2
+\hat{\mathbf{x}} = W_2 W_1 \mathbf{x}
 $$
 
-**线性自编码器 ≈ PCA**：当编码器和解码器都是线性映射时，自编码器学到的子空间与 PCA 相同。
+其中 $W_1 \in \mathbb{R}^{d \times D}$ 是编码矩阵，$W_2 \in \mathbb{R}^{D \times d}$ 是解码矩阵。最优解的列空间与 PCA 的前 $d$ 个主成分相同。
+
+#### 2.5 自编码器的局限
+
+自编码器学会了**压缩和重建**，但它的隐空间**没有结构**：
+- 隐空间不连续——两个相邻的 $\mathbf{h}$ 解码后可能完全不同
+- 无法从隐空间**采样**生成新数据——因为不知道哪些 $\mathbf{h}$ 是"合法的"
+
+> 这正是 VAE 要解决的问题。
 
 ---
 
 ### 3. 变分自编码器 (VAE)
 
-VAE 将自编码器的概率化版本——编码器输出的不是一个点，而是一个**分布**。
-
 #### 3.1 核心思想
 
-编码器（识别模型）：$q_\phi(\mathbf{z} \mid \mathbf{x}) = \mathcal{N}(\boldsymbol{\mu}_\phi(\mathbf{x}), \boldsymbol{\sigma}^2_\phi(\mathbf{x}))$
+> **生成模型的目标**：学会数据分布 $p(x)$，从而能采样生成新数据。
 
-解码器（生成模型）：$p_\theta(\mathbf{x} \mid \mathbf{z})$
-
-#### 3.2 ELBO 损失
+**VAE 的策略**：假设数据由低维隐变量 $\mathbf{z}$ 生成（先采样 $\mathbf{z}$，再经 Decoder 映射成 $\mathbf{x}$）：
 
 $$
-\mathcal{L}_{\text{ELBO}} = \underbrace{\mathbb{E}_{q_\phi(\mathbf{z}|\mathbf{x})}[\log p_\theta(\mathbf{x}|\mathbf{z})]}_{\text{重建项}} - \underbrace{D_{\text{KL}}(q_\phi(\mathbf{z}|\mathbf{x}) \| p(\mathbf{z}))}_{\text{正则项}}
+p(\mathbf{x}) = \int p(\mathbf{x}|\mathbf{z})\,p(\mathbf{z})\,d\mathbf{z}
 $$
 
-- **重建项**：解码器能否从 $\mathbf{z}$ 重建 $\mathbf{x}$
-- **正则项**：编码器的分布 $q_\phi$ 与先验 $p(\mathbf{z}) = \mathcal{N}(0, I)$ 的接近程度
+> **流形假设**：高维数据的实际自由度远低于维度。例如 28×28 的手写数字（784 维），变化因素只有笔画粗细、倾斜角度等约 10-20 个因素。VAE 用一个低维向量 $\mathbf{z}$（如 20 维）表示这些潜在因素，并且认为 $\mathbf{z}$ 服从标准正态分布（先验假设）。
 
-#### 3.3 重参数化技巧
+**两个核心困难**：
 
-为了让梯度能通过采样操作：
+1. $p(\mathbf{x}) = \int p(\mathbf{x}|\mathbf{z})p(\mathbf{z})d\mathbf{z}$ 需要对所有可能的 $\mathbf{z}$ 求积分，高维空间不可行
+2. 训练还需要后验 $p(\mathbf{z}|\mathbf{x}) = \frac{p(\mathbf{x}|\mathbf{z})p(\mathbf{z})}{p(\mathbf{x})}$，但分母 $p(\mathbf{x})$ 就是不可解的积分
+
+> **VAE 的解法——变分推断**：既然真实后验 $p(\mathbf{z}|\mathbf{x})$ 算不出来，就训练一个 Encoder 网络 $q_\phi(\mathbf{z}|\mathbf{x})$（输出高斯分布的参数 $\mu, \sigma$）去近似它。然后优化一个可计算的下界 ELBO 来替代不可解的积分。
+>
+> "变分"来自变分法（Calculus of Variations）——在一族函数中找最优的那个。
+
+#### 3.2 架构
+
+```
+x  →  [Encoder q_φ(z|x)]  →  μ, log σ²
+                                ↓
+                         z = μ + σ·ε    (ε ~ N(0,I), 重参数化)
+                                ↓
+z  →  [Decoder p_θ(x|z)]  →  x̂ (重建)
+```
+
+- **编码器** $q_\phi(\mathbf{z}|\mathbf{x})$：数据 → 隐变量分布的参数（均值 $\mu$、方差 $\sigma^2$）
+- **解码器** $p_\theta(\mathbf{x}|\mathbf{z})$：隐变量 → 重建数据
+
+#### 3.3 ELBO 推导
+
+**出发点**：最大化对数似然 $\log p_\theta(\mathbf{x})$，但 $p_\theta(\mathbf{x}) = \int p_\theta(\mathbf{x}|\mathbf{z})p(\mathbf{z})d\mathbf{z}$ 不可计算。
+
+> 为什么用 $\log$ 而非 $p(\mathbf{x})$？
+> 1. 数值稳定——$p(\mathbf{x})$ 在高维空间极小（如 $10^{-300}$），取 log 后正常
+> 2. 乘法变加法——联合似然 $\prod p(\mathbf{x}_i)$ 取 log 后变为 $\sum \log p(\mathbf{x}_i)$
+
+**引入变分分布** $q_\phi(\mathbf{z}|\mathbf{x})$，用 Jensen 不等式：
 
 $$
-\mathbf{z} = \boldsymbol{\mu} + \boldsymbol{\sigma} \odot \boldsymbol{\epsilon}, \quad \boldsymbol{\epsilon} \sim \mathcal{N}(0, I)
+\log p_\theta(\mathbf{x}) = \log \mathbb{E}_{q_\phi(\mathbf{z}|\mathbf{x})}\left[\frac{p_\theta(\mathbf{x}, \mathbf{z})}{q_\phi(\mathbf{z}|\mathbf{x})}\right] \geq \mathbb{E}_{q_\phi(\mathbf{z}|\mathbf{x})}\left[\log \frac{p_\theta(\mathbf{x}, \mathbf{z})}{q_\phi(\mathbf{z}|\mathbf{x})}\right]
 $$
+
+这个下界就是 **ELBO**（Evidence Lower Bound，证据下界）。
+
+**ELBO 的分解**：
+
+$$
+\text{ELBO} = \underbrace{\mathbb{E}_{q_\phi(\mathbf{z}|\mathbf{x})}[\log p_\theta(\mathbf{x}|\mathbf{z})]}_{\text{重建项}} - \underbrace{D_{\text{KL}}(q_\phi(\mathbf{z}|\mathbf{x}) \| p(\mathbf{z}))}_{\text{KL 正则项}}
+$$
+
+**ELBO 与真实似然的关系**：
+
+$$
+\log p_\theta(\mathbf{x}) = \text{ELBO} + D_{\text{KL}}(q_\phi(\mathbf{z}|\mathbf{x}) \| p_\theta(\mathbf{z}|\mathbf{x}))
+$$
+
+因为 $D_{\text{KL}} \geq 0$，所以 $\log p_\theta(\mathbf{x}) \geq \text{ELBO}$。最大化 ELBO 同时做到两件事：
+1. 最大化数据似然（让生成模型变好）
+2. 最小化近似间隙（让 Encoder 近似更准确）
+
+#### 3.4 损失函数最终形式
+
+$$
+\mathcal{L}_{\text{VAE}} = -\mathbb{E}_{q_\phi(\mathbf{z}|\mathbf{x})}[\log p_\theta(\mathbf{x}|\mathbf{z})] + D_{\text{KL}}(q_\phi(\mathbf{z}|\mathbf{x}) \| p(\mathbf{z}))
+$$
+
+| 项 | 含义 | 直觉 |
+|---|---|---|
+| $-\mathbb{E}[\log p_\theta(\mathbf{x}\|\mathbf{z})]$ | Decoder 从 $\mathbf{z}$ 重建 $\mathbf{x}$ 的负对数似然 | 若 Decoder 输出高斯分布，就是 MSE |
+| $D_{\text{KL}}(q \| p)$ | Encoder 输出的分布偏离先验 $\mathcal{N}(0,I)$ 的程度 | 让隐空间平滑可采样 |
+
+> **为什么重建损失是 MSE？** 假设 $p_\theta(\mathbf{x}|\mathbf{z}) = \mathcal{N}(\mathbf{x}; \boldsymbol{\mu}_\theta(\mathbf{z}), \sigma^2 I)$，则 $-\log p_\theta(\mathbf{x}|\mathbf{z}) = \frac{\|\mathbf{x} - \boldsymbol{\mu}_\theta(\mathbf{z})\|^2}{2\sigma^2} + \text{const}$，忽略常数后就是 MSE。
+
+#### 3.5 重参数化技巧
+
+> **问题**：从 $q_\phi(\mathbf{z}|\mathbf{x}) = \mathcal{N}(\boldsymbol{\mu}_\phi(\mathbf{x}), \boldsymbol{\sigma}^2_\phi(\mathbf{x}))$ 中采样 $\mathbf{z}$ 的操作不可微，梯度无法从 Decoder 流回 Encoder。
+
+> **解决方案**：把随机性"外包"给外部噪声
+>
+> $$\mathbf{z} = \boldsymbol{\mu} + \boldsymbol{\sigma} \odot \boldsymbol{\epsilon}, \quad \boldsymbol{\epsilon} \sim \mathcal{N}(0, I)$$
+>
+> - $\boldsymbol{\epsilon}$ 从固定分布采样（与参数 $\phi$ 无关）
+> - $\mathbf{z}$ 对 $\boldsymbol{\mu}$ 和 $\boldsymbol{\sigma}$ 是可微的确定性函数：$\frac{\partial \mathbf{z}}{\partial \boldsymbol{\mu}} = 1, \frac{\partial \mathbf{z}}{\partial \boldsymbol{\sigma}} = \boldsymbol{\epsilon}$
 
 ```python
 def reparameterize(mu, log_var):
-    std = torch.exp(0.5 * log_var)
-    eps = torch.randn_like(std)
-    return mu + eps * std
+    """重参数化：z = μ + σ * ε, ε ~ N(0,I)"""
+    std = torch.exp(0.5 * log_var)  # σ = exp(0.5 * log σ²)
+    eps = torch.randn_like(std)      # ε ~ N(0,I)
+    return mu + eps * std            # z = μ + σ * ε
 ```
+
+> **重参数化的通用性**：重参数化并非 VAE 独有，是随机计算图中的通用方法。**Diffusion 中的前向过程 $\mathbf{x}_t = \sqrt{\bar\alpha_t} \mathbf{x}_0 + \sqrt{1-\bar\alpha_t}\boldsymbol{\epsilon}$ 本质上也是重参数化。**
+
+#### 3.6 KL 散度闭式解
+
+当 $q(\mathbf{z}|\mathbf{x}) = \mathcal{N}(\boldsymbol{\mu}, \text{diag}(\boldsymbol{\sigma}^2))$，$p(\mathbf{z}) = \mathcal{N}(0, I)$ 时，KL 散度有闭式解：
+
+$$
+D_{\text{KL}} = -\frac{1}{2}\sum_{j=1}^{d}\left(1 + \log\sigma_j^2 - \mu_j^2 - \sigma_j^2\right)
+$$
+
+> 这避免了蒙特卡洛采样估计 KL 散度带来的方差。
+
+#### 3.7 完整 VAE 实现
+
+```python
+class VAE(nn.Module):
+    def __init__(self, input_dim=784, hidden_dim=256, latent_dim=20):
+        super().__init__()
+        # 编码器：输出 μ 和 log σ²
+        self.encoder = nn.Sequential(
+            nn.Linear(input_dim, hidden_dim),
+            nn.ReLU(),
+            nn.Linear(hidden_dim, hidden_dim),
+            nn.ReLU()
+        )
+        self.fc_mu = nn.Linear(hidden_dim, latent_dim)      # μ
+        self.fc_logvar = nn.Linear(hidden_dim, latent_dim)   # log σ²
+
+        # 解码器
+        self.decoder = nn.Sequential(
+            nn.Linear(latent_dim, hidden_dim),
+            nn.ReLU(),
+            nn.Linear(hidden_dim, hidden_dim),
+            nn.ReLU(),
+            nn.Linear(hidden_dim, input_dim),
+            nn.Sigmoid()
+        )
+
+    def encode(self, x):
+        h = self.encoder(x)
+        return self.fc_mu(h), self.fc_logvar(h)
+
+    def reparameterize(self, mu, logvar):
+        std = torch.exp(0.5 * logvar)
+        eps = torch.randn_like(std)
+        return mu + eps * std
+
+    def decode(self, z):
+        return self.decoder(z)
+
+    def forward(self, x):
+        mu, logvar = self.encode(x)
+        z = self.reparameterize(mu, logvar)
+        x_hat = self.decode(z)
+        return x_hat, mu, logvar
+
+
+def vae_loss(x_hat, x, mu, logvar):
+    """VAE 损失 = 重建损失 + KL 散度"""
+    # 重建损失（MSE 或 BCE）
+    recon_loss = nn.functional.mse_loss(x_hat, x, reduction='sum')
+
+    # KL 散度闭式解
+    kl_loss = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
+
+    return recon_loss + kl_loss
+```
+
+#### 3.8 VAE 的本质困境
+
+**重建 vs 正则化的张力**：
+
+- **重建项**想让 Encoder 把尽可能多的信息塞进 $\mathbf{z}$ → $\sigma$ 越小越好
+- **KL 项**想让 $q(\mathbf{z}|\mathbf{x})$ 接近 $\mathcal{N}(0,I)$ → $\mu \to 0$，$\sigma \to 1$
+
+这种张力导致 VAE 生成的图像往往偏模糊——它是所有可能重建的"平均"。
+
+**后验坍缩（Posterior Collapse）**：当 Decoder 太强大时（如自回归 Decoder），它可以忽略 $\mathbf{z}$ 直接从上下文生成 $\mathbf{x}$。此时 $q(\mathbf{z}|\mathbf{x}) \approx p(\mathbf{z})$，$\mathbf{z}$ 不再携带任何信息。
+
+缓解方法：KL 退火、$\beta$-VAE（调节 KL 权重）、Free bits（给每维 KL 设最小值）。
+
+#### 3.9 VAE vs 自编码器
+
+| | 自编码器 | VAE |
+|---|---|---|
+| **编码器输出** | 一个确定的点 $\mathbf{h}$ | 一个分布 $q(\mathbf{z}\|\mathbf{x})$ |
+| **隐空间** | 无结构，不可采样 | 有结构（接近 $\mathcal{N}(0,I)$），可采样 |
+| **能否生成** | ❌ 不能 | ✅ 可以从 $p(\mathbf{z})$ 采样生成 |
+| **损失函数** | 重建误差 | 重建损失 + KL 散度 |
+| **训练方式** | 确定性 | 随机（重参数化） |
+
+#### 3.10 VAE 的应用
+
+- **Stable Diffusion 的图像编解码器**（KL-VAE）：把 512×512 图压缩到 64×64 隐空间
+- 异常检测、数据增强、半监督学习
+- 隐空间插值、属性编辑
 
 ---
 
@@ -317,100 +632,319 @@ $$
 
 ### 1. 核心思想
 
-**前向过程**：逐步向数据添加高斯噪声，将数据变成纯噪声
+> 如果知道如何把一张图片逐渐"腐蚀"成噪声，那么学会"逆转腐蚀"的过程就等于学会了生成。
 
-$$
-\mathbf{x}_t = \mathbf{x}_0 + \sigma_t \boldsymbol{\epsilon}, \quad \boldsymbol{\epsilon} \sim \mathcal{N}(0, I)
-$$
+**两步走**：
 
-**反向过程**：从噪声出发，逐步去噪，恢复数据
+1. **前向过程（固定，不需要学习）**：对数据逐步加高斯噪声，$T$ 步后变成纯噪声
+2. **反向过程（需要学习）**：训练神经网络逐步去噪，把纯噪声变回数据
 
-**关键**：学习 Score 函数 $\mathbf{s}(\mathbf{x}, t) = \nabla_{\mathbf{x}} \log p_t(\mathbf{x})$ 来指导反向过程。
+```
+前向: x_0 → x_1 → x_2 → ... → x_T    (逐步加噪，信号衰减)
+反向: x_T → x_{T-1} → ... → x_0      (逐步去噪，网络预测噪声)
+```
 
----
-
-### 2. Score 函数
-
-$$
-\mathbf{s}(\mathbf{x}) = \nabla_{\mathbf{x}} \log p(\mathbf{x})
-$$
-
-**几何直觉**：Score 指向概率密度增长最快的方向，其大小反映离高密度区域的远近。
-
-对于高斯混合模型，Score 是各分量 Score 的加权平均：
-
-$$
-\mathbf{s}(\mathbf{x}) = \sum_i \pi_i(\mathbf{x}) \cdot \mathbf{s}_i(\mathbf{x})
-$$
-
-其中 $\pi_i(\mathbf{x})$ 是第 $i$ 个分量在 $\mathbf{x}$ 处的"责任"。
+**信噪比**：$\mathrm{SNR}(t) = \frac{\bar\alpha_t}{1-\bar\alpha_t}$，随 $t$ 增大单调递减。
 
 ---
 
-### 3. 反向扩散 SDE
+### 2. 前向过程（加噪）
 
-如果前向过程是：
+#### 2.1 单步加噪
 
-$$
-d\mathbf{x} = g(t) \, d\mathbf{w}
-$$
+定义噪声调度 $\beta_1, \beta_2, \ldots, \beta_T$（通常 $\beta_t \in [0.0001, 0.02]$，$T=1000$）：
 
-则反向过程为：
+$$q(x_t | x_{t-1}) = \mathcal{N}(x_t; \sqrt{1-\beta_t}\, x_{t-1}, \beta_t I)$$
 
-$$
-d\mathbf{x} = -g^2(t) \, \nabla_{\mathbf{x}} \log p_t(\mathbf{x}) \, dt + g(t) \, d\mathbf{w}
-$$
+重参数化形式：
 
-**离散化**（采样公式）：
+$$x_t = \sqrt{1-\beta_t}\, x_{t-1} + \sqrt{\beta_t}\, \epsilon_t, \quad \epsilon_t \sim \mathcal{N}(0, I)$$
 
-$$
-\mathbf{x}_{t-\Delta t} = \mathbf{x}_t + g(t)^2 \, \mathbf{s}(\mathbf{x}_t, t) \, \Delta t + g(t) \sqrt{\Delta t} \, \mathbf{z}_t
-$$
+定义 $\alpha_t = 1 - \beta_t$，等价形式：
 
----
+$$x_t = \sqrt{\alpha_t}\, x_{t-1} + \sqrt{1-\alpha_t}\, \epsilon_t$$
 
-### 4. 去噪分数匹配 (Denoising Score Matching)
+> **方差守恒**：系数设计保证了 $(\sqrt{\alpha_t})^2 + (\sqrt{1-\alpha_t})^2 = 1$，每步加噪后方差不发散也不坍缩。
 
-**目标**：通过去噪来学习 Score 函数
+#### 2.2 闭式解（核心推导）
 
-$$
-\mathcal{L} = \mathbb{E}_{t} \mathbb{E}_{\mathbf{x}_0} \mathbb{E}_{\mathbf{z}} \left[\left\|\sigma_t \, \mathbf{s}_\theta(\mathbf{x}_0 + \sigma_t \mathbf{z}, t) + \mathbf{z}\right\|^2\right]
-$$
+定义 $\bar{\alpha}_t = \prod_{s=1}^{t}\alpha_s$。利用独立高斯的可加性（$a\epsilon_1 + b\epsilon_2 \sim \mathcal{N}(0, (a^2+b^2)I)$），可以一步直接算出任意时刻的 $x_t$：
 
-**步骤**：
-1. 从训练数据采样 $\mathbf{x}_0$
-2. 采样噪声 $\mathbf{z} \sim \mathcal{N}(0, I)$
-3. 采样时间 $t$，创建带噪数据 $\tilde{\mathbf{x}} = \mathbf{x}_0 + \sigma_t \mathbf{z}$
-4. 用神经网络预测 Score $\mathbf{s}_\theta(\tilde{\mathbf{x}}, t)$
-5. 最小化 $\|\sigma_t \mathbf{s}_\theta + \mathbf{z}\|^2$
+$$x_t = \sqrt{\bar{\alpha}_t}\, x_0 + \sqrt{1-\bar{\alpha}_t}\, \epsilon, \quad \epsilon \sim \mathcal{N}(0, I)$$
+
+或写为分布形式：
+
+$$q(x_t | x_0) = \mathcal{N}(x_t; \sqrt{\bar{\alpha}_t}\, x_0, (1-\bar{\alpha}_t)\, I)$$
+
+当 $t = T$ 时，$\bar{\alpha}_T \approx 0$，所以 $x_T \approx \mathcal{N}(0, I)$。
+
+> **这是 Diffusion 中最重要的数学推导之一**：闭式解让训练时可以随机采样任意 $t$，一步构造 $x_t$，无需逐步加噪。
 
 ---
 
-### 5. 训练与采样流程
+### 3. 反向过程（核心难点）
+
+#### 3.1 问题：$q(x_{t-1}|x_t)$ 为什么不可算？
+
+用贝叶斯定理展开：
+
+$$q(x_{t-1}|x_t) = \frac{q(x_t|x_{t-1}) \cdot q(x_{t-1})}{q(x_t)}$$
+
+- $q(x_t|x_{t-1})$ 是已知的高斯 ✓
+- $q(x_{t-1})$ 和 $q(x_t)$ 是**边际分布**，需要对整个数据分布积分：
+
+$$q(x_{t-1}) = \int q(x_{t-1}|x_0) \cdot q_{\text{data}}(x_0) \, dx_0$$
+
+这是 $N$ 个高斯的**混合**（不是线性组合），是一个极其复杂的多峰分布，没有闭式表达。
+
+> **关键区分——高斯的"线性组合" vs "混合"**：
+> - **线性组合** $Z = aX + bY$：对随机变量的采样值做算术运算，结果仍是高斯（如前向过程中的噪声合并）
+> - **混合** $p(x) = \sum_i w_i \cdot \mathcal{N}(x; \mu_i, \sigma_i^2)$：对概率密度函数做加权平均，结果一般不是高斯（多峰）
+
+#### 3.2 突破：给定 $x_0$ 后，一切变成已知高斯
+
+$$q(x_{t-1}|x_t, x_0) = \frac{q(x_t|x_{t-1}) \cdot q(x_{t-1}|x_0)}{q(x_t|x_0)}$$
+
+右边三项全都是已知的高斯分布！三个已知高斯做贝叶斯运算，结果仍是高斯。
+
+> **本质**：给定 $x_0$ 后，"$N$ 个高斯的混合"坍缩成了"一个确定的高斯"。
+
+#### 3.3 配方推导
+
+通过配方（completing the square）求出后验的均值和方差：
+
+$$\tilde\beta_t = \frac{\beta_t(1-\bar\alpha_{t-1})}{1-\bar\alpha_t}$$
+
+$$\tilde\mu_t = \frac{\sqrt{\alpha_t}(1-\bar\alpha_{t-1})}{1-\bar\alpha_t}\,x_t + \frac{\sqrt{\bar\alpha_{t-1}}\,\beta_t}{1-\bar\alpha_t}\,x_0$$
+
+$$q(x_{t-1}|x_t, x_0) = \mathcal{N}(x_{t-1}; \tilde{\mu}_t(x_t, x_0), \tilde{\beta}_t I)$$
+
+> **$\tilde\mu_t$ 的直觉**：$\tilde\mu_t$ 是 $x_t$（当前噪声图）和 $x_0$（原始数据）之间的"折中"——噪声大时（$t$ 大）更依赖 $x_0$，噪声小时更依赖 $x_t$。
+
+#### 3.4 用噪声 $\epsilon$ 替换 $x_0$（连接神经网络）
+
+推理时没有 $x_0$。利用前向闭式解反解 $x_0 = \frac{x_t - \sqrt{1-\bar\alpha_t}\,\epsilon}{\sqrt{\bar\alpha_t}}$，代入 $\tilde\mu_t$：
+
+$$\tilde\mu_t = \frac{1}{\sqrt{\alpha_t}}\left(x_t - \frac{\beta_t}{\sqrt{1-\bar\alpha_t}}\,\epsilon\right)$$
+
+> **核心结论**：$\tilde\mu_t$ 只依赖于 $x_t$（已知）和 $\epsilon$（唯一未知量）。训练神经网络 $\epsilon_\theta(x_t, t)$ 预测 $\epsilon$ 即可完成反向去噪。
+
+#### 3.5 完整逻辑链
+
+1. 想要 $q(x_{t-1}|x_t)$ → **不可算**（需要整个数据分布）
+2. 退而求其次 $q(x_{t-1}|x_t, x_0)$ → **可算**（三个已知高斯配方）
+3. 后验均值 $\tilde\mu_t(x_t, x_0)$ → 依赖 $x_0$，推理时没有
+4. 用 $\epsilon$ 替换 $x_0$ → $\tilde\mu_t(x_t, \epsilon)$
+5. 训练网络预测 $\epsilon$ → $\epsilon_\theta(x_t, t) \approx \epsilon$
+
+---
+
+### 4. 损失函数推导
+
+#### 4.1 变分下界（VLB）
+
+目标：最大化 $\log p_\theta(x_0)$。与 VAE 完全一致的思路——引入前向过程 $q(x_{1:T}|x_0)$ 作为"桥梁"，Jensen 不等式推出下界：
+
+$$\log p_\theta(x_0) \geq \mathbb{E}_{q}\left[\log \frac{p_\theta(x_{0:T})}{q(x_{1:T}|x_0)}\right]$$
+
+**对比：VAE vs Diffusion**
+
+| | VAE | Diffusion |
+|---|---|---|
+| 隐变量 | $\mathbf{z}$（单个向量） | $x_1, x_2, \ldots, x_T$（整条马尔可夫链） |
+| 近似后验 | $q_\phi(\mathbf{z}\|x_0)$（需学习的 Encoder） | $q(x_{1:T}\|x_0)$（固定前向加噪，无需学习） |
+| 生成模型 | $p_\theta(x_0, \mathbf{z}) = p_\theta(x_0\|\mathbf{z}) \cdot p(\mathbf{z})$ | $p_\theta(x_{0:T}) = p(x_T) \cdot \prod p_\theta(x_{t-1}\|x_t)$ |
+
+#### 4.2 分解为逐步 KL
+
+通过贝叶斯翻转和伸缩消去（Telescoping），VLB 分解为：
+
+$$-\text{ELBO} = \underbrace{D_{\text{KL}}(q(x_T|x_0) \| p(x_T))}_{L_T} + \sum_{t=2}^{T} \underbrace{D_{\text{KL}}(q(x_{t-1}|x_t, x_0) \| p_\theta(x_{t-1}|x_t))}_{L_{t-1}} - \underbrace{\mathbb{E}_{q}[\log p_\theta(x_0|x_1)]}_{L_0}$$
+
+- $L_T$：前向终点与先验的匹配，常数（$\approx 0$）
+- $L_{t-1}$：**核心项**，模型的去噪一步与真实反向后验的匹配
+- $L_0$：最终一步的重建损失
+
+#### 4.3 核心项 $L_{t-1}$ 的计算
+
+$$L_{t-1} = D_{\text{KL}}(q(x_{t-1}|x_t, x_0) \| p_\theta(x_{t-1}|x_t))$$
+
+- 真实后验：高斯，均值 $\tilde\mu_t(x_t, x_0)$，方差 $\tilde\beta_t$
+- 模型分布：也设为高斯，方差固定为 $\tilde\beta_t$，只学均值 $\mu_\theta(x_t, t)$
+
+两个方差相同的高斯之间的 KL 散度 = 均值差的平方：
+
+$$L_{t-1} = \frac{1}{2\tilde\beta_t}\|\tilde\mu_t(x_t, x_0) - \mu_\theta(x_t, t)\|^2$$
+
+#### 4.4 参数化为噪声预测
+
+将真实后验均值的 $\epsilon$ 替换为网络预测 $\epsilon_\theta$：
+
+$$\mu_\theta(x_t, t) = \frac{1}{\sqrt{\alpha_t}}\left(x_t - \frac{\beta_t}{\sqrt{1-\bar\alpha_t}}\,\epsilon_\theta(x_t, t)\right)$$
+
+代入后 $x_t$ 项抵消：
+
+$$L_{t-1} = \frac{\beta_t^2}{2\tilde\beta_t \alpha_t (1-\bar\alpha_t)}\|\epsilon - \epsilon_\theta(x_t, t)\|^2$$
+
+#### 4.5 简化损失（DDPM）
+
+> **Ho et al. 2020 的简化损失**：去掉时间步权重系数直接用简化损失训练效果更好：
+>
+> $$\mathcal{L}_{\text{simple}} = \mathbb{E}_{x_0, \epsilon \sim \mathcal{N}(0,I), t \sim U\{1,T\}}\left[\|\epsilon - \epsilon_\theta(x_t, t)\|^2\right]$$
+>
+> 其中 $x_t = \sqrt{\bar\alpha_t}x_0 + \sqrt{1-\bar\alpha_t}\epsilon$。
+
+> **为什么去掉权重反而更好？** 简化损失对所有时间步均匀权重，给高噪声级别（负责全局结构）更多关注，实践中产生更好的生成质量。
+
+---
+
+### 5. 三种等价的预测目标
+
+一切都源于前向闭式解：$x_t = \sqrt{\bar\alpha_t}\,x_0 + \sqrt{1-\bar\alpha_t}\,\epsilon$
+
+给定 $x_t$（已知），$\epsilon$、$x_0$、$v$ 三者可以互相转化：
+
+$$\epsilon = \frac{x_t - \sqrt{\bar\alpha_t}\,x_0}{\sqrt{1-\bar\alpha_t}}, \quad x_0 = \frac{x_t - \sqrt{1-\bar\alpha_t}\,\epsilon}{\sqrt{\bar\alpha_t}}$$
+
+速度 $v$ 是 $\epsilon$ 和 $x_0$ 的线性组合：
+
+$$v = \sqrt{\bar\alpha_t}\,\epsilon - \sqrt{1-\bar\alpha_t}\,x_0$$
+
+**三种预测目标对比**：
+
+| | $\epsilon$ 预测 | $x_0$ 预测 | $v$ 预测 |
+|---|---|---|---|
+| 网络输出 | 预测噪声 | 预测去噪后的原图 | 信号与噪声的"旋转" |
+| $t$ 小（噪声少） | 噪声信号微弱 | 接近 $x_t$，容易 | 稳定 |
+| $t$ 大（噪声多） | 接近 $x_t$，容易 | 与 $x_t$ 差异大，困难 | 稳定 |
+| 数值稳定性 | $t \to 0$ 时不稳定 | $t \to T$ 时不稳定 | **两端都稳定** |
+| 代表工作 | DDPM (Ho 2020) | DALL·E (Ramesh et al.) | Stable Diffusion v2+ |
+
+---
+
+### 6. 采样：DDPM 与 DDIM
+
+#### 6.1 DDPM 采样（随机，T 步）
+
+$$x_{t-1} = \frac{1}{\sqrt{\alpha_t}}\left(x_t - \frac{\beta_t}{\sqrt{1-\bar{\alpha}_t}}\,\epsilon_\theta(x_t, t)\right) + \sigma_t\, z, \quad z \sim \mathcal{N}(0, I)$$
+
+这是一个 SDE 的离散化，每步加入新的随机噪声。必须走完所有 $T$ 步。
+
+```python
+# DDPM 采样
+x_T = torch.randn(...)  # 从纯噪声开始
+for t in reversed(range(1, T+1)):
+    z = torch.randn_like(x_T) if t > 1 else 0
+    eps_pred = model(x_T, t)
+    x_T = (1/sqrt(alpha_t)) * (x_T - (beta_t/sqrt(1-alpha_bar_t)) * eps_pred) + sigma_t * z
+```
+
+#### 6.2 DDIM 采样（确定性，可加速）
+
+> **DDIM 核心洞察**：反向过程不一定要是随机的马尔可夫链。唯一约束只有前向边际分布不变。
+
+**两步走策略**：
+
+1. 用网络估计 $\hat{x}_0 = \frac{x_t - \sqrt{1-\bar{\alpha}_t}\,\epsilon_\theta(x_t, t)}{\sqrt{\bar\alpha_t}}$
+2. "重新加噪"到目标时刻：$x_{t-1} = \sqrt{\bar{\alpha}_{t-1}}\,\hat{x}_0 + \sqrt{1-\bar{\alpha}_{t-1}}\,\epsilon_\theta(x_t, t)$
+
+> **为什么可以跳步？** 公式中只出现累积系数 $\bar\alpha$，不依赖单步衰减系数 $\alpha_t$。定义子序列 $\tau = [T, T-k, T-2k, \ldots, 0]$，每步直接跳 $k$ 个时间步。
+
+```python
+# DDIM 采样（确定性，σ=0）
+x_T = torch.randn(...)
+tau = list(range(0, T, T // S))  # 子序列，如 S=50 步
+for t in reversed(tau):
+    eps_pred = model(x_T, t)
+    x0_pred = (x_T - sqrt(1 - alpha_bar_t) * eps_pred) / sqrt(alpha_bar_t)
+    x_T = sqrt(alpha_bar_prev) * x0_pred + sqrt(1 - alpha_bar_prev) * eps_pred
+```
+
+**DDPM vs DDIM 对比**：
+
+| | DDPM | DDIM |
+|---|---|---|
+| 随机性 | 有（每步加新噪声） | 无（确定性，可复现） |
+| 步数 | 必须 T 步 | 可跳步（如 50 步） |
+| 隐空间插值 | 不支持 | 支持（$x_T \leftrightarrow x_0$ 确定性双射） |
+
+> **本质**：DDIM 去掉了随机噪声，把 SDE 转化成了 ODE。
+
+---
+
+### 7. Score Matching 视角
+
+#### 7.1 Score Function
+
+$$s(x) = \nabla_x \log p(x)$$
+
+> **直觉**：想象数据分布 $p(x)$ 是一个地形图，"海拔"代表概率密度。score function 是每一点的上坡方向——指向概率密度增大最快的方向。
+> - 在峰值处，score $\approx 0$（已经在山顶）
+> - 在低谷处，score 指向最近的峰值
+
+> **为什么学 score 而不直接学 $p(x)$？** 直接学 $p(x)$ 需要保证积分为 1（归一化常数 $Z$ 在高维空间极难计算），而 $\nabla_x \log p(x) = \nabla_x \log \frac{p^*(x)}{Z} = \nabla_x \log p^*(x)$，对 $x$ 求梯度时 $Z$ 直接消失。
+
+#### 7.2 预测噪声 = 学 Score
+
+> **核心结论**：
+> $$\epsilon_\theta(x_t, t) \approx -\sqrt{1-\bar\alpha_t}\,\nabla_{x_t}\log q(x_t)$$
+
+直觉：噪声把你推离数据，score 把你拉回数据，两者差一个负号和一个缩放因子。
+
+#### 7.3 Probability Flow ODE
+
+Song et al. 2021 证明：对于任意 SDE，都存在一个确定性的 ODE，使得两者在每个时刻的概率分布完全相同：
+
+$$\frac{dx}{dt} = f(x,t) - \frac{1}{2}g(t)^2 \nabla_x \log p_t(x)$$
+
+> **DDIM 与 PF-ODE 的联系**：DDIM 的确定性采样本质上就是在求解 Probability Flow ODE。
+
+---
+
+### 8. 训练与采样完整代码
 
 **训练**：
 
 ```python
 for x0 in dataloader:
-    t = torch.rand(batch_size)           # 随机时间
-    z = torch.randn_like(x0)             # 随机噪声
-    sigma = sigma_t(t)                   # 噪声标准差
-    x_t = x0 + sigma[:, None] * z        # 加噪
-    score = model(x_t, t)                # 预测 Score
-    loss = ((score * sigma[:, None] + z) ** 2).mean()
+    # 随机采样时间步
+    t = torch.randint(1, T+1, (batch_size,))
+    # 采样噪声
+    eps = torch.randn_like(x0)
+    # 构造 x_t（闭式解，一步到位）
+    x_t = sqrt(alpha_bar_t) * x0 + sqrt(1 - alpha_bar_t) * eps
+    # 预测噪声
+    eps_pred = model(x_t, t)
+    # 简化损失
+    loss = F.mse_loss(eps_pred, eps)
     loss.backward()
     optimizer.step()
 ```
 
-**采样**：
+**DDPM 采样**：
 
 ```python
-x_T = sigma_T * torch.randn(...)  # 从纯噪声开始
-dt = 1.0 / num_steps
-for i in range(num_steps):
-    t = 1.0 - i * dt
-    score = model(x_T, t)
-    x_T = x_T + g(t)**2 * score * dt + g(t) * sqrt(dt) * torch.randn_like(x_T)
+x = torch.randn(batch_size, C, H, W)
+for t in reversed(range(1, T+1)):
+    eps_pred = model(x, t)
+    mu = (1/sqrt(alpha_t)) * (x - (beta_t/sqrt(1-alpha_bar_t)) * eps_pred)
+    if t > 1:
+        x = mu + sqrt(beta_t) * torch.randn_like(x)
+    else:
+        x = mu
+```
+
+**DDIM 采样**：
+
+```python
+x = torch.randn(batch_size, C, H, W)
+tau = list(range(0, T, T // 50))  # 50 步
+for i, t in enumerate(reversed(tau)):
+    eps_pred = model(x, t)
+    x0_pred = (x - sqrt(1-alpha_bar_t) * eps_pred) / sqrt(alpha_bar_t)
+    t_prev = tau[len(tau)-2-i] if i < len(tau)-1 else 0
+    alpha_bar_prev = alpha_bars[t_prev] if t_prev > 0 else 1.0
+    x = sqrt(alpha_bar_prev) * x0_pred + sqrt(1-alpha_bar_prev) * eps_pred
 ```
 
 ---

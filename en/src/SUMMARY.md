@@ -25,6 +25,14 @@
 
 ---
 
-# Part III — Advanced Topics
+# Part III — Neuromatch Deep Learning
+
+- [Deep Learning Fundamentals — Week 1](ch09-dl-week1.md)
+- [Deep Learning Advanced — Week 2](ch10-dl-week2.md)
+- [Deep Learning Frontier — Week 3](ch11-dl-week3.md)
+
+---
+
+# Part IV — Advanced Topics
 
 - [Markov Processes & Kalman Filtering](ch08-markov-kalman.md)

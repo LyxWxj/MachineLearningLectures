@@ -1044,7 +1044,7 @@ $$
 
 ### Covariance: Visual Intuition
 
-![cov_scatter.png](assets/cov_scatter.png)
+![cov_scatter.png](../../assets/cov_scatter.png)
 
 Each scatter shows 200 samples from a 2D Gaussian with different covariance.
 
@@ -1082,7 +1082,7 @@ Each entry $\hat{\Sigma}_{ij}$ tells you how feature $i$ and feature $j$ co-vary
 
 ### Covariance Matrix as Heatmap
 
-![cov_heatmap.png](assets/cov_heatmap.png)
+![cov_heatmap.png](../../assets/cov_heatmap.png)
 
 Visualizing the covariance matrix reveals the correlation structure at a glance:
 
@@ -1099,7 +1099,7 @@ Visualizing the covariance matrix reveals the correlation structure at a glance:
 
 The covariance matrix defines a **confidence ellipse** that shows the spread of the data:
 
-![cov_ellipse.png](assets/cov_ellipse.png)
+![cov_ellipse.png](../../assets/cov_ellipse.png)
 
 **Key insight**: The eigenvectors of $\Sigma$ are the **axes** of the ellipse; the eigenvalues are the **squared lengths** of those axes.
 
@@ -1139,7 +1139,7 @@ Covariance has units ($\text{units}_x \times \text{units}_y$), making it hard to
 
 $r_{xy} = \frac{\text{Cov}(x, y)}{\sigma_x \cdot \sigma_y} \in [-1, 1]$
 
-![cov_vs_corr.png](assets/cov_vs_corr.png)
+![cov_vs_corr.png](../../assets/cov_vs_corr.png)
 
 **Left**: same correlation ($r = 0.8$), but scaling $x$ by 3× changes the covariance from ~0.7 to ~2.0. Correlation is **scale-invariant**; covariance is not.
 
@@ -1214,9 +1214,9 @@ where $\mathbf{W}_{1:K}$ contains the top $K$ eigenvectors as columns.
 
 **Key insight**: PCA is equivalent to finding the **best rank-$K$ approximation** to the data in the least-squares sense (Eckart-Young theorem).
 
-![latent_space_plots_pca.png](assets/latent_space_plots_pca.png)
+![latent_space_plots_pca.png](../../assets/latent_space_plots_pca.png)
 
-![pca-components.png](assets/pca-components.png)
+![pca-components.png](../../assets/pca-components.png)
 
 ---
 
@@ -1344,7 +1344,7 @@ KL divergence penalizes **false negatives** heavily (high-D neighbors that got s
 
 ### t-SNE: Algorithm Visualization
 
-![tsne_steps.png](assets/tsne_steps.png)
+![tsne_steps.png](../../assets/tsne_steps.png)
 
 **Why t-distribution instead of Gaussian?**
 
@@ -1364,7 +1364,7 @@ This solves the **crowding problem**: in high-D, there are many "medium-distance
 
 A feedforward network transforms input $\mathbf{r}$ through a series of **layers** to produce output $y$.
 
-![one-layer-network.png](assets/one-layer-network.png)
+![one-layer-network.png](../../assets/one-layer-network.png)
 
 **Single hidden layer**:
 
@@ -1396,11 +1396,11 @@ Nonlinear activations allow the network to compute **arbitrary functions** (univ
 
 Activation functions introduce nonlinearity into neural networks.
 
-  ![relu.png](assets/relu.png)
+  ![relu.png](../../assets/relu.png)
 
-![sigmoid.png](assets/sigmoid.png)
+![sigmoid.png](../../assets/sigmoid.png)
 
-![prelu.png](assets/prelu.png)
+![prelu.png](../../assets/prelu.png)
 
 | Function | Formula | Range | Use case |
 |----------|---------|-------|----------|
@@ -1439,7 +1439,7 @@ The loss function measures how bad the network's predictions are.
 
 ---
 
-  ![bce-mse.png](assets/bce-mse.png)
+  ![bce-mse.png](../../assets/bce-mse.png)
 
 ---
 
@@ -1601,7 +1601,7 @@ where $f$ is a $K \times K$ kernel and $I$ is the input image.
 
 Different kernels produce dramatically different outputs on the same image:
 
-![conv_demo_result.png](assets/conv_demo_result.png)
+![conv_demo_result.png](../../assets/conv_demo_result.png)
 
 ---
 
@@ -1628,9 +1628,9 @@ CNNs extend convolution to **multiple learned kernels** across **multiple layers
 
 A typical CNN alternates convolution and pooling layers, then ends with fully connected layers.
 
-![conv-network.png](assets/conv-network.png)
+![conv-network.png](../../assets/conv-network.png)
 
-![convnet.png](assets/convnet.png)
+![convnet.png](../../assets/convnet.png)
 
 ```
 Input image
@@ -1648,7 +1648,7 @@ Conv + ReLU → Pool → Conv + ReLU → Pool → ... → Flatten → FC → Out
 
 Weight sharing dramatically reduces parameters!
 
- ![weight-sharing.png](assets/weight-sharing.png)
+ ![weight-sharing.png](../../assets/weight-sharing.png)
 
 **CNNs in neuroscience**: The visual cortex has a similar hierarchical structure:
 
@@ -1759,7 +1759,7 @@ Compare the RDM from brain data with the RDM from each model layer. Higher corre
 
 Autoencoders learn **compressed representations** by reconstructing their own input.
 
-![ae-ann-1h.png](assets/ae-ann-1h.png)
+![ae-ann-1h.png](../../assets/ae-ann-1h.png)
 
 **Architecture**:
 
