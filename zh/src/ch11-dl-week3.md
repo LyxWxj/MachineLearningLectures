@@ -102,9 +102,11 @@ $$
 
 ---
 
-### 5. 自注意力 (Self-Attention)
+### 5. 自注意力与交叉注意力
 
-在自注意力中，$Q$、$K$、$V$ 都来自同一个序列：
+#### 5.1 自注意力 (Self-Attention)
+
+在自注意力中，$Q$、$K$、$V$ **都来自同一个序列**：
 
 $$
 Q = XW^Q, \quad K = XW^K, \quad V = XW^V
@@ -112,7 +114,67 @@ $$
 
 **含义**：序列中的每个位置关注序列中的所有其他位置，学习它们之间的关系。
 
+```
+输入 X: (B, T, d_model)
+    ↓
+Q = X @ W_Q,  K = X @ W_K,  V = X @ W_V    ← 都来自 X
+    ↓
+Attention(Q, K, V) = softmax(QK^T / √d_k) @ V
+    ↓
+输出: (B, T, d_model)   ← 每个位置都"看到了"整个序列
+```
+
+**应用场景**：
+- **BERT**：双向自注意力，每个 token 关注左右所有 token
+- **GPT**：因果自注意力（带掩码），每个 token 只关注左侧的 token
+- **ViT**：图像 patch 之间的自注意力
+
 **复杂度**：$O(n^2 d)$，其中 $n$ 是序列长度，$d$ 是维度。这是 Transformer 的主要瓶颈。
+
+#### 5.2 交叉注意力 (Cross-Attention)
+
+在交叉注意力中，$Q$ 来自一个序列，$K$、$V$ 来自**另一个序列**：
+
+$$
+Q = X_{\text{query}} W^Q, \quad K = X_{\text{key}} W^K, \quad V = X_{\text{key}} W^V
+```
+
+**含义**：一个序列的每个位置关注另一个序列的所有位置，实现跨序列的信息融合。
+
+```
+查询序列 X_q: (B, T_q, d_model)    键值序列 X_kv: (B, T_kv, d_model)
+    ↓                                       ↓
+Q = X_q @ W_Q                        K = X_kv @ W_K,  V = X_kv @ W_V
+    ↓                                       ↓
+    └───────────── Attention(Q, K, V) ──────┘
+                        ↓
+              输出: (B, T_q, d_model)   ← 输出形状跟随查询序列
+```
+
+**应用场景**：
+- **Encoder-Decoder Transformer**：解码器查询编码器的输出（翻译任务中，目标语言关注源语言）
+- **Stable Diffusion**：文本条件通过交叉注意力注入图像生成过程
+- **多模态模型**：图像特征关注文本描述
+
+#### 5.3 自注意力 vs 交叉注意力对比
+
+| | 自注意力 | 交叉注意力 |
+|---|---|---|
+| **Q 来源** | 序列 X | 序列 X（查询端） |
+| **K, V 来源** | 序列 X（同一个） | 序列 Y（另一个） |
+| **输出形状** | (B, T_x, d) | (B, T_x, d) |
+| **核心作用** | 建模序列内部关系 | 融合两个序列的信息 |
+| **典型用途** | BERT, GPT, ViT | Decoder-Encoder, 条件生成 |
+
+```python
+# 自注意力：Q, K, V 都来自 x
+self_attn = nn.MultiheadAttention(d_model, num_heads)
+out, _ = self_attn(x, x, x)  # query=x, key=x, value=x
+
+# 交叉注意力：Q 来自 decoder，K/V 来自 encoder
+cross_attn = nn.MultiheadAttention(d_model, num_heads)
+out, _ = cross_attn(decoder_out, encoder_out, encoder_out)  # Q=decoder, KV=encoder
+```
 
 ---
 
@@ -260,7 +322,33 @@ scores = scores.masked_fill(mask, float('-inf'))
 
 ---
 
-## W3D2：DL 讨论 2——架构设计与多模态
+### 12. 思考题：Attention Sink 现象
+
+> **问题**：上网查阅 Attention Sink 现象，思考以下问题：
+> 1. 什么是 Attention Sink？为什么 LLM 会把大量注意力集中在第一个 token 上？
+> 2. 这种现象对模型性能有什么影响？
+> 3. 有哪些解决方法？
+
+**提示**：阅读以下论文了解 Attention Sink 现象：
+- Xiao et al. (2023). "Efficient Streaming Language Models with Attention Sinks". [arxiv:2309.17453](https://arxiv.org/abs/2309.17453)
+
+**讨论要点**：
+
+Attention Sink 是指在大型语言模型中，**无论输入内容是什么，模型都会将大量注意力权重分配给序列的第一个 token**（通常是 `[BOS]` 或 `<s>`）。这个 token 就像一个"注意力汇"——它本身没有特殊的语义意义，但模型习惯性地把"多余"的注意力"倒"进去。
+
+**为什么会发生？**
+- Softmax 的归一化约束：注意力权重必须加起来等于 1。即使当前位置不需要关注任何其他位置，也必须把注意力分配出去
+- 第一个 token 是唯一一个**所有位置都能看到的** token（因果注意力中），因此成为了"默认接收者"
+- 训练过程中，模型发现把"无用"注意力dump到第一个token是一个有效的"作弊"策略
+
+**影响**：
+- 在长序列推理中，如果丢弃了第一个 token 的 KV cache，模型性能会剧烈下降——即使第一个 token 本身不携带重要信息
+- 这限制了 KV cache 压缩和流式推理的效率
+
+**解决方法**（供查阅）：
+- 保留初始 token 的 KV cache（StreamingLLM）
+- 使用特殊的 placeholder token 替代 `[BOS]`
+- 在注意力计算中引入 sink-aware 的剪枝策略
 
 ---
 

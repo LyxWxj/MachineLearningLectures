@@ -102,9 +102,11 @@ Typically $d_k = d_v = d_{\text{model}} / h$.
 
 ---
 
-### 5. Self-Attention
+### 5. Self-Attention and Cross-Attention
 
-In self-attention, $Q$, $K$, and $V$ all come from the same sequence:
+#### 5.1 Self-Attention
+
+In self-attention, $Q$, $K$, and $V$ **all come from the same sequence**:
 
 $$
 Q = XW^Q, \quad K = XW^K, \quad V = XW^V
@@ -112,7 +114,67 @@ $$
 
 **Meaning**: Each position in the sequence attends to all other positions in the sequence, learning the relationships between them.
 
+```
+Input X: (B, T, d_model)
+    ↓
+Q = X @ W_Q,  K = X @ W_K,  V = X @ W_V    ← all from X
+    ↓
+Attention(Q, K, V) = softmax(QK^T / √d_k) @ V
+    ↓
+Output: (B, T, d_model)   ← each position "sees" the entire sequence
+```
+
+**Applications**:
+- **BERT**: Bidirectional self-attention, each token attends to all tokens left and right
+- **GPT**: Causal self-attention (with mask), each token only attends to tokens on its left
+- **ViT**: Self-attention between image patches
+
 **Complexity**: $O(n^2 d)$, where $n$ is the sequence length and $d$ is the dimension. This is the main bottleneck of the Transformer.
+
+#### 5.2 Cross-Attention
+
+In cross-attention, $Q$ comes from one sequence, while $K$ and $V$ come from **another sequence**:
+
+$$
+Q = X_{\text{query}} W^Q, \quad K = X_{\text{key}} W^K, \quad V = X_{\text{key}} W^V
+$$
+
+**Meaning**: Each position in one sequence attends to all positions in another sequence, enabling cross-sequence information fusion.
+
+```
+Query seq X_q: (B, T_q, d_model)    Key-Value seq X_kv: (B, T_kv, d_model)
+    ↓                                         ↓
+Q = X_q @ W_Q                          K = X_kv @ W_K,  V = X_kv @ W_V
+    ↓                                         ↓
+    └───────────── Attention(Q, K, V) ──────┘
+                        ↓
+              Output: (B, T_q, d_model)   ← output shape follows query sequence
+```
+
+**Applications**:
+- **Encoder-Decoder Transformer**: Decoder attends to encoder output (in translation, target language attends to source language)
+- **Stable Diffusion**: Text conditioning injected into image generation via cross-attention
+- **Multimodal models**: Image features attend to text descriptions
+
+#### 5.3 Self-Attention vs Cross-Attention
+
+| | Self-Attention | Cross-Attention |
+|---|---|---|
+| **Q source** | Sequence X | Sequence X (query side) |
+| **K, V source** | Sequence X (same) | Sequence Y (another) |
+| **Output shape** | (B, T_x, d) | (B, T_x, d) |
+| **Core purpose** | Model intra-sequence relations | Fuse information across sequences |
+| **Typical use** | BERT, GPT, ViT | Decoder-Encoder, conditional generation |
+
+```python
+# Self-attention: Q, K, V all from x
+self_attn = nn.MultiheadAttention(d_model, num_heads)
+out, _ = self_attn(x, x, x)  # query=x, key=x, value=x
+
+# Cross-attention: Q from decoder, K/V from encoder
+cross_attn = nn.MultiheadAttention(d_model, num_heads)
+out, _ = cross_attn(decoder_out, encoder_out, encoder_out)  # Q=decoder, KV=encoder
+```
 
 ---
 
@@ -260,7 +322,33 @@ Pre-trained language models inherit biases from the training data (gender, race,
 
 ---
 
-## W3D2: DL Discussion 2 — Architecture Design and Multimodal
+### 12. Thinking Exercise: The Attention Sink Phenomenon
+
+> **Question**: Research the Attention Sink phenomenon online, and consider:
+> 1. What is Attention Sink? Why do LLMs concentrate so much attention on the first token?
+> 2. How does this phenomenon affect model performance?
+> 3. What solutions exist?
+
+**Hint**: Read the following paper to understand the Attention Sink phenomenon:
+- Xiao et al. (2023). "Efficient Streaming Language Models with Attention Sinks". [arxiv:2309.17453](https://arxiv.org/abs/2309.17453)
+
+**Discussion points**:
+
+Attention Sink refers to the phenomenon where large language models **assign a large portion of attention weights to the first token in the sequence** (usually `[BOS]` or `<s>`), regardless of the input content. This token acts as an "attention sink" — it has no special semantic meaning, but the model habitually dumps "excess" attention into it.
+
+**Why does it happen?**
+- Softmax normalization constraint: attention weights must sum to 1. Even when a position doesn't need to attend to anything, it must distribute its attention somewhere
+- The first token is the only token **visible to all positions** (in causal attention), making it the "default receiver"
+- During training, the model discovers that dumping "useless" attention to the first token is an effective "cheating" strategy
+
+**Impact**:
+- In long-sequence inference, discarding the first token's KV cache causes dramatic performance degradation — even though the first token itself carries no important information
+- This limits KV cache compression and streaming inference efficiency
+
+**Solutions** (to research):
+- Preserve the initial token's KV cache (StreamingLLM)
+- Use special placeholder tokens instead of `[BOS]`
+- Introduce sink-aware pruning strategies in attention computation
 
 ---
 
