@@ -12,6 +12,7 @@ default-theme = "light"
 preferred-dark-theme = "ayu"
 mathjax-support = true
 theme = "theme"
+site-url = "/MachineLearningLectures/en/"
 
 [preprocessor.katex]
 command = "mdbook-katex-fork"
