@@ -14,12 +14,6 @@ mathjax-support = true
 theme = "theme"
 site-url = "/MachineLearningLectures/en/"
 
-[preprocessor.katex]
-command = "mdbook-katex"
-
-[preprocessor.mermaid]
-command = "mdbook-mermaid"
-
 [output.html.playground]
 editable = true
 line-numbers = true

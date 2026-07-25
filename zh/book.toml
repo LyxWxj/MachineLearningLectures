@@ -12,12 +12,7 @@ default-theme = "light"
 preferred-dark-theme = "ayu"
 theme = "theme"
 site-url = "/MachineLearningLectures/zh/"
-
-[preprocessor.katex]
-command = "mdbook-katex"
-
-[preprocessor.mermaid]
-command = "mdbook-mermaid"
+mathjax-support = true
 
 [output.html.playground]
 editable = true
