@@ -54,6 +54,44 @@ $$
 x(t) = x_0 e^{(\text{real} + i \cdot \text{imag})t} = x_0 e^{\text{real} \cdot t} \cdot [\cos(\text{imag} \cdot t) + i \sin(\text{imag} \cdot t)]
 $$
 
+#### Why Does Complex $a$ Lead to Oscillations? — The Geometric Intuition of Euler's Formula
+
+The core lies in **Euler's formula**:
+
+$$
+e^{i\theta} = \cos\theta + i\sin\theta
+$$
+
+**Geometric meaning**: Multiplying by $e^{i\theta}$ is equivalent to **rotating** by $\theta$ radians on the complex plane.
+
+When the differential equation $\dot{x} = ax$ has $a$ as a pure imaginary number (i.e., $a = i\omega$):
+
+$$
+x(t) = x_0 e^{i\omega t} = x_0 [\cos(\omega t) + i\sin(\omega t)]
+$$
+
+On the complex plane, this is **uniform circular motion** with angular velocity $\omega$ — its projection on the real axis is $\cos(\omega t)$, and its projection on the imaginary axis is $\sin(\omega t)$, both of which oscillate.
+
+**Why the exponential form $e$?**
+
+The solution of $\dot{x} = ax$ comes from the fundamental property of differential equations — the derivative equals itself times a constant. The only function satisfying this property is the exponential function $e^{at}$:
+
+$$
+\frac{d}{dt}\big(e^{at}\big) = a \cdot e^{at}
+$$
+
+When $a$ is real, $e^{at}$ is **monotonic growth or decay**; when $a$ is imaginary, $e^{i\omega t}$ is **pure oscillation** (constant amplitude); when $a$ is complex, $e^{(\sigma + i\omega)t} = e^{\sigma t} \cdot e^{i\omega t}$ is **oscillation + envelope growth/decay**.
+
+**Visualization**:
+
+![Euler's formula and complex plane oscillation](../../assets/complex_oscillation.png)
+
+The figure shows:
+
+- **Left (complex plane trajectory)**: The red dot is the initial point at $t=0$, the blue trajectory rotates counterclockwise along the unit circle over time ($a = i\omega$), with projections on the real and imaginary axes being cosine and sine respectively
+- **Right (real/imaginary part time-domain plot)**: Real part is cosine oscillation (blue), imaginary part is sine oscillation (orange)
+- **General case of complex $a$**: When $a = \sigma + i\omega$, the trajectory becomes a spiral ($e^{\sigma t}$ controls the contraction or expansion of the spiral radius)
+
 **Key insight**:
 
 - **Real part** → growth/decay rate (amplitude envelope)
@@ -103,11 +141,85 @@ $$
 - States: Closed (0) and Open (1)
 - Transition probabilities: $P(0 \to 1 | x=0) = \mu_{c2o}$, $P(1 \to 0 | x=1) = \mu_{o2c}$
 
-**Poisson process properties**:
+**Poisson process**: A sequence of events occurring at a constant rate $\lambda$, the most fundamental model for describing the counting of random events.
 
-1. Event probability is independent of all other events
-2. Average rate of events is constant within a given time period
-3. Two events cannot occur simultaneously
+#### Definition and Three Conditions
+
+A counting process $\{N(t), t \geq 0\}$ is called a Poisson process with rate $\lambda$ if and only if:
+
+1. **Independent increments**: The numbers of events occurring in disjoint time intervals are independent of each other
+2. **Stationary increments**: For any interval of length $s$, the distribution of the number of events depends only on the length $s$, not on the starting point
+3. **Ordinariness**: In an infinitesimally small time $\Delta t$, the probability of more than one event occurring is of higher order infinitesimal in $\Delta t$:
+   $$P(N(\Delta t) \geq 2) = o(\Delta t)$$
+
+#### Poisson Distribution
+
+The probability of exactly $k$ events occurring in an interval of length $t$ follows the Poisson distribution:
+
+$$P(N(t) = k) = \frac{(\lambda t)^k}{k!} e^{-\lambda t}, \quad k = 0, 1, 2, \ldots$$
+
+- Mean: $\mathbb{E}[N(t)] = \lambda t$
+- Variance: $\text{Var}[N(t)] = \lambda t$
+- The equality of mean and variance is an important characteristic of the Poisson distribution
+
+#### Waiting Time and Exponential Distribution
+
+The interval $T_i$ between adjacent events (waiting time) follows the **exponential distribution**:
+
+$$f_T(t) = \lambda e^{-\lambda t}, \quad t \geq 0$$
+
+Derivation intuition:
+$$P(T_1 > t) = P(N(t) = 0) = e^{-\lambda t}$$
+
+This implies the memoryless property:
+$$P(T > s + t \mid T > s) = P(T > t)$$
+
+**Connection to Markov processes**: The memoryless property of the exponential distribution is the root of why the Poisson process has the Markov property.
+
+#### Simulation of Poisson Process
+
+```python
+import numpy as np
+
+# Method 1: Sample waiting times (using exponential distribution)
+def poisson_process_exponential(rate, T, seed=42):
+    """Simulate a Poisson process up to time T using exponential waiting times"""
+    rng = np.random.default_rng(seed)
+    events = []
+    t = 0
+    while t < T:
+        # Sample next waiting time Exp(rate)
+        t += rng.exponential(1 / rate)
+        if t < T:
+            events.append(t)
+    return np.array(events)
+
+# Method 2: Sample counts (using Poisson distribution)
+def poisson_process_counting(rate, T, delta=0.01, seed=42):
+    """Simulate using Poisson counts in fixed time bins"""
+    rng = np.random.default_rng(seed)
+    n_bins = int(T / delta)
+    # Number of events per bin ~ Poisson(rate * delta)
+    counts = rng.poisson(rate * delta, n_bins)
+    return counts
+
+rate = 2.0  # Average 2 events per second
+events = poisson_process_exponential(rate, T=10)
+print(f"{len(events)} events occurred in 10 seconds (expected: {rate * 10})")
+```
+
+#### Relationship Between Poisson and Binomial Distributions
+
+The Poisson distribution can be viewed as the limiting case of the binomial distribution: partition $[0, t]$ into $n$ small intervals, each with event probability $p = \lambda t / n$, as $n \to \infty$:
+
+$$\lim_{n \to \infty} \binom{n}{k} p^k (1-p)^{n-k} = \frac{(\lambda t)^k}{k!} e^{-\lambda t}$$
+
+#### Connection to Neuron Firing
+
+In neuroscience, if the refractory period is ignored, the firing times of a neuron can be approximately modeled as a Poisson process:
+- The probability of firing in each time bin is $\lambda \Delta t$ ($\lambda$ is the firing rate)
+- The firing rate $\lambda$ is modulated by stimulus intensity → **Inhomogeneous Poisson process**
+- The histogram of ISIs (inter-spike intervals) decays exponentially (contrast with gamma distributions in real neurons)
 
 **State transition matrix**:
 
