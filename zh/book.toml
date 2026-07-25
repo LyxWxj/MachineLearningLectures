@@ -14,7 +14,7 @@ theme = "theme"
 site-url = "/MachineLearningLectures/zh/"
 
 [preprocessor.katex]
-command = "mdbook-katex-fork"
+command = "mdbook-katex"
 
 [preprocessor.mermaid]
 command = "mdbook-mermaid"
