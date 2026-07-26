@@ -34,8 +34,8 @@ jobs:
 
       - name: Install mdbook and preprocessor
         run: |
-          cargo install mdbook --locked --version 0.5.4
-          cargo install mdbook-katex --locked --version 0.10.0
+          which mdbook || cargo install mdbook --locked --version 0.5.4
+          which mdbook-katex || cargo install mdbook-katex --locked --version 0.10.0
 
       - name: Build zh
         run: cd zh && mdbook build
