@@ -10,7 +10,7 @@ build-dir = "book"
 [output.html]
 default-theme = "light"
 preferred-dark-theme = "ayu"
-mathjax-support = true
+# KaTeX client-side rendering (loaded via head.hbs)
 theme = "theme"
 site-url = "/MachineLearningLectures/en/"
 

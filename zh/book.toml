@@ -12,7 +12,7 @@ default-theme = "light"
 preferred-dark-theme = "ayu"
 theme = "theme"
 site-url = "/MachineLearningLectures/zh/"
-mathjax-support = true
+# KaTeX client-side rendering (loaded via head.hbs)
 
 [output.html.playground]
 editable = true
