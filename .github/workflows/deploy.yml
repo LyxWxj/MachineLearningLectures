@@ -30,11 +30,12 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
             ~/.cargo/bin
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ runner.os }}-cargo-mdbook-${{ hashFiles('.github/workflows/deploy.yml') }}
 
-      - name: Install mdbook
+      - name: Install mdbook and preprocessor
         run: |
-          which mdbook || cargo install mdbook
+          cargo install mdbook --locked --version 0.5.4
+          cargo install mdbook-katex --locked --version 0.10.0
 
       - name: Build zh
         run: cd zh && mdbook build

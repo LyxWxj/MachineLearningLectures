@@ -10,9 +10,11 @@ build-dir = "book"
 [output.html]
 default-theme = "light"
 preferred-dark-theme = "ayu"
-# KaTeX client-side rendering (loaded via head.hbs)
 theme = "theme"
 site-url = "/MachineLearningLectures/en/"
+
+[preprocessor.katex]
+command = "mdbook-katex"
 
 [output.html.playground]
 editable = true

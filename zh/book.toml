@@ -12,7 +12,9 @@ default-theme = "light"
 preferred-dark-theme = "ayu"
 theme = "theme"
 site-url = "/MachineLearningLectures/zh/"
-# KaTeX client-side rendering (loaded via head.hbs)
+
+[preprocessor.katex]
+command = "mdbook-katex"
 
 [output.html.playground]
 editable = true

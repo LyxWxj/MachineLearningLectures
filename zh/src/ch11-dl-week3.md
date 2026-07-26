@@ -137,7 +137,7 @@ Attention(Q, K, V) = softmax(QK^T / √d_k) @ V
 
 $$
 Q = X_{\text{query}} W^Q, \quad K = X_{\text{key}} W^K, \quad V = X_{\text{key}} W^V
-```
+$$
 
 **含义**：一个序列的每个位置关注另一个序列的所有位置，实现跨序列的信息融合。
 

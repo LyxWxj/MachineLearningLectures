@@ -719,9 +719,9 @@ $$
 
 **Example**: $\int e^{3x}\, dx$
 
-Let $u = 3x$, then $du = 3\, dx$, so $dx = \frac{1}{3} du\r
+Let $u = 3x$, then $du = 3\, dx$, so $dx = \frac{1}{3} du$
 
-\int e^{3x}\, dx = \frac{1}{3}\int e^u\, du = \frac{1}{3}e^{3x} + C$
+$\int e^{3x}\, dx = \frac{1}{3}\int e^u\, du = \frac{1}{3}e^{3x} + C$
 
 **Exerciese**: $\int e^{-x} \,dx$
 
