@@ -740,6 +740,115 @@ $$
 
 ---
 
+### Breaking Down the Q-Learning Update
+
+A single update has four ingredients:
+
+$$
+Q(s_t, a_t) \leftarrow \underbrace{Q(s_t, a_t)}_{\text{old estimate}} + \alpha \Big[ \underbrace{r_{t+1}}_{\text{immediate reward}} + \gamma \underbrace{\max_a Q(s_{t+1}, a)}_{\text{best estimate of the future}} - \underbrace{Q(s_t, a_t)}_{\text{old estimate}} \Big]
+$$
+
+- $Q(s_t, a_t)$: **old estimate** — "how good I think this state-action pair is"
+- $r_{t+1}$: **immediate reward** — what the environment actually just gave (a fact)
+- $\gamma \max_a Q(s_{t+1}, a)$: **best estimate of the future** — assumes the next action will be the best one (bootstrapping)
+- $\alpha$: **learning rate** — how much of the new information to adopt (0 = no learning, 1 = full adoption)
+
+The bracket as a whole is the action version of the **TD error** $\delta_t$: "what actually happened" minus "what was expected". So the update can be written compactly as:
+
+$$
+Q(s_t, a_t) \leftarrow Q(s_t, a_t) + \alpha \cdot \delta_t
+$$
+
+**Note**: each update changes only the single entry $(s_t, a_t)$ in the Q-table; every other entry stays unchanged.
+
+---
+
+### A Concrete Example
+
+A fork in the road: state A has two actions — "left" leads to B (big reward $+10$ at the end), "right" leads to C (small reward $+2$). Discount factor $\gamma = 0.9$, learning rate $\alpha = 0.5$, and the Q-table starts all zeros (the agent explores with $\varepsilon$-greedy).
+
+| State-action    | Initial Q |
+| --------------- | --------- |
+| $(A, \text{left})$   | 0 |
+| $(A, \text{right})$  | 0 |
+| $(B, \text{forward})$ | 0 |
+| $(C, \text{forward})$ | 0 |
+
+**Step 1**: exploration picks "left", $A \to B$, no reward along the way ($r = 0$):
+
+$$
+\delta = r + \gamma \max_a Q(B, a) - Q(A, \text{left}) = 0 + 0.9 \times 0 - 0 = 0
+$$
+
+$$
+Q(A, \text{left}) \leftarrow 0 + 0.5 \times 0 = 0 \quad \text{(no new info: } B \text{ is still worth 0)}
+$$
+
+**Step 2**: at B, pick "forward", reach the goal, reward $r = +10$:
+
+$$
+\delta = 10 + 0.9 \times \max_a Q(\text{goal}, a) - 0 = 10
+$$
+
+$$
+Q(B, \text{forward}) \leftarrow 0 + 0.5 \times 10 = 5
+$$
+
+**Step 3**: walk $A \to B$ again ($r = 0$) — the key step:
+
+$$
+\delta = 0 + 0.9 \times \max_a Q(B, a) - 0 = 0.9 \times 5 - 0 = 4.5
+$$
+
+$$
+Q(A, \text{left}) \leftarrow 0 + 0.5 \times 4.5 = 2.25
+$$
+
+$Q(A, \text{left})$ jumps from 0 to 2.25 — even though A never received a reward directly, the $+10$ at the goal has **propagated backward** to A through B. That is bootstrapping: value spreads outward like ripples, one "discounted step" per update.
+
+**Step 4**: exploration picks "right", $A \to C$ ($r = 0$):
+
+$$
+\delta = 0 + 0.9 \times \max_a Q(C, a) - 0 = 0
+$$
+
+$$
+Q(A, \text{right}) \leftarrow 0
+$$
+
+**Step 5**: at C, pick "forward", reach the goal, reward $r = +2$:
+
+$$
+Q(C, \text{forward}) \leftarrow 0 + 0.5 \times 2 = 1
+$$
+
+**Step 6**: walk $A \to C$ again ($r = 0$):
+
+$$
+\delta = 0 + 0.9 \times \max_a Q(C, a) - 0 = 0.9 \times 1 - 0 = 0.9
+$$
+
+$$
+Q(A, \text{right}) \leftarrow 0 + 0.5 \times 0.9 = 0.45
+$$
+
+**Updated Q-table**:
+
+| State-action    | Q value |
+| --------------- | ------- |
+| $(A, \text{left})$   | 2.25 |
+| $(A, \text{right})$  | 0.45 |
+| $(B, \text{forward})$ | 5    |
+| $(C, \text{forward})$ | 1    |
+
+**Three observations**:
+
+- **Entry-by-entry updates**: 6 steps touched only 4 entries — each step updates just $(s_t, a_t)$
+- **Gradual convergence**: $\alpha = 0.5$ means only half of each new target is adopted; the true value of $Q(A, \text{left})$ is $0.9 \times 10 = 9$, reached only after many iterations
+- **The target uses max**: even when the behavior policy is exploring (occasionally picking "right"), the target always assumes the next action will be optimal — exactly the off-policy property above in action: explore while converging to the optimal policy
+
+---
+
 ### SARSA: On-Policy TD Control — A More Cautious Learner
 
 **SARSA update**:
