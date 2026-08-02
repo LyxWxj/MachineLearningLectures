@@ -182,7 +182,7 @@ $$
 其中：
 
 $$
-\mu_3 = \frac{\sigma_2^{-2} \mu_1 + \sigma_1^{-2} \mu_2}{\sigma_1^{-2} + \sigma_2^{-2}}, \qquad \sigma_3^{-2} = \sigma_1^{-2} + \sigma_2^{-2}
+\mu_3 = \frac{\sigma_2^{2} \mu_1 + \sigma_1^{2} \mu_2}{\sigma_1^{2} + \sigma_2^{2}}, \qquad \sigma_3^{2} = \sigma_1^{2} + \sigma_2^{2}
 $$
 
 **为什么要关心这个**？
