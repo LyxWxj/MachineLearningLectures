@@ -399,45 +399,136 @@ Wald and Wolfowitz proved that under given error rate constraints, SPRT has the 
 
 SPRT is in discrete time, but the brain's decision process is continuous. The **drift-diffusion model** is the natural extension of SPRT to continuous time, and is one of the most successful models in neuroscience for describing decision behavior.
 
-**Decomposition of each evidence step**:
+**Recall the SPRT decision loop**: at each step, maintain the log-likelihood ratio $L_T = L_{T-1} + \Delta_t$; stop and decide when $L_T$ crosses the upper threshold $\theta_A$ or lower threshold $\theta_B$; otherwise keep observing.
+
+DDM differs from SPRT in only two ways:
+
+- **Concretization**: SPRT only requires $\Delta_t$ to be a likelihood-ratio increment; DDM specifies a noise model for the observations, which gives $\Delta_t$ a concrete distribution
+- **Continuization**: turning "update once per step" into "integrate continuously"
+
+With these two points in mind, the DDM is just the "analog version" of SPRT — the same decision process, on a different clock.
+
+---
+
+**Step 1: observation model**. Assume the brain receives a noisy observation $m_t$ at each moment: from $\mathcal{N}(+\mu, \sigma^2)$ when the state is $s=+1$, and from $\mathcal{N}(-\mu, \sigma^2)$ when $s=-1$, i.e.:
 
 $$
-\Delta_t = b + c \cdot \varepsilon_t
+m_t = \mu \cdot s + \sigma \cdot \varepsilon_t, \qquad \varepsilon_t \sim \mathcal{N}(0, 1)
 $$
 
-where:
-
-- $b = \frac{2\mu^2}{\sigma^2}$ — **drift rate** (signal, deterministic component): represents the "average push" of evidence
-- $c = \frac{2\mu}{\sigma}$ — **diffusion coefficient** (noise scaling factor): represents the uncertainty of evidence
-- $\varepsilon_t \sim \mathcal{N}(0, 1)$ — standard normal noise
-
-**Cumulative evidence** follows a random walk with drift:
+**Step 2: compute the single-step evidence $\Delta_t$ — exactly the log-likelihood ratio increment from SPRT**:
 
 $$
-L_T \sim \mathcal{N}(b \cdot T, \, c^2 \cdot T)
+\Delta_t = \log \frac{p(m_t | s=+1)}{p(m_t | s=-1)}
+= \log \frac{e^{-(m_t - \mu)^2 / 2\sigma^2}}{e^{-(m_t + \mu)^2 / 2\sigma^2}}
+= \frac{2\mu}{\sigma^2} m_t
 $$
 
-Mean grows linearly (signal accumulation), variance also grows linearly (noise accumulation). The **signal-to-noise ratio** improves as $\sqrt{T}$ — this is the mathematical essence of "more data → better decisions."
+Substituting $m_t = \mu s + \sigma\varepsilon_t$ gives the decomposition of each evidence step:
+
+$$
+\Delta_t = \underbrace{\frac{2\mu^2}{\sigma^2} \cdot s}_{\text{drift } b \cdot s} + \underbrace{\frac{2\mu}{\sigma} \cdot \varepsilon_t}_{\text{diffusion } c \cdot \varepsilon_t}
+$$
+
+The two parameters are **not defined out of thin air — they follow necessarily from "Gaussian observations + likelihood ratio"**:
+
+- $b = \frac{2\mu^2}{\sigma^2}$ — **drift rate** (signal, deterministic component): the stronger the signal ($\mu$ large) or the smaller the noise ($\sigma$ small), the larger the average push per step
+- $c = \frac{2\mu}{\sigma}$ — **diffusion coefficient** (noise scaling factor): the random fluctuation of each step's evidence
+- $s$ sets the drift **direction**: on average $+b$ per step when $s=+1$ (evidence pushed toward $+1$), $-b$ when $s=-1$
+
+---
+
+**Step 3: cumulative evidence is a random walk with drift**. Summing $T$ increments:
+
+$$
+L_T = \sum_{t=1}^{T} \Delta_t \;\Big|\; s \;\sim\; \mathcal{N}(b \cdot s \cdot T, \; c^2 \cdot T)
+$$
+
+- The mean $b \cdot s \cdot T$ grows linearly — signal accumulates linearly
+- The variance $c^2 \cdot T$ also grows linearly — noise accumulates too
+- **Signal-to-noise ratio** $= \dfrac{|b \cdot s \cdot T|}{c\sqrt{T}} = \dfrac{b}{c}\sqrt{T} = \dfrac{\mu}{\sigma}\sqrt{T}$ — improves as $\sqrt{T}$, because noise is gradually "averaged out"
+
+This is the mathematical essence of "more data → better decisions," and explains why SPRT is willing to wait: waiting buys a better signal-to-noise ratio.
+
+---
+
+**Step 4: continuous-time limit**. As the time steps get finer and finer ($dt \to 0$), the random walk converges to a **Brownian motion with drift** (Wiener process):
+
+$$
+dL = b \cdot s \cdot dt + c \cdot dW, \qquad L(0) = 0
+$$
+
+where $dW$ is a Brownian motion increment. This is the classic drift-diffusion equation: **deterministic drift** (signal) plus **random diffusion** (noise).
+
+**The decision rule is isomorphic to SPRT**: when $L(t)$ first reaches the upper bound $+B$ → decide $s=+1$; first reaches the lower bound $-B$ → decide $s=-1$; the decision time is the **first-passage time** (corresponding to reaction time in behavior).
+
+---
+
+**SPRT ↔ DDM correspondence**:
+
+| SPRT (discrete time)             | DDM (continuous time)                    |
+| -------------------------------- | ---------------------------------------- |
+| Log-likelihood ratio $L_T$       | Decision variable $x(t)$ (evidence integrator) |
+| Single-step increment $\Delta_t$ | Infinitesimal increment $b \cdot s\, dt + c\, dW$ |
+| Thresholds $\theta_A$ / $\theta_B$ | Upper/lower bounds $+B$ / $-B$        |
+| Stop when crossing a threshold   | Decide when hitting a bound              |
+| Minimum average sample size (Wald optimal) | Minimum average decision time for given accuracy |
+| Target error rate $\alpha$ sets thresholds | Accuracy requirement sets bound height |
+
+In essence, both are **the same sequential likelihood-ratio test**: SPRT measures evidence in "how many steps," DDM in "how much time," and the thresholds play exactly the same role.
+
+---
+
+**A concrete example: motion direction discrimination**
+
+Suppose $s=+1$ means the stimulus moves right and $s=-1$ left; per-step signal-to-noise ratio $\mu/\sigma = 0.5$ (take $\mu=0.5, \sigma=1$), so $b = 2\mu^2/\sigma^2 = 0.5$ and $c = 2\mu/\sigma = 1$. Set the bounds at $\pm B = \pm 2$, and let the true state be $s=+1$ (right).
+
+Per-step increment: $\Delta_t = 0.5 + \varepsilon_t$ — pushed right by 0.5 on average, with ±1-scale noise on every step.
+
+| Time | Noise $\varepsilon_t$ | Increment $\Delta_t$ | Cumulative $L_t$ | Decide? |
+| ---- | --------------------- | -------------------- | ---------------- | ------- |
+| 1    | $-0.8$                | $-0.3$               | $-0.3$           | No (even briefly drifting left!) |
+| 2    | $+1.2$                | $+1.7$               | $+1.4$           | No |
+| 3    | $-0.5$                | $0.0$                | $+1.4$           | No (hovering) |
+| 4    | $+0.9$                | $+1.4$               | $+2.8$           | **Yes: crossed $+2$, decide "right"** |
+
+**Three observations**:
+
+- **Single-step noise cannot mislead the decision**: at step 1 the evidence is pushed by noise toward the wrong direction ($-0.3$), but the bounds $\pm 2$ ensure that one or two noisy steps cannot fool the agent — this is the value of "not jumping to conclusions"
+- **Drift is the average push, not the direction of every step**: the real path is a mixture of drift and noise — it can hover, or even briefly move backward
+- **Lower bounds mean faster but more error-prone decisions**: with bounds at $\pm 1$, step 3 ($L = 1.4$) would already have decided — one step earlier, but with a higher error probability under the same noise: this is the **speed-accuracy tradeoff**
 
 ---
 
 ### Speed-Accuracy Tradeoff in DDM
 
-**Speed-accuracy tradeoff**: The choice of threshold determines whether decisions are "fast" or "accurate."
+**Speed-accuracy tradeoff**: the choice of bound height $B$ determines whether decisions are "fast" or "accurate."
 
-- **High threshold**: Need more evidence before deciding → more accurate but slower
-- **Low threshold**: Decide with less evidence → faster but more error-prone
+- **High bounds**: need more evidence before deciding → more accurate but slower
+- **Low bounds**: decide with less evidence → faster but more error-prone
 
-**Analytical accuracy**:
+**Analytical solution for decision accuracy** (symmetric bounds $+B/-B$, exact in the continuous-time limit):
 
 $$
-P(\text{correct}) = \frac{1}{2} + \frac{1}{2} \operatorname{erf}\left(\frac{\mu}{\sqrt{2} \cdot \sigma / \sqrt{T}}\right)
+P(\text{error}) = \frac{1}{1 + e^{2\mu B / \sigma^2}}
 $$
+
+- Higher bounds → error rate drops **exponentially** (more accurate). In the example above: $\mu=0.5, \sigma=1, B=2$ gives $P(\text{error}) = 1/(1+e^2) \approx 12\%$
+- But the mean decision time also grows with $B$ (about $B/\mu$ for strong signals) — accuracy and speed cannot both be had, because they are controlled by **the same parameter $B$**
+
+For comparison, if the decision is forced at a fixed time $T$ (no sequential testing), the accuracy is:
+
+$$
+P(\text{correct}) = \frac{1}{2} + \frac{1}{2} \operatorname{erf}\left(\frac{\mu}{\sqrt{2}\,\sigma/\sqrt{T}}\right)
+$$
+
+SPRT/DDM trade **variable time** for fixed accuracy — this is Wald optimality in continuous time: the same error rate with the least average time.
 
 **Neuroscience connection**:
 
-- Neural activity in brain decision areas (e.g., LIP) indeed shows DDM-like evidence accumulation patterns
-- Under different task conditions (emphasizing speed vs. accuracy), subject behavior can be well fit by adjusting DDM threshold parameters
+- Neurons in decision areas (e.g., LIP) show **ramping activity** that triggers an action once it reaches a fixed level — firing rate ≈ accumulated evidence $x(t)$, trigger level ≈ bound $B$
+- Neurons cannot compute probabilities exactly, but they can integrate signals — the DDM provides exactly the neural implementation of "how the brain implements SPRT"
+- Behavioral predictions: reaction time distributions should be **right-skewed** (first-passage time distributions), and emphasizing speed should shorten reaction times while raising error rates — experimental observations fit DDM extremely well
 - This provides strong evidence that "the brain performs optimal sequential testing"
 
 ---
@@ -458,7 +549,50 @@ Many real-world models contain **variables that cannot be directly observed** (l
 1. **E-step** (Expectation step): Under current parameters $\theta^{(t)}$, compute the **posterior expectation** of latent variables — i.e., "given current parameters, what are the latent variables most likely to be?"
 2. **M-step** (Maximization step): Fix the expectations of latent variables, update parameters to maximize expected log-likelihood — i.e., "if the latent variables are as the E-step guessed, what are the optimal parameters?"
 
-**Monotonicity guarantee**:
+---
+
+**Why is direct maximization intractable?** The log-likelihood of the observations requires **summing over latent variables**:
+
+$$
+\mathcal{L}(\theta) = \log p(Y \mid \theta) = \log \sum_x p(Y, x \mid \theta)
+$$
+
+The latent variables sit inside a log of a sum, and the number of state sequences $x$ grows exponentially with length — no closed form, no direct numerical optimization.
+
+**Key trick — evidence lower bound (ELBO)**: introduce any distribution $q(x)$; by Jensen's inequality (log is concave):
+
+$$
+\log p(Y\mid\theta) = \log \sum_x q(x)\frac{p(Y,x\mid\theta)}{q(x)}
+\geq \sum_x q(x)\log\frac{p(Y,x\mid\theta)}{q(x)}
+= \underbrace{\mathbb{E}_q[\log p(Y,x\mid\theta)] + H(q)}_{\text{ELBO}(q,\theta)}
+$$
+
+where $H(q)$ is the entropy of $q$. Jensen's inequality is tight if and only if $q(x) \propto p(Y,x\mid\theta)$, i.e., $q(x) = p(x \mid Y, \theta)$ — exactly what the E-step does. So the two EM steps can be restated as:
+
+- **E-step**: fix $\theta^{(t)}$, set $q(x) = p(x \mid Y, \theta^{(t)})$ — lift the bound until it is tangent to the true likelihood (equality holds)
+- **M-step**: fix $q$, maximize the expected log-likelihood $\mathbb{E}_q[\log p(Y,x\mid\theta)]$ in the bound, obtain $\theta^{(t+1)}$
+
+**Monotonicity guarantee — why the likelihood never decreases**: decompose the log-likelihood into "a bound + a non-negative KL divergence":
+
+$$
+\log p(Y\mid\theta) = \underbrace{\text{ELBO}(q,\theta)}_{\text{lower bound}} + \underbrace{\mathrm{KL}\big(q(x) \,\|\, p(x\mid Y,\theta)\big)}_{\geq 0,\ =0\ \text{when } q = \text{posterior}}
+$$
+
+Every iteration satisfies:
+
+$$
+\mathcal{L}(\theta^{(t+1)}) \geq \text{ELBO}(q^{(t)}, \theta^{(t+1)}) \geq \text{ELBO}(q^{(t)}, \theta^{(t)}) = \mathcal{L}(\theta^{(t)})
+$$
+
+- First $\geq$: the KL divergence is always $\geq 0$, so the bound never overestimates the likelihood
+- Second $\geq$: by definition of the M-step — the new parameters do not decrease the bound (hence the expected log-likelihood)
+- Final equality: by definition of the E-step — with $q$ equal to the posterior, the bound coincides with the likelihood
+
+**Intuition**: think of the log-likelihood curve as a mountain and the ELBO as a lower-bound curve beneath it. The E-step lifts the bound until it is tangent to the mountain (at $\theta^{(t)}$); the M-step walks along the bound to its highest point, then repeat. Each stopping point is no lower than the previous one, so the likelihood increases monotonically and stops at a **local** maximum. Only local optimality is guaranteed: EM is sensitive to the initial value $\theta^{(0)}$ — different initializations can converge to different local solutions.
+
+**Stopping criterion**: stop when the change in log-likelihood between two consecutive iterations falls below a tolerance (e.g., $10^{-6}$).
+
+---
 
 $$
 \mathcal{L}(\theta^{(t+1)}) \geq \mathcal{L}(\theta^{(t)})
@@ -480,6 +614,14 @@ $$
 
 Meaning: to reach state $i$, the previous step must have been in some state $j$, then transitioned to $i$, while observing $y_t$.
 
+**What is $A$?** $A$ is the **state transition matrix**, and $A_{ji}$ is the probability of **transitioning** from state $j$ at the previous time step to state $i$ now:
+
+$$
+A_{ji} = p(x_t = i \mid x_{t-1} = j)
+$$
+
+**Index-order convention**: $A_{\text{from}, \text{to}}$ — the first subscript is "where you come from," the second is "where you go to." So in the forward recursion, $A_{ji} \cdot \alpha_j(t-1)$ means: the (observation-weighted) probability of being in $j$ at the previous step, $\alpha_j(t-1)$, times the transition probability from $j$ to $i$, $A_{ji}$, summed over all possible previous states $j$. In the backward recursion below, $A_{ij}$ is instead the probability of going from the current state $i$ to the next state $j$. Each row of the transition matrix sums to 1: $\sum_j A_{ij} = 1$ — from any state, the next step must land somewhere.
+
 **Backward probability** $\beta_i(t) = p(y_{t+1:T} | x_t = i)$ — "the sum of probabilities of all paths from state $i$ at time $t$ to generate the remaining observations":
 
 $$
@@ -500,11 +642,20 @@ $$
 - $\beta_i(t)$: accounts for "how we proceed into the future"
 - Their product: the **total weight** of this path
 
+**What is $\gamma$ — the core output of the E-step**, three views:
+
+- **Probability view**: $\gamma_i(t)$ is the **posterior marginal probability** (also called the "smoothed posterior") of being in state $i$ at time $t$ given all observations $y_{1:T}$ — it uses both the past and the future
+- **Soft-assignment view**: for each time $t$, $\gamma_i(t)$ forms a probability distribution over states: $\sum_i \gamma_i(t) = 1$. It does not "hard" assign time $t$ to one state; it spreads the "responsibility" across states proportionally
+- **Counting view**: $\sum_t \gamma_i(t)$ = "expected total time (expected number of visits) in state $i$ over the whole sequence" — this is exactly why the M-step uses it as an "expected count"
+
 **Pairwise marginal probability** (joint posterior at adjacent times):
 
 $$
-\xi_{ij}(t) = p(x_t = i, x_{t+1} = j | y_{1:T})
+\xi_{ij}(t) = p(x_t = i, x_{t+1} = j \mid y_{1:T})
+= \frac{\alpha_i(t) \cdot A_{ij} \cdot p(y_{t+1} \mid x_{t+1}=j) \cdot \beta_j(t+1)}{p(Y_{1:T})}
 $$
+
+Segment by segment: reach $i$ from the past ($\alpha_i(t)$) → transition $i \to j$ ($A_{ij}$) → observe $y_{t+1}$ in $j$ (emission probability) → proceed into the future from $j$ ($\beta_j(t+1)$), then normalize by $p(Y_{1:T})$.
 
 $\gamma_i(t)$ and $\xi_{ij}(t)$ are the outputs of the E-step — they are all the "expected counts" needed by the M-step.
 
@@ -514,27 +665,37 @@ $\gamma_i(t)$ and $\xi_{ij}(t)$ are the outputs of the E-step — they are all t
 
 Given the expectations computed in the E-step, the M-step has closed-form solutions, and the form is surprisingly intuitive.
 
-**Transition matrix update**:
+**Why is the form so simple?** Every M-step update can be understood uniformly: **pretend the hidden states are visible, write down the maximum-likelihood estimate ("frequency = ratio"), then replace the true counts with the expected counts from the E-step**.
+
+**Transition matrix update — what is $\hat{A}$**:
 
 $$
 \hat{A}_{ij} = \frac{\sum_t \xi_{ij}(t)}{\sum_t \gamma_i(t)}
 $$
 
-Numerator = "expected number of transitions from $i$ to $j$", denominator = "expected number of times in state $i$."
+- Numerator = "**expected** number of transitions from $i$ to $j$", denominator = "**expected** number of times in state $i$" — both come from the E-step's $\gamma$ and $\xi$
+- **The hat (^) denotes an estimator**: $\hat{A}$ is the transition-probability estimate produced by the M-step; together its entries form the new transition matrix, which becomes the next iteration's $\theta^{(t+1)}$
+- Intuition: if the hidden states were visible, the maximum-likelihood estimate of a transition probability is the frequency — "count of $i \to j$ ÷ total count of departures from $i$." EM merely replaces the invisible true counts with expected counts; everything else is identical
+- Normalization holds automatically: $\sum_j \hat{A}_{ij} = 1$ (the numerator sum is exactly the denominator)
 
-**Observation parameter update** (e.g., Poisson firing rate):
+**Observation parameter update** (e.g., Poisson firing rate) — what is $\hat{\lambda}_i$:
 
 $$
 \hat{\lambda}_i = \frac{\sum_t \gamma_i(t) \cdot y_t}{\sum_t \gamma_i(t) \cdot \Delta t}
 $$
 
-Numerator = "expected total firing in state $i$", denominator = "expected total time in state $i$."
+- If the observation model is $y_t \mid x_t = i \sim \text{Poisson}(\lambda_i \Delta t)$, then $\lambda_i$ is the **firing rate** of state $i$ (mean number of spikes per unit time) and $\Delta t$ is the bin width
+- The MLE of a Poisson rate is total spikes ÷ total time; the numerator is "expected total spikes while in state $i$" (weighted by $\gamma_i(t)$), the denominator "expected total time in state $i$"
+- So $\hat{\lambda}_i$ ("lambda hat") is the **estimate** of state $i$'s firing rate — the new parameter output by the M-step
 
-**Initial state probability**:
+**Initial state probability — what is $\hat{\psi}_i$**:
 
 $$
 \hat{\psi}_i = \frac{1}{N_{\text{trials}}} \sum_{\text{trials}} \gamma_i(1)
 $$
+
+- $\psi_i = p(x_1 = i)$: probability that the sequence **starts** in state $i$ (the initial distribution)
+- Estimate = expected number of trials that "start in state $i$" ÷ total number of trials — again a frequency estimate, with "visits" replaced by "starts in $i$"
 
 ---
 
@@ -548,13 +709,37 @@ Animals and humans can learn to predict future rewards. **TD learning** provides
 
 **Core question**: Given the current state $s_t$, what is the cumulative future reward (**return**)?
 
-**Return** (discounted cumulative reward):
+**Return** (discounted cumulative reward) — sum of future rewards, each discounted by how far away it is:
 
 $$
-G_t = \sum_{k=0}^{\infty} \gamma^k \cdot r_{t+k+1} = r_{t+1} + \gamma \cdot G_{t+1}
+G_t = r_{t+1} + \gamma r_{t+2} + \gamma^2 r_{t+3} + \gamma^3 r_{t+4} + \cdots = \sum_{k=0}^{\infty} \gamma^k \cdot r_{t+k+1}
 $$
 
-where $\gamma \in [0,1)$ is the **discount factor** — future rewards are weighted less than immediate rewards. The closer $\gamma$ is to 1, the more "patient" the agent is.
+Term by term:
+
+- $r_{t+1}$: the reward available **immediately** (weight 1)
+- $\gamma r_{t+2}$: the reward one step ahead, discounted by $\gamma$
+- $\gamma^2 r_{t+3}$: the reward two steps ahead, discounted by $\gamma^2$
+- The farther the reward, the more it is discounted; $\gamma = 0$ means only the immediate reward matters, $\gamma \to 1$ means infinite patience (future valued almost as much as the present)
+
+**Recursive form** (pull out the first term; what remains is exactly the return at the next time step):
+
+$$
+G_t = r_{t+1} + \gamma \left( r_{t+2} + \gamma r_{t+3} + \cdots \right) = r_{t+1} + \gamma G_{t+1}
+$$
+
+**A concrete example**: suppose the next four rewards are $r_{t+1}=1,\; r_{t+2}=2,\; r_{t+3}=0,\; r_{t+4}=3$, with $\gamma = 0.9$:
+
+$$
+G_t = 1 + 0.9 \times 2 + 0.9^2 \times 0 + 0.9^3 \times 3 = 1 + 1.8 + 0 + 2.187 = 4.987
+$$
+
+The $3$ at step 4 is large in magnitude, but after discounting by $0.9^3 \approx 0.729$ it contributes only 2.187 — **the farther in the future, the smaller the contribution**.
+
+**Two special cases**:
+
+- **Finite episode** (ends at time $T$): $G_t = \sum_{k=0}^{T-t-1} \gamma^k r_{t+k+1}$ — nothing beyond $T$
+- **Constant reward** $r$: geometric series $G_t = r(1 + \gamma + \gamma^2 + \cdots) = \dfrac{r}{1-\gamma}$ (e.g., with $\gamma = 0.9$, a perpetual reward of 1 is worth about 10)
 
 **State value function** — expected return:
 
@@ -1228,8 +1413,8 @@ $$
 
 ### W3D3: Latent Dynamics
 
-- SPRT: optimal sequential testing
-- DDM: continuous-time evidence accumulation
+- SPRT: optimal sequential testing (log-likelihood ratio + threshold stopping)
+- DDM: SPRT in continuous time (drift + diffusion, bounds = thresholds)
 - EM algorithm: iterative optimization with latent variables
 - Forward-backward: efficient posterior computation
 
