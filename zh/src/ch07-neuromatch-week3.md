@@ -794,37 +794,162 @@ $\gamma_i(t)$ 和 $\xi_{ij}(t)$ 就是 E 步的输出——它们是 M 步所需
 
 给定 E 步计算出的期望，M 步有闭式解，而且形式出人意料地直观。
 
-**为什么形式这么简单**：M 步的每个更新都可以统一理解为——**先假装隐状态可见，写出最大似然估计（" 频率 = 比值 "），再把其中的真实计数换成 E 步算出的期望计数**。
+**为什么形式这么简单**：M 步的每个更新都可以统一理解为——**先假装隐状态可见，写出最大似然估计（" 频率 = 比值 "），再把其中的真实计数换成 E 步算出的期望计数**。下面逐步推导：为什么解恰好长这样。
 
-**转移矩阵更新**——$\hat{A}$ 是什么：
+---
 
-$$
-\hat{A}_{ij} = \frac{\sum_t \xi_{ij}(t)}{\sum_t \gamma_i(t)}
-$$
+### EM 推导：3.8 出发点——M 步在最大化什么
 
-- 分子 = " 从 $i$ 转移到 $j$ 的**期望**次数 "，分母 = " 处于状态 $i$ 的**期望**次数 "，两者都来自 E 步的 $\gamma$ 和 $\xi$
-- **帽子（^）表示估计量**：$\hat{A}$ 是 M 步输出的转移概率估计，整体构成新的转移矩阵，成为下一轮迭代的 $\theta^{(t+1)}$
-- 直觉：如果隐状态可见，转移概率的最大似然估计就是频率——" 从 $i$ 到 $j$ 的次数 ÷ 从 $i$ 出发的总次数 "。EM 只是把看不见的真实计数替换为期望计数，其余完全一样
-- 归一化自动成立：$\sum_j \hat{A}_{ij} = 1$（分子的和恰为分母）
-
-**观测参数更新**（如泊松发放率）——$\hat{\lambda}_i$ 是什么：
+M 步固定 E 步算出的 $q^{(t)}(x) = p(x \mid Y, \theta^{(t)})$，对 $\theta$ 最大化期望对数似然（$Q$ 函数）：
 
 $$
-\hat{\lambda}_i = \frac{\sum_t \gamma_i(t) \cdot y_t}{\sum_t \gamma_i(t) \cdot \Delta t}
+Q(\theta \mid \theta^{(t)}) = \mathbb{E}_{q^{(t)}}[\log p(Y, x \mid \theta)]
 $$
 
-- 若观测模型是 $y_t \mid x_t = i \sim \text{Poisson}(\lambda_i \Delta t)$，则 $\lambda_i$ 是状态 $i$ 的**发放率**（单位时间的平均发放数），$\Delta t$ 是时间窗宽度
-- 泊松率的最大似然估计 = 总发放数 ÷ 总时间；分子是 " 处于 $i$ 期间的期望总发放数 "（按 $\gamma_i(t)$ 加权），分母是 " 处于 $i$ 的期望总时长 "
-- 所以 $\hat{\lambda}_i$（" lambda hat "）是状态 $i$ 的发放率**估计值**——M 步输出的新参数
+要点：$\gamma_i(t)$、$\xi_{ij}(t)$ 在这一步是**冻结的权重**——E 步算好就不再改变，M 步只是"带着这些权重做最大似然"。
 
-**初始状态概率**——$\hat{\psi}_i$ 是什么：
+---
+
+### EM 推导：3.9 完全数据对数似然——三项分解
+
+给定整条隐状态序列 $x_{1:T}$（假装可见），完全数据对数似然是"初始 + 转移 + 发射"三段：
 
 $$
-\hat{\psi}_i = \frac{1}{N_{\text{trials}}} \sum_{\text{trials}} \gamma_i(1)
+\log p(Y, x \mid \theta)
+= \underbrace{\log p(x_1 \mid \psi)}_{\text{初始}}
++ \underbrace{\sum_{t=1}^{T-1} \log p(x_{t+1} \mid x_t, A)}_{\text{转移}}
++ \underbrace{\sum_{t=1}^{T} \log p(y_t \mid x_t, \lambda)}_{\text{发射}}
 $$
 
-- $\psi_i = p(x_1 = i)$：序列**起始时刻**处于状态 $i$ 的概率（初始分布）
-- 估计 = 所有试验中 " 从状态 $i$ 开始 " 的期望次数 ÷ 试验总数——又是一个频率估计，只是把 " 访问次数 " 换成 " 开头是 $i$ 的次数 "
+用指示函数把"抽签"展开成求和（$x_t = i$ 时 $\mathbb{1}\{x_t = i\} = 1$，否则为 0）：
+
+$$
+= \sum_i \mathbb{1}\{x_1 {=} i\}\log \psi_i
++ \sum_{t=1}^{T-1}\sum_{i,j} \mathbb{1}\{x_t {=} i,\, x_{t+1} {=} j\}\log A_{ij}
++ \sum_{t=1}^{T}\sum_i \mathbb{1}\{x_t {=} i\}\log p(y_t \mid \lambda_i)
+$$
+
+**关键**：三项各自只含自己的参数——$\psi$ 只出现在第一项，$A$ 只在第二项，$\lambda$ 只在第三项。所以最大化 $Q$ 自动分解成三个独立的小问题。
+
+---
+
+### EM 推导：3.10 取期望——真实计数变成期望计数
+
+对 $q^{(t)}$ 取期望时，指示函数的期望就是 E 步算好的后验概率：
+
+$$
+\mathbb{E}_q[\mathbb{1}\{x_t {=} i\}] = \gamma_i(t), \qquad
+\mathbb{E}_q[\mathbb{1}\{x_t {=} i,\, x_{t+1} {=} j\}] = \xi_{ij}(t)
+$$
+
+于是 $Q$ 函数变成"加权和"：
+
+$$
+Q(\theta\mid\theta^{(t)}) = \underbrace{\sum_i \gamma_i(1)\log\psi_i}_{\text{只含 }\psi}
++ \underbrace{\sum_t\sum_{i,j}\xi_{ij}(t)\log A_{ij}}_{\text{只含 }A}
++ \underbrace{\sum_t\sum_i \gamma_i(t)\log p(y_t\mid\lambda_i)}_{\text{只含 }\lambda}
+$$
+
+**这就是"期望计数"**：真实计数 $\mathbb{1}\{\cdots\}$ 是 0/1，期望计数是 $[0,1]$ 之间的软权重——"频率 = 比值"里的"计数"二字由此而来。
+
+---
+
+### EM 推导：3.11 逐个求解——ψ、A、λ
+
+三个子问题都是同一个套路：**"$\sum$（权重 × log 概率）" + 归一化约束 ⇒ 加权频率**。用拉格朗日乘子法推导。
+
+**初始状态概率** $\hat{\psi}_i$：
+
+$$
+\max_{\psi} \sum_i \gamma_i(1)\log\psi_i, \qquad \text{s.t. } \sum_i \psi_i = 1
+$$
+
+拉格朗日函数 $\sum_i \gamma_i(1)\log\psi_i - \mu\left(\sum_i\psi_i - 1\right)$，对 $\psi_i$ 求导置零：
+
+$$
+\frac{\gamma_i(1)}{\psi_i} - \mu = 0 \;\Rightarrow\; \psi_i \propto \gamma_i(1)
+\;\Rightarrow\; \hat{\psi}_i = \frac{\gamma_i(1)}{\sum_j \gamma_j(1)} = \gamma_i(1)
+$$
+
+（$\sum_j \gamma_j(1) = 1$，单组试验时直接等于 $\gamma_i(1)$；多组试验时对 $\gamma_i(1)$ 取平均，即 $\hat{\psi}_i = \frac{1}{N_{\text{trials}}}\sum_{\text{trials}}\gamma_i(1)$。）
+
+含义：**"开头处于状态 $i$"的期望次数 ÷ 试验总数**——频率估计，只是把"访问次数"换成"开头是 $i$ 的次数"。
+
+**转移矩阵** $\hat{A}_{ij}$：约束逐行独立（每行 $\sum_j A_{ij} = 1$），对第 $i$ 行：
+
+$$
+\max_{A_{i\cdot}} \sum_j\Big(\sum_t \xi_{ij}(t)\Big)\log A_{ij}, \qquad \text{s.t. } \sum_j A_{ij} = 1
+$$
+
+同样的拉格朗日套路给出：
+
+$$
+\hat{A}_{ij} = \frac{\sum_t \xi_{ij}(t)}{\sum_j\sum_t \xi_{ij}(t)} = \frac{\sum_t \xi_{ij}(t)}{\sum_t \gamma_i(t)}
+$$
+
+最后一步用了恒等式 $\sum_j \xi_{ij}(t) = \gamma_i(t)$（从 $i$ 出发必到某个 $j$）——它同时保证每行自动归一化：$\sum_j \hat{A}_{ij} = 1$。
+
+含义：**期望的"从 $i$ 到 $j$ 的次数 ÷ 处于 $i$ 的次数"**——如果隐状态可见，这就是字面意义的频率计数。$\hat{A}$（" A hat "）是 M 步输出的转移概率估计，整体构成新的转移矩阵，成为下一轮迭代的 $\theta^{(t+1)}$。
+
+**泊松发放率** $\hat{\lambda}_i$：发射模型 $y_t \mid x_t = i \sim \text{Poisson}(\lambda_i \Delta t)$，即
+
+$$
+p(y_t \mid \lambda_i) = \frac{(\lambda_i \Delta t)^{y_t} e^{-\lambda_i \Delta t}}{y_t!}
+\;\Rightarrow\; \log p(y_t\mid\lambda_i) = y_t\log\lambda_i - \lambda_i\Delta t + \text{常数}
+$$
+
+$Q$ 中与 $\lambda_i$ 有关的部分是 $\sum_t \gamma_i(t)(y_t\log\lambda_i - \lambda_i\Delta t)$，求导置零：
+
+$$
+\sum_t \gamma_i(t)\Big(\frac{y_t}{\lambda_i} - \Delta t\Big) = 0
+\;\Rightarrow\;
+\hat{\lambda}_i = \frac{\sum_t \gamma_i(t)\, y_t}{\sum_t \gamma_i(t)\, \Delta t}
+$$
+
+含义：**期望总发放数 ÷ 期望总时长**——普通泊松最大似然估计（总计数 ÷ 总时间）的加权版本，权重是"时刻 $t$ 处于状态 $i$ 的概率"（$\gamma_i(t)$）。
+
+---
+
+### EM 推导：3.12 为什么形式这么简单——指数族视角
+
+完全数据似然是若干独立"事件"（初始状态、每次转移、每次发射）概率的乘积，取 log 后成和；而每类事件的分布（分类分布、泊松）都属于**指数族**。指数族的 MLE 有统一形式：**让期望充分统计量等于观测充分统计量**（矩匹配）。EM 只是把"观测充分统计量"换成"期望充分统计量"（$\gamma$、$\xi$），解的形状自然不变——这就是"形式这么简单"的深层原因，也是 M 步更新永远是"频率 = 比值"的根源。
+
+---
+
+### EM 推导：3.13 数值小例子
+
+2 个状态、$T = 3$、一组试验。假设 E 步给出：
+
+| $t$ | $\gamma_1(t)$ | $\gamma_2(t)$ | $\xi_{11}(t)$ | $\xi_{12}(t)$ | $\xi_{21}(t)$ | $\xi_{22}(t)$ |
+| --- | --- | --- | --- | --- | --- | --- |
+| 1 | 0.8 | 0.2 | 0.5 | 0.3 | 0.1 | 0.1 |
+| 2 | 0.6 | 0.4 | 0.25 | 0.35 | 0.05 | 0.35 |
+
+（可自行验证恒等式 $\sum_j \xi_{ij}(t) = \gamma_i(t)$：如 $0.5 + 0.3 = 0.8$ ✓）
+
+**转移矩阵更新**：
+
+$$
+\hat{A}_{11} = \frac{0.5 + 0.25}{0.8 + 0.6} = \frac{0.75}{1.4} \approx 0.54, \qquad
+\hat{A}_{12} = \frac{0.3 + 0.35}{1.4} \approx 0.46
+$$
+
+$$
+\hat{A}_{21} = \frac{0.1 + 0.05}{0.2 + 0.4} = \frac{0.15}{0.6} = 0.25, \qquad
+\hat{A}_{22} = \frac{0.1 + 0.35}{0.6} = 0.75
+$$
+
+每行之和为 1（归一化自动成立）。
+
+**泊松发放率更新**：若观测 $y = [3, 1, 5]$、$\Delta t = 1$：
+
+$$
+\hat{\lambda}_1 = \frac{0.8\cdot 3 + 0.6\cdot 1 + 0.3\cdot 5}{0.8 + 0.6 + 0.3} = \frac{4.5}{1.7} \approx 2.65
+$$
+
+与"假设一直处于状态 1"的朴素估计 $(3+1+5)/3 = 3$ 相比，$\hat{\lambda}_1$ 更小——因为状态 1 在低计数时刻 $t = 2$ 的后验概率最高（$\gamma_1(2) = 0.6$），发放率被那里的低计数"拉下来"了。
+
+**别忘了闭环**：M 步得到 $\theta^{(t+1)}$ 后要重新做 E 步（重算 $\gamma$、$\xi$），再 M 步……如此交替——这正是 3.7 单调性链条里"第二个 $\geq$"的由来。
 
 ---
 
