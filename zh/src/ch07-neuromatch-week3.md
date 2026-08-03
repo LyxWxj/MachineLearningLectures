@@ -518,11 +518,25 @@ $$
 - 边界越高 → 错误率**指数**下降（更准）。以上面的例子：$\mu=0.5, \sigma=1, B=2$ 时 $P(\text{错}) = 1/(1+e^2) \approx 12\%$
 - 但平均决策时间也随 $B$ 增大（强信号时约 $B/\mu$）——精确与快速不能兼得，因为它们由**同一个参数 $B$** 控制
 
+![DDM 的速度-精度权衡（$\mu=0.5, \sigma=1$）：(a) 样本路径与首达决策——低边界更快但更易撞错边界；(b) 同一个参数 $B$ 同时决定错误率与平均决策时间；(c) 调整 $B$ 只能沿速度-精度权衡前沿移动；(d) 假设检验的两类错误：单次观测 $\alpha=\beta\approx 31\%$；累积到 $\pm B$ 后 $P(\text{对})=1/(1+e^{-2\mu B/\sigma^2})$、$P(\text{错})=1/(1+e^{2\mu B/\sigma^2})$，B=2 时约 88%/12%）](../../assets/ddm_speed_accuracy.png)
+
 作为对照，如果强制在固定时间 $T$ 决策（不做序贯检验），精度为：
 
 $$
 P(\text{正确}) = \frac{1}{2} + \frac{1}{2} \operatorname{erf}\left(\frac{\mu}{\sqrt{2}\,\sigma/\sqrt{T}}\right)
 $$
+
+**为什么是"对照"**：这个公式描述的是**固定时间决策**——观测满 $T$ 个单位时间后强制给答案，不做序贯检验。此时累积证据 $L_T \sim \mathcal{N}(b s T,\ c^2 T)$，最优决策规则是看符号：$L_T > 0$ 判 $s=+1$，否则判 $s=-1$。真实状态为 $s=+1$ 时，正确率就是"这个正态变量恰好取正值"的概率：
+
+$$
+P(\text{正确}) = \Phi\left(\frac{b\sqrt{T}}{c}\right) = \Phi\left(\frac{\mu}{\sigma}\sqrt{T}\right)
+$$
+
+其中 $\Phi$ 是标准正态分布的累积分布函数。最后一步用到 $b = \frac{2\mu^2}{\sigma^2}$、$c = \frac{2\mu}{\sigma}$，于是信噪比 $\frac{b\sqrt{T}}{c} = \frac{\mu}{\sigma}\sqrt{T}$——正是前面"噪声随 $\sqrt{T}$ 被平均掉"的那个量。
+
+- **erf 只是 $\Phi$ 的另一种写法**：恒等式 $\Phi(z) = \frac{1}{2} + \frac{1}{2}\operatorname{erf}(z/\sqrt{2})$，代入 $z = \frac{\mu}{\sigma}\sqrt{T}$ 就得到上面的公式
+- **直觉**：$T \to 0$ 时 P(正确) → 50%（瞎猜）；$T \to \infty$ 时 → 100%。但固定时间的问题是：时间到了证据可能还没结论——噪声恰好把 $L_T$ 推到 0 的错误一侧，就出现错误了。
+- **与 DDM 对比**（$\mu=0.5, \sigma=1, B=2$）：DDM 平均用时 $\mathbb{E}[\tau] \approx 3.05$、正确率约 88%；固定时间要达到同样的 88% 正确率需要 $T \approx 5.6$——同一精度，固定时间要多花约 80% 的时间
 
 SPRT/DDM 用**变化的时间**换取固定精度——这正是 Wald 最优性在连续时间下的体现：同样的错误率，平均用时最少。
 
@@ -553,55 +567,169 @@ SPRT/DDM 用**变化的时间**换取固定精度——这正是 Wald 最优性�
 
 ---
 
-**为什么直接最大化不可行**？观测数据的对数似然需要对隐变量**求和**：
+### EM 推导：3.1 出发点——最大化对数似然
+
+EM 要解决的最大化问题：给定观测 $Y$（隐变量 $x$ 不可见），找参数 $\theta$ 最大化观测数据的对数似然：
 
 $$
-\mathcal{L}(\theta) = \log p(Y \mid \theta) = \log \sum_x p(Y, x \mid \theta)
+\theta^* = \arg\max_\theta \mathcal{L}(\theta), \qquad \mathcal{L}(\theta) = \log p(Y\mid\theta)
 $$
 
-隐变量被 log 包在求和里面，而状态序列 $x$ 的数量随长度指数增长——既没有闭式解，也无法直接数值优化。
+> **为什么用 $\log$ 而不是 $p(Y\mid\theta)$？**
+> 1. **数值稳定**：似然是很多小概率的乘积，高维下会下溢（如 $10^{-300}$），取 $\log$ 后变成量级正常的数
+> 2. **乘法变加法**：$N$ 个独立样本的联合似然 $\prod_n p(Y_n\mid\theta)$ 取 $\log$ 后变成 $\sum_n \log p(Y_n\mid\theta)$，便于求导和优化
+> 3. **单调性**：$\log$ 严格递增，最大化 $\log p$ 与最大化 $p$ 等价，最优解不变
 
-**关键技巧——证据下界（ELBO）**：引入任意分布 $q(x)$，由 Jensen 不等式（log 是凹函数）：
-
-$$
-\log p(Y\mid\theta) = \log \sum_x q(x)\frac{p(Y,x\mid\theta)}{q(x)}
-\geq \sum_x q(x)\log\frac{p(Y,x\mid\theta)}{q(x)}
-= \underbrace{\mathbb{E}_q[\log p(Y,x\mid\theta)] + H(q)}_{\text{ELBO}(q,\theta)}
-$$
-
-其中 $H(q)$ 是 $q$ 的熵。Jensen 不等式取等号当且仅当 $q(x) \propto p(Y,x\mid\theta)$，即 $q(x) = p(x \mid Y, \theta)$——这正是 E 步做的事情。于是 EM 的两步可以重新表述为：
-
-- **E 步**：固定 $\theta^{(t)}$，令 $q(x) = p(x \mid Y, \theta^{(t)})$——把下界**抬**到与真实似然相切（等号成立）
-- **M 步**：固定 $q$，最大化下界中的期望对数似然 $\mathbb{E}_q[\log p(Y,x\mid\theta)]$，得到 $\theta^{(t+1)}$
-
-**单调性保证——为什么似然一定不下降**：把对数似然分解为 " 下界 + 非负的 KL 散度 "：
+**难点在于边缘化**：隐变量 $x$ 看不见，观测似然必须把隐变量的所有可能取值"加总"（离散）或"积分"（连续）掉：
 
 $$
-\log p(Y\mid\theta) = \underbrace{\text{ELBO}(q,\theta)}_{\text{下界}} + \underbrace{\mathrm{KL}\big(q(x) \,\|\, p(x\mid Y,\theta)\big)}_{\geq 0，\ q=\text{后验} 时取 0}
+\mathcal{L}(\theta) = \log \sum_x p(Y, x\mid\theta) = \log \sum_x p(Y\mid x,\theta)\, p(x\mid\theta)
+\qquad\left(\text{连续时}\ \sum_x \to \int dx\right)
 $$
 
-每一轮迭代都满足：
+问题出在 **$\log$ 在求和号外面**：$\log \sum_x$ 无法与求和交换（$\log(a+b) \neq \log a + \log b$），而状态序列 $x$ 的数量随长度指数增长——既没有闭式解，也无法直接做数值优化。
+
+> **关键矛盾**：如果隐变量 $x$ 可见，"完全数据"对数似然 $\log p(Y,x\mid\theta)$ 的最大化通常很简单（后文 M 步会看到：就是频率计数）；问题只在于 $x$ 不可见，而边缘化又把 $\log$ 和求和焊在了一起。EM 的策略：**不边缘化，而是"猜测" $x$ 服从什么分布**。
+
+---
+
+### EM 推导：3.2 引入辅助分布 q(x)——重要性采样
+
+任意在 $x$ 的取值范围内满足 $q(x) > 0$ 的分布 $q(x)$，都可以乘进去再除回来——这是恒等变形，没有引入任何近似：
+
+$$
+\log p(Y\mid\theta)
+= \log \sum_x q(x)\, \frac{p(Y,x\mid\theta)}{q(x)}
+= \log \mathbb{E}_{q}\!\left[\frac{p(Y,x\mid\theta)}{q(x)}\right]
+$$
+
+- 这一步把"对 $x$ 求和"改写成了"对分布 $q$ 求期望"——期望比求和更容易处理（解析计算、采样都行）
+- $q(x)$ 完全自由，称为**变分分布**（variational distribution）。$q$ 越接近真实的隐变量后验 $p(x\mid Y,\theta)$，比值 $p(Y,x\mid\theta)/q(x)$ 的波动越小
+- 在 VAE 里这个角色由 encoder $q_\phi(z\mid x)$ 扮演；在 EM 里 $q$ 不需要参数化，E 步会直接把它"解"出来（见 3.5）
+
+---
+
+### EM 推导：3.3 Jensen 不等式——下界从何而来
+
+$\log$ 是**凹函数**，由 Jensen 不等式：$\log \mathbb{E}[X] \ge \mathbb{E}[\log X]$（凹函数取 $\ge$；若函数是凸的则方向相反）。套在 3.2 的式子上：
+
+$$
+\log p(Y\mid\theta)
+\ge \mathbb{E}_{q}\!\left[\log \frac{p(Y,x\mid\theta)}{q(x)}\right]
+= \underbrace{\mathbb{E}_q[\log p(Y,x\mid\theta)] - \mathbb{E}_q[\log q(x)]}_{\text{ELBO}(q,\theta)}
+$$
+
+这个下界就是 **ELBO（证据下界，Evidence Lower Bound）**——与 VAE 中的 ELBO 是同一个对象，只是记号不同。写回熵的形式：
+
+$$
+\text{ELBO}(q,\theta) = \mathbb{E}_q[\log p(Y,x\mid\theta)] + H(q), \qquad H(q) = -\sum_x q(x)\log q(x)
+$$
+
+其中 $H(q)$ 是 $q$ 的**熵**（连续情形为 $-\int q\log q\, dx$），衡量 $q$ 的分散程度：$q$ 越均匀熵越大，ELBO 越高——熵项在"奖励" $q$ 不要过早锁死在某个状态上。
+
+> **为什么这个下界有用？** 因为 $q$ 是自由的：调 $q$ 可以把下界**抬**到贴近真实似然（E 步），调 $\theta$ 可以把下界**推**高（M 步）。EM 就是交替拧这两个旋钮。
+
+---
+
+### EM 推导：3.4 分解 ELBO——两项各自的含义
+
+把联合分布拆成 $p(Y,x\mid\theta) = p(Y\mid x,\theta)\,p(x\mid\theta)$，ELBO 可以重排成"拟合项 − 正则项"：
+
+$$
+\text{ELBO}(q,\theta) = \underbrace{\mathbb{E}_q[\log p(Y\mid x,\theta)]}_{\text{数据拟合项}} - \underbrace{\mathrm{KL}\big(q(x)\,\|\,p(x\mid\theta)\big)}_{\text{先验正则项}}
+$$
+
+推导：$\mathbb{E}_q[\log p(Y,x\mid\theta)] = \mathbb{E}_q[\log p(Y\mid x,\theta)] + \mathbb{E}_q[\log p(x\mid\theta)]$，而其中 $\mathbb{E}_q[\log p(x\mid\theta)] - \mathbb{E}_q[\log q(x)] = -\mathrm{KL}\big(q(x)\,\|\,p(x\mid\theta)\big)$（由 $\mathrm{KL}(q\|p) = \mathbb{E}_q[\log q - \log p]$）。
+
+- **数据拟合项**：在 $q$ 给出的隐变量分布下，观测 $Y$ 的对数似然——越大说明模型越能解释数据
+- **先验正则项**：$q(x)$ 偏离隐变量先验/动力学 $p(x\mid\theta)$ 的程度——防止 $q$ 为了拟合数据而编造不合理的隐变量分布
+
+这正是 VAE 的"重建项 − KL 项"的翻版，角色一一对应：
+
+| EM | VAE | 角色 |
+| --- | --- | --- |
+| $q(x)$（后验近似） | $q_\phi(z\mid x)$（encoder） | 从数据推断隐变量 |
+| $p(x\mid\theta)$（先验/状态动力学） | $p(z)$（先验） | 隐变量的先验知识 |
+| $p(Y\mid x,\theta)$（观测/发射模型） | $p_\theta(x\mid z)$（decoder） | 由隐变量生成数据 |
+| E 步解析解 $q=p(x\mid Y,\theta)$ | 无解析解，梯度下降逼近 | 优化 $q$ 的方式 |
+| 熵 $H(q)$ 与 $\theta$ 无关 | KL 正则项 | 防止 $q$ 过早"锁死" |
+
+**两种写法各有用处**：
+
+- 3.3 的形式（期望对数联合似然 + 熵）：**M 步方便**——$H(q)$ 不依赖 $\theta$，对 $\theta$ 最大化 ELBO 等价于最大化 $\mathbb{E}_q[\log p(Y,x\mid\theta)]$
+- 3.4 的形式（拟合 − 正则）：**理解方便**——一眼看出"既要拟合数据，又不能太偏离先验"
+
+---
+
+### EM 推导：3.5 ELBO 与真实似然的关系——缺口就是 KL
+
+把 $\log p(Y\mid\theta)$ 写成 $\mathbb{E}_q[\log p(Y\mid\theta)]$（它不含 $x$，在任意 $q$ 下的期望都是它自己），与 ELBO 相减：
+
+$$
+\log p(Y\mid\theta) - \text{ELBO}(q,\theta)
+= \mathbb{E}_q\!\left[\log \frac{q(x)}{p(x\mid Y,\theta)}\right]
+= \mathrm{KL}\big(q(x)\,\|\,p(x\mid Y,\theta)\big)
+$$
+
+于是得到与 VAE 中完全相同的恒等式：
+
+$$
+\log p(Y\mid\theta) = \underbrace{\text{ELBO}(q,\theta)}_{\text{下界}} + \underbrace{\mathrm{KL}\big(q(x)\,\|\,p(x\mid Y,\theta)\big)}_{\text{缺口，恒} \ge 0}
+$$
+
+两个推论：
+
+- **缺口非负**：$\mathrm{KL} \ge 0$，所以 $\log p(Y\mid\theta) \ge \text{ELBO}$——下界永远不会高估似然
+- **缺口何时消失**：$\mathrm{KL} = 0$ 当且仅当 $q(x) = p(x\mid Y,\theta)$（两分布处处相等）。也就是说，**$q$ 恰好取真实后验时，ELBO 与对数似然重合**——这就是 E 步的数学依据：把下界"抬"到与真实似然相切
+
+> **EM 比 VAE 幸运在哪**：VAE 中 $q_\phi(z\mid x)$ 是神经网络，只能逼近真实后验，缺口永远 $> 0$；EM 中隐变量结构简单（离散状态或低维），E 步可以直接算出真实后验，把缺口清零。
+
+---
+
+### EM 推导：3.6 E 步与 M 步——从 ELBO 读出算法
+
+每一轮迭代交替优化 $q$ 和 $\theta$：
+
+- **E 步（优化 $q$）**：固定 $\theta^{(t)}$，令 $q^{(t)}(x) = p(x\mid Y,\theta^{(t)})$。由 3.5，此时 $\text{ELBO}(q^{(t)},\theta^{(t)}) = \mathcal{L}(\theta^{(t)})$——下界被抬到与真实似然在 $\theta^{(t)}$ 处重合
+- **M 步（优化 $\theta$）**：固定 $q^{(t)}$，最大化 $\text{ELBO}(q^{(t)},\theta)$ 关于 $\theta$。由 3.4，$H(q^{(t)})$ 与 $\theta$ 无关，因此等价于最大化**期望对数似然**（EM 的 $Q$ 函数）：
+
+$$
+Q(\theta\mid\theta^{(t)}) = \mathbb{E}_{q^{(t)}}[\log p(Y,x\mid\theta)]
+$$
+
+**"期望"与"最大化"两个词从哪来**：E 步算出后验后，M 步的 $Q$ 函数要对隐变量 $x$ 求**期望**；再对 $\theta$ 做**最大化**——算法的名字就是这两步的缩写。
+
+**为什么 M 步通常有闭式解**：$\log p(Y,x\mid\theta)$ 对参数往往属于指数族，对 $x$ 求期望只会把"真实计数"变成"期望计数"（如 HMM 中的 $\gamma_i(t)$、$\xi_{ij}(t)$）。于是 M 步的解 = 把"频率 = 比值"的闭式公式里的真实计数替换成期望计数——这正是后文"EM：M 步更新"的形式。
+
+**EM 算法总览**：
+
+```
+初始化 θ^(0)
+重复直到相邻两轮对数似然的变化 < 容差（如 10^-6）：
+    E 步：q^(t)(x) = p(x | Y, θ^(t))                       # 计算后验 → 期望计数
+    M 步：θ^(t+1) = argmax_θ E_{q^(t)}[log p(Y, x | θ)]    # 加权最大似然
+```
+
+---
+
+### EM 推导：3.7 单调性——为什么一定收敛
+
+**为什么似然一定不下降**：由 3.5 的分解（对数似然 = 下界 + 非负 KL），每一轮迭代都满足：
 
 $$
 \mathcal{L}(\theta^{(t+1)}) \geq \text{ELBO}(q^{(t)}, \theta^{(t+1)}) \geq \text{ELBO}(q^{(t)}, \theta^{(t)}) = \mathcal{L}(\theta^{(t)})
 $$
 
-- 第一个 $\geq$：KL 散度恒 $\geq 0$，下界永远不会高估似然
-- 第二个 $\geq$：M 步的定义——新参数使下界（从而期望对数似然）不下降
-- 最后的等号：E 步的定义——$q$ 取后验时下界与似然重合
+- 第一个 $\geq$：$\mathrm{KL} \ge 0$，下界永远不会高估似然（3.5）
+- 第二个 $\geq$：M 步的定义——新参数使下界（从而期望对数似然）不下降（3.6）
+- 最后的等号：E 步的定义——$q$ 取后验时下界与似然重合（3.5）
 
-**直觉**：把对数似然曲线比作一座山，ELBO 是山下面的**下界曲线**。E 步把下界抬到与山相切（在 $\theta^{(t)}$ 处），M 步沿下界走到它的最高点，然后重复。每一步的终点都不低于起点，因此似然单调不降，最终停在**局部**极大值。注意只能保证局部最优：EM 对初始值 $\theta^{(0)}$ 敏感，不同初值可能收敛到不同的局部解。
+**直觉**：把对数似然曲线比作一座山，ELBO 是山下面的**下界曲线**。E 步把下界抬到与山相切（在 $\theta^{(t)}$ 处），M 步沿下界走到它的最高点，然后重复。每一步的终点都不低于起点，因此似然单调不降，最终停在**局部**极大值。
 
-**收敛判据**：当相邻两轮的对数似然变化小于某个容差（如 $10^{-6}$）时停止迭代。
----
-
-$$
-\mathcal{L}(\theta^{(t+1)}) \geq \mathcal{L}(\theta^{(t)})
-$$
-
-每一步都不会让似然变差——这保证了算法会收敛（至少到局部最优）。
+**收敛到哪**：只能保证**局部**最优。EM 对初始值 $\theta^{(0)}$ 敏感，不同初值可能收敛到不同的局部解；实际中常用多个初值分别运行后取似然最高的结果，或用启发式方法先给出较好的初始值。
 
 ---
+
 
 ### EM：前向 - 后向算法
 
