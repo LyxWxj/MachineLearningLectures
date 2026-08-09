@@ -1789,3 +1789,4 @@ $$
 $$
 \hat{A}_{ij}^{\text{IV}} = \frac{\text{Cov}(x_{t-1}^i, x_{t+1}^j)}{\text{Cov}(x_{t-1}^i, x_t^i)} \quad \text{（工具变量：在混杂存在下估计因果效应）}
 $$
+it
