@@ -4,6 +4,173 @@
 
 ---
 
+## 神经网络究竟在学习什么？
+
+在讨论正则化和专用架构之前，先回答一个更基础的问题：神经网络并不是在“发现唯一正确的公式”。训练只要求它在给定数据与损失函数下找到一个参数函数 $f_\theta$；**数据的结构、网络的归纳偏置和优化过程**共同决定它最终优先学到什么。下面的实验会反复区分两件事：在训练集上拟合，和对新样本泛化。
+
+### 1. 最简单的神经网络：两层多层感知机
+
+这里“两层”按**带参数的层**计数：一个隐藏层加一个输出层。对输入 $x \in \mathbb{R}^d$，宽度为 $m$ 的 MLP 写作
+
+$$
+h(x) = \sigma(W_1x+b_1), \qquad f_\theta(x)=W_2h(x)+b_2.
+$$
+
+每个隐藏单元先用一个线性超平面切分输入空间，再经过非线性激活；输出层把这些“基元”线性组合。若没有 $\sigma$，两层线性层仍可合并成一个线性映射，不能表达弯曲的决策边界。
+
+```python
+class TwoLayerMLP(nn.Module):
+    def __init__(self, input_dim, width, output_dim):
+        super().__init__()
+        self.net = nn.Sequential(
+            nn.Linear(input_dim, width),
+            nn.ReLU(),
+            nn.Linear(width, output_dim),
+        )
+
+    def forward(self, x):
+        return self.net(x)
+```
+
+### 2. 万能逼近定理：存在性，不是训练保证
+
+对紧致区域 $K \subset \mathbb{R}^d$ 上的连续目标函数 $g$，只要激活函数满足合适条件（例如 ReLU、sigmoid、tanh），对于任意误差阈值 $\varepsilon>0$，存在某个足够宽的单隐藏层网络，使得
+
+$$
+\sup_{x\in K}|f_\theta(x)-g(x)|<\varepsilon.
+$$
+
+这个定理说的是“**存在**一组参数”，没有说需要多宽、SGD 能否找到它、需要多少样本，也没有保证模型在 $K$ 外或未见数据上正确。因此它不能推出“一个两层 MLP 实际上能拟合任何函数”。
+
+更准确地说：
+
+- 宽度固定时，它的函数族有限，不能覆盖所有复杂度的目标函数；有限宽度的 ReLU MLP 只有有限个线性分段。
+- 即使增宽到可以逼近，所需宽度可能随输入维度和目标函数的高频细节急剧增长；这就是维度灾难。
+- 训练数据有限时，有无数个函数在训练点上相同；优化器可找到记忆训练样本的解，却未必选到有意义的规律。
+
+深度与特殊结构的价值在于以较少参数表达任务中的已知结构：CNN 用局部连接和权重共享编码平移等变性；RNN 复用状态以处理顺序；Transformer 用注意力让 token 按内容交互。这些是**归纳偏置**，不是比万能逼近定理更强的“万能性”。
+
+### 3. 四个实验：拟合、偏好、泛化与表示
+
+每张图只呈现一个实验的核心观测量。图中的曲线是应观察到的典型形态；真实运行中的具体拐点会随随机种子、网络宽度、优化器、正则化和数据切分而变化。下面的代码骨架统一使用 PyTorch，并把需要记录的量写清楚。
+
+#### 实验 0：随机分类，网络可以硬背标签
+
+在 $[-1,1]^2$ 均匀采样二维点，再独立地抛硬币产生红/蓝标签。位置与标签没有关系，所以测试集的理论最优准确率是约 $50\%$。但是一个足够宽的 MLP 可在有限训练点间制造复杂边界，达到接近 $100\%$ 的训练准确率。
+
+![Random labels: memorization without generalization](../../assets/experiment_random_labels.svg)
+
+左图刻意没有画出可分的几何边界，因为类别是独立随机变量；右图则说明网络仍能把**训练点及其标签**编码进参数。训练准确率上升并不是发现规律的证据，测试准确率留在 $50\%$ 附近才是这里的关键观测。
+
+```python
+torch.manual_seed(0)
+x_train = 2 * torch.rand(512, 2) - 1
+y_train = torch.randint(0, 2, (512,))       # independent random labels
+x_test = 2 * torch.rand(2048, 2) - 1
+y_test = torch.randint(0, 2, (2048,))
+
+model = TwoLayerMLP(2, width=512, output_dim=2)
+# Train with CrossEntropyLoss. Log both train_acc and test_acc every epoch.
+```
+
+这不是“网络理解了随机性”，而是容量足以为训练集建立一张查找表。训练准确率到 100% 与测试准确率接近随机猜测同时出现，正是记忆化与泛化的分界。
+
+#### 实验 1：频率偏好，模型通常先学平滑部分
+
+令目标函数为
+
+$$
+f(x)=\sin x+0.15\sin(10x), \qquad x\in[-\pi,\pi].
+$$
+
+第一项是高振幅低频结构，第二项是低振幅高频细节。训练一个一维回归 MLP，并在固定网格上保存不同训练步的预测曲线：早期预测常先接近 $\sin x$，继续训练后才逐步刻画细小振荡。这种现象通常称为**频率偏好（spectral bias）**，但它依赖网络、初始化与优化设置，并非所有配置下严格成立。
+
+![Spectral bias: early fit](../../assets/experiment_spectral_bias_early.svg)
+
+第一张图只比较目标函数与 early fit。蓝线已经恢复主要的 $sin(x)$ 形状，但还没有跟随每个细小振荡；因此此时的误差主要集中在高频部分。
+
+![Spectral bias: late fit](../../assets/experiment_spectral_bias_late.svg)
+
+第二张图只比较目标函数与 late fit。经过更多训练后，红线开始补上 $0.15\sin(10x)$ 的细节。两张图共同说明：网络具备表示高频的能力，并不意味着优化会在一开始就优先学到高频。
+
+```python
+x = torch.linspace(-torch.pi, torch.pi, 256).unsqueeze(1)
+y = torch.sin(x) + 0.15 * torch.sin(10 * x)
+model = TwoLayerMLP(1, width=128, output_dim=1)
+snapshots = {}
+for step in range(10_001):
+    prediction = model(x)
+    loss = F.mse_loss(prediction, y)
+    optimizer.zero_grad(); loss.backward(); optimizer.step()
+    if step in (0, 100, 1_000, 10_000):
+        snapshots[step] = model(x).detach().cpu()
+# Plot x against y and every snapshots[step] on the same axes.
+```
+
+它说明“能表示高频”不等于“优化会同样快地学到高频”。因此训练动态本身也是一种偏好。
+
+#### 实验 2：Grokking，泛化可能在很晚才出现
+
+取素数 $p$，输入离散对 $(a,b)$，标签为 $(a+b)\bmod p$。从所有对中随机保留一部分训练，其余测试；用两个 token 的嵌入、MLP 或小型 Transformer 预测 $p$ 个类别。训练准确率会很快到 100%，而测试准确率可能长时间接近随机水平 $1/p$；在持续训练、且通常配合权重衰减时，测试准确率才突然上升。Power 等人把这种“先长时间过拟合，后突然泛化”的现象称为 **grokking**。
+
+![Grokking: delayed generalization](../../assets/experiment_grokking.svg)
+
+蓝线先饱和表示模型已经能记住训练对；橙线在很长一段时间内接近随机，随后才明显上升。这个时间差是 grokking 的定义性信号：泛化不是训练准确率刚达到 100% 时自动发生的。
+
+```python
+p = 97
+pairs = torch.cartesian_prod(torch.arange(p), torch.arange(p))
+labels = (pairs[:, 0] + pairs[:, 1]) % p
+perm = torch.randperm(len(pairs))
+train_idx, test_idx = perm[:3_000], perm[3_000:]
+
+class ModularAdder(nn.Module):
+    def __init__(self, p, d=128):
+        super().__init__()
+        self.embedding = nn.Embedding(p, d)
+        self.readout = nn.Sequential(nn.Linear(2 * d, d), nn.ReLU(), nn.Linear(d, p))
+    def forward(self, ab):
+        return self.readout(self.embedding(ab).flatten(1))
+
+# Use AdamW(weight_decay=...) and log train/test accuracy for many more steps
+# after train accuracy first reaches 100%.
+```
+
+这个实验的关键不是保证每个随机种子都会出现 grokking，而是必须**继续训练并同时画出 train/test accuracy**；只看训练 loss 会错过“泛化何时出现”。
+
+#### 实验 3：Toy Models of Superposition，表示可以叠加而非一一对应
+
+Anthropic 的 *Toy Models of Superposition* 研究稀疏特征在表示维度不足时会怎样编码。设数据本来有 $n$ 个可独立出现的特征，但模型的隐藏表示只有 $d<n$ 个维度；为了降低总体重构误差，模型可以让多个特征投影到不完全正交的方向上。于是，**一个神经元或一个维度不必对应一个人类可命名的概念**，概念可分布在多个方向，而一个方向也可承载多个特征。
+
+![Superposition: six features share two dimensions](../../assets/experiment_superposition.svg)
+
+图中只有两条坐标轴，却有六个特征方向；它们没有一一占据正交坐标，而是以不同夹角共享二维容量。稀疏激活使这种重叠可以在许多样本上仍然可解码，但特征越多、越常同时出现，干扰也越大。
+
+一个最小复现实验是训练线性编码器/解码器重构稀疏二值向量，并比较 $d\ge n$ 与 $d<n$ 时编码向量的 Gram 矩阵：后者会出现大量非零内积，显示特征正在“挤”进同一低维空间。
+
+```python
+n_features, hidden_dim = 6, 2
+x = (torch.rand(4096, n_features) < 0.12).float()  # sparse independent features
+encoder = nn.Linear(n_features, hidden_dim, bias=False)
+decoder = nn.Linear(hidden_dim, n_features, bias=False)
+for _ in range(5_000):
+    reconstruction = decoder(F.relu(encoder(x)))
+    loss = F.mse_loss(reconstruction, x)
+    optimizer.zero_grad(); loss.backward(); optimizer.step()
+
+feature_vectors = encoder.weight.detach().T  # one encoded direction per feature
+gram = F.normalize(feature_vectors, dim=1) @ F.normalize(feature_vectors, dim=1).T
+# Plot gram as a heatmap; off-diagonal values reveal shared directions.
+```
+
+这里学到的不是单个“特征探测器”列表，而是一个在容量、稀疏性和误差之间折中的几何编码。它为理解大型模型的 polysemantic neurons 提供了刻意简化的起点，并不直接证明真实语言模型必然使用同一种机制。
+
+### 4. 小结
+
+神经网络学习的是一个由参数定义的函数与内部表示；它是否学到我们关心的规律，取决于数据中是否有规律、架构是否把合适的先验写进模型、以及优化与正则化偏向哪些解。后续的正则化、CNN、生成模型和序列模型，正是在分别控制或利用这些因素。
+
+---
+
 ## 总览
 
 第二周将视野从全连接网络扩展到**更丰富的架构和任务**——卷积网络处理图像、生成模型创造新样本、序列模型处理语言：
@@ -24,7 +191,46 @@
 
 ---
 
-### 1. 过拟合问题
+### 1. 正则化与优化器究竟在解决什么？
+
+训练神经网络时，我们不断调整参数 $\theta$ 来降低训练损失；但一个好的训练过程不能只看训练集。正则化、优化器、学习率调度和归一化虽然作用方式不同，通常都围绕三个目标：**泛化、效率和稳定性**。
+
+![Regularization and optimization objectives](../../assets/regularization_objectives.svg)
+
+#### 1.1 泛化：在拟合训练集与未见数据表现之间选择解
+
+更准确地说，这不是希望“牺牲 test accuracy 来提高 train accuracy”的 trade-off；目标是让训练拟合产生一个也能在未见样本上正确工作的函数。训练集准确率通常继续提高，但测试集准确率可能在达到峰值后停滞或下降，此时继续优化训练损失会走向过拟合。
+
+```python
+# Every epoch, log both quantities on disjoint data.
+history["train_acc"].append(accuracy(model, train_loader))
+history["test_acc"].append(accuracy(model, test_loader))
+
+# Select hyperparameters / early-stopping epoch on validation data, not test data.
+best_epoch = int(torch.tensor(history["val_acc"]).argmax())
+```
+
+应当用验证集选择模型和训练轮数，把测试集留作最后一次无偏评估。权重衰减、数据增强、早停与 dropout 等正则化方法，都是在大量同样能拟合训练集的参数解中，偏向泛化更好的解。
+
+#### 1.2 效率：以更少更新达到相近泛化性
+
+在不降低目标测试性能的前提下，更少的 epoch、样本访问或计算量意味着更高的训练效率。合适的学习率、动量/AdamW、学习率 warmup 与衰减、归一化以及良好初始化，能够缩短到达同一验证性能所需的步数。这里比较的是**同等泛化质量所需的成本**，而不是单纯比较谁的训练 loss 降得最快。
+
+#### 1.3 稳定性：让损失与更新可控
+
+稳定不意味着每一步 loss 都严格变小（mini-batch 噪声会使它上下波动），而是整体趋势下降，梯度和参数范数保持有限，训练不会频繁发散、NaN 或长时间停滞。学习率过大、初始化不当、梯度爆炸或数值精度问题都会破坏稳定性。
+
+### 2. 用损失地形建立直觉
+
+![Illustrative loss landscape states](../../assets/loss_landscape_states.svg)
+
+图中的四种状态可以帮助诊断训练：尖锐极小值附近的函数对扰动更敏感，平缓极小值通常更稳健；鞍点区域的局部梯度可能很小而拖慢训练；高原表示模型仍处于较高损失，尚未充分拟合。这里的“平坦极小值泛化更好”是常见经验和有用启发，但不是不依赖参数化的充分判据，最终仍要以严格分离的验证/测试数据评估。
+
+由此可以把后续内容放到同一张地图中：权重衰减与数据增强主要影响**选择哪个解**，优化器和学习率调度主要影响**怎么走到那里**，而归一化与初始化同时影响速度和稳定性。
+
+---
+
+### 3. 过拟合问题
 
 **过拟合**：模型在训练集上表现很好，但在测试集上表现差。
 
@@ -34,7 +240,7 @@
 
 ---
 
-### 2. Frobenius 范数与权重衰减
+### 4. Frobenius 范数与权重衰减
 
 **Frobenius 范数**衡量权重矩阵的"大小"：
 
@@ -57,7 +263,7 @@ optimizer = torch.optim.SGD(model.parameters(), lr=0.01, weight_decay=1e-4)
 
 ---
 
-### 3. 早停 (Early Stopping)
+### 5. 早停 (Early Stopping)
 
 **思想**：在验证集性能不再提升时停止训练。
 
@@ -86,7 +292,7 @@ for epoch in range(max_epochs):
 
 ---
 
-### 4. 记忆化实验
+### 6. 记忆化实验
 
 **惊人的发现**：即使标签完全随机，足够大的网络也能达到 100% 训练准确率！
 
@@ -94,7 +300,7 @@ for epoch in range(max_epochs):
 
 ---
 
-### 5. 数据增强 (Data Augmentation)
+### 7. 数据增强 (Data Augmentation)
 
 通过对训练数据施加变换来"创造"更多样本：
 
@@ -118,11 +324,11 @@ transform = transforms.Compose([
 
 ---
 
-### 6. 归一化层 (Normalization Layers)
+### 8. 归一化层 (Normalization Layers)
 
 归一化层解决的核心问题：**Internal Covariate Shift**——随着训练进行，每层输入的分布不断变化，导致训练不稳定、收敛慢。
 
-#### 6.1 Batch Normalization (BN)
+#### 8.1 Batch Normalization (BN)
 
 **思想**：对每个 mini-batch 内的每个特征通道，沿 batch 维度归一化。
 
@@ -165,7 +371,7 @@ y = bn(x)
 print(y.shape)  # torch.Size([32, 64])
 ```
 
-#### 6.2 Layer Normalization (LN)
+#### 8.2 Layer Normalization (LN)
 
 **思想**：对每个样本内部的所有特征维度归一化（不依赖 batch）。
 
@@ -211,7 +417,7 @@ print(ln(x).shape)  # (32, 64)
 | **训练/推理一致性** | ❌ 不同（用 running stats） | ✅ 相同 |
 | **适用场景** | CNN、固定长度输入 | Transformer、RNN、变长序列 |
 
-#### 6.3 RMS Normalization (RMSNorm)
+#### 8.3 RMS Normalization (RMSNorm)
 
 **思想**：去掉均值中心化，只做缩放归一化（更简单、更快）。
 
@@ -244,7 +450,7 @@ class RMSNorm(nn.Module):
 
 > LLaMA、Gemma 等现代大语言模型普遍使用 RMSNorm 替代 LayerNorm。
 
-#### 6.4 实验：归一化与初始化的交互
+#### 8.4 实验：归一化与初始化的交互
 
 ![初始权重尺度对训练的影响](../../assets/image.png)
 
@@ -1174,7 +1380,72 @@ $$\frac{dx}{dt} = f(x,t) - \frac{1}{2}g(t)^2 \nabla_x \log p_t(x)$$
 
 ---
 
-### 8. 训练与采样完整代码
+### 8. Diffusion 的本质：分布之间的迁移
+
+把 Diffusion 看成“逐步去噪”当然正确，但更有统一性的表述是：它在学习一个**从简单分布到数据分布的迁移过程**。设真实数据分布为 $p_0(x)$，简单先验为 $p_1(x)=\mathcal{N}(0,I)$：
+
+$$
+p_0 \xrightarrow{\text{forward noising}} p_t \xrightarrow{\text{learned reverse transport}} p_1 \quad\text{或}\quad p_1 \xrightarrow{\text{generation}} p_0.
+$$
+
+前向扩散 $q(x_t|x_0)$ 是人为设计的随机路径，把复杂数据逐渐推向高斯；反向模型则学习每个时刻的局部迁移方向，使样本从高斯回到数据流形。因而模型真正需要学习的不是某张训练图片，而是随时间变化的向量场/score：在当前位置 $x_t$，下一步应该往哪里走。
+
+![Diffusion distribution transport](../../assets/diffusion_distribution_transport.svg)
+
+#### 8.1 Flow Matching：直接学习迁移速度
+
+Diffusion 的 score/noise 参数化把反向过程写成许多小步的随机或 ODE 更新。Flow Matching（FM）换一个问题：先规定一条连接源分布 $p_0$ 和目标分布 $p_1$ 的概率路径 $p_t$，再直接回归路径上的速度场 $u_t(x)$。
+
+为避免和 DDPM 中“$x_0$ 表示干净数据、$x_T$ 表示噪声”的下标约定混淆，这里令 $z\sim p_{\mathrm{noise}}$、$x\sim p_{\mathrm{data}}$，并从噪声端向数据端定义线性插值
+
+$$
+x_t=(1-t)z+t x, \qquad \frac{d x_t}{dt}=x-z.
+$$
+
+训练一个网络 $v_\theta(x_t,t)$，最小化速度匹配损失：
+
+$$
+\mathcal{L}_{\mathrm{FM}}=\mathbb{E}_{t,z,x}\left[\|v_\theta(x_t,t)-(x-z)\|^2\right].
+$$
+
+推理时从 $z\sim\mathcal{N}(0,I)$ 出发，求解确定性 ODE：
+
+$$
+\frac{d\hat{x}_t}{dt}=v_\theta(\hat{x}_t,t), \qquad \hat{x}_0=z,
+$$
+
+直到到达数据端。实际实现会选择时间方向的约定（从 $t=0$ 到 $1$ 或反过来），关键是网络输出**速度**而不是必须输出噪声。
+
+![Curved and straight transport paths](../../assets/flow_matching_paths.svg)
+
+#### 8.2 Rectified Flow：让路径尽量直
+
+你给出的论文 *Flow Straight and Fast: Learning to Generate and Transfer Data with Rectified Flow* 将这个想法进一步强调为 **Rectified Flow（RF）**：学习连接两个经验分布的 ODE，并尽量沿样本对之间的直线运动。直线路径是两点之间最短的路径，数值积分时不需要很细的时间网格；论文还提出递归 rectification，让路径越来越直，在图像生成与迁移任务中展示了单步 Euler 也能得到高质量结果的情形。
+
+这里的“简化”可以拆成三层：
+
+1. **训练目标简化**：从预测噪声/score，转为监督式的速度回归；目标 $x_1-x_0$ 直接可计算。
+2. **生成过程简化**：从带随机项的长马尔可夫链，转为求解一个确定性 ODE。
+3. **路径几何简化**：通过合适的 coupling 与 rectification 减少弯曲，从而允许更少的 Euler/RK 步。
+
+![Diffusion and rectified-flow inference steps](../../assets/diffusion_vs_flow_steps.svg)
+
+#### 8.3 Diffusion、Flow Matching 与 Rectified Flow 的关系
+
+| 视角 | 学习对象 | 采样形式 | 主要代价/优势 |
+|---|---|---|---|
+| DDPM | 噪声或等价的 score | 多步随机反向链 | 训练稳定、方法成熟，但采样步数多 |
+| Probability Flow ODE / DDIM | 与 score 对应的确定性速度 | ODE 或确定性跳步 | 可复现，可减少步数，但仍受路径弯曲影响 |
+| Flow Matching | 插值路径上的速度场 | 确定性 ODE | 目标直接、适合监督回归 |
+| Rectified Flow | 尽量直的速度场/耦合 | 粗粒度 ODE 积分 | 路径更短，潜在单步或少步采样 |
+
+FM/RF 并不是“无条件地替代” Diffusion：路径设计、样本 coupling、网络容量和 ODE 求解器都会影响质量；少步采样也可能牺牲细节。更准确的统一图景是：它们都在构造一个随时间变化的 transport，使一个易采样分布迁移到目标数据分布，只是选择的路径、监督信号和数值求解方式不同。
+
+参考：[Liu, Gong & Liu, *Flow Straight and Fast: Learning to Generate and Transfer Data with Rectified Flow*](https://arxiv.org/abs/2209.03003)。
+
+---
+
+### 9. 训练与采样完整代码
 
 **训练**：
 
@@ -1313,4 +1584,5 @@ $$
 - [Deep Learning Book, Chapter 9 (CNNs)](https://www.deeplearningbook.org/contents/convnets.html)
 - [Deep Learning Book, Chapter 20 (Generative Models)](https://www.deeplearningbook.org/contents/generative.html)
 - [What are Diffusion Models? (Lil'Log)](https://lilianweng.github.io/posts/2021-07-11-diffusion-models/)
+- [Flow Straight and Fast: Learning to Generate and Transfer Data with Rectified Flow](https://arxiv.org/abs/2209.03003)
 - [The Illustrated Word2Vec](https://jalammar.github.io/illustrated-word2vec/)
