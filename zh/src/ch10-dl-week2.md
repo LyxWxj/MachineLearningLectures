@@ -324,11 +324,125 @@ transform = transforms.Compose([
 
 ---
 
-### 8. 归一化层 (Normalization Layers)
+### 8. 权重初始化 (Weight Initialization)
+
+**为什么初始化很重要？**
+
+- 初始化太大 → 激活值爆炸、梯度爆炸
+- 初始化太小 → 激活值消失、梯度消失
+- 好的初始化：让每层的输出方差保持稳定
+
+#### 8.1 Xavier Initialization (Glorot Initialization)
+
+**目标**：让前向传播和反向传播中，每层输出的方差保持不变。
+
+**推导**：对于线性层 $y = Wx$，假设 $x$ 和 $W$ 独立且均值为 0：
+
+$$
+\text{Var}(y) = n_{\text{in}} \cdot \text{Var}(W) \cdot \text{Var}(x)
+$$
+
+要让 $\text{Var}(y) = \text{Var}(x)$，需要：
+
+$$
+\text{Var}(W) = \frac{1}{n_{\text{in}}}
+$$
+
+同时考虑反向传播（梯度从 $y$ 传回 $x$），需要 $\text{Var}(W) = \frac{1}{n_{\text{out}}}$。
+
+**折中方案**：
+
+$$
+W \sim \mathcal{N}\left(0, \frac{2}{n_{\text{in}} + n_{\text{out}}}\right) \quad \text{或} \quad W \sim \mathcal{U}\left(-\sqrt{\frac{6}{n_{\text{in}} + n_{\text{out}}}}, \sqrt{\frac{6}{n_{\text{in}} + n_{\text{out}}}}\right)
+$$
+
+```python
+# PyTorch 中的 Xavier 初始化
+linear = nn.Linear(256, 128)
+nn.init.xavier_uniform_(linear.weight)   # 均匀分布
+nn.init.xavier_normal_(linear.weight)    # 正态分布
+
+print(f"fan_in={linear.weight.shape[1]}, fan_out={linear.weight.shape[0]}")
+# fan_in=256, fan_out=128
+print(f"std={torch.sqrt(torch.tensor(2.0 / (256 + 128))):.4f}")
+# std=0.0722
+```
+
+**适用场景**：Sigmoid、Tanh 激活函数（输出均值为 0 附近）。
+
+#### 8.2 Kaiming Initialization (He Initialization)
+
+**问题**：ReLU 会将一半的激活值置零，导致方差减半。Xavier 没有考虑这一点。
+
+**推导**：对于 ReLU 激活，$\text{Var}(\text{ReLU}(x)) = \frac{1}{2}\text{Var}(x)$，所以：
+
+$$
+\text{Var}(y) = \frac{1}{2} n_{\text{in}} \cdot \text{Var}(W) \cdot \text{Var}(x)
+$$
+
+要让 $\text{Var}(y) = \text{Var}(x)$：
+
+$$
+\text{Var}(W) = \frac{2}{n_{\text{in}}}
+$$
+
+$$
+W \sim \mathcal{N}\left(0, \frac{2}{n_{\text{in}}}\right) \quad \text{或} \quad W \sim \mathcal{U}\left(-\sqrt{\frac{6}{n_{\text{in}}}}, \sqrt{\frac{6}{n_{\text{in}}}}\right)
+$$
+
+```python
+# PyTorch 中的 Kaiming 初始化
+linear = nn.Linear(256, 128)
+nn.init.kaiming_uniform_(linear.weight, mode='fan_in', nonlinearity='relu')
+nn.init.kaiming_normal_(linear.weight, mode='fan_in', nonlinearity='relu')
+
+print(f"fan_in={linear.weight.shape[1]}")
+# fan_in=256
+print(f"std={torch.sqrt(torch.tensor(2.0 / 256)):.4f}")
+# std=0.0884
+```
+
+**`mode` 参数**：
+
+```python
+# fan_in: 保持前向传播方差稳定（常用）
+nn.init.kaiming_normal_(w, mode='fan_in', nonlinearity='relu')
+
+# fan_out: 保持反向传播方差稳定
+nn.init.kaiming_normal_(w, mode='fan_out', nonlinearity='relu')
+```
+
+**适用场景**：ReLU 及其变体（Leaky ReLU、PReLU 等）。
+
+#### 8.3 Xavier vs Kaiming 对比
+
+| | Xavier | Kaiming |
+|---|---|---|
+| **方差** | $\frac{2}{n_{\text{in}} + n_{\text{out}}}$ | $\frac{2}{n_{\text{in}}}$ |
+| **适用激活** | Sigmoid, Tanh | ReLU, Leaky ReLU |
+| **核心思想** | 前向+反向方差折中 | 考虑 ReLU 的半区置零 |
+| **PyTorch** | `xavier_uniform_`, `xavier_normal_` | `kaiming_uniform_`, `kaiming_normal_` |
+
+```python
+# 实际使用示例
+def init_weights(m):
+    if isinstance(m, nn.Linear):
+        nn.init.kaiming_normal_(m.weight, nonlinearity='relu')
+        if m.bias is not None:
+            nn.init.zeros_(m.bias)
+
+model = MyNet()
+model.apply(init_weights)  # 递归应用到所有子模块
+```
+
+> **现代实践**：PyTorch 的 `nn.Linear` 默认使用 Kaiming 初始化（`fan_in` 模式），通常不需要手动设置。但对于自定义层或特殊架构，理解初始化原理仍然很重要。
+---
+
+### 9. 归一化层 (Normalization Layers)
 
 归一化层解决的核心问题：**Internal Covariate Shift**——随着训练进行，每层输入的分布不断变化，导致训练不稳定、收敛慢。
 
-#### 8.1 Batch Normalization (BN)
+#### 9.1 Batch Normalization (BN)
 
 **思想**：对每个 mini-batch 内的每个特征通道，沿 batch 维度归一化。
 
@@ -371,7 +485,7 @@ y = bn(x)
 print(y.shape)  # torch.Size([32, 64])
 ```
 
-#### 8.2 Layer Normalization (LN)
+#### 9.2 Layer Normalization (LN)
 
 **思想**：对每个样本内部的所有特征维度归一化（不依赖 batch）。
 
@@ -417,7 +531,7 @@ print(ln(x).shape)  # (32, 64)
 | **训练/推理一致性** | ❌ 不同（用 running stats） | ✅ 相同 |
 | **适用场景** | CNN、固定长度输入 | Transformer、RNN、变长序列 |
 
-#### 8.3 RMS Normalization (RMSNorm)
+#### 9.3 RMS Normalization (RMSNorm)
 
 **思想**：去掉均值中心化，只做缩放归一化（更简单、更快）。
 
@@ -450,7 +564,7 @@ class RMSNorm(nn.Module):
 
 > LLaMA、Gemma 等现代大语言模型普遍使用 RMSNorm 替代 LayerNorm。
 
-#### 8.4 实验：归一化与初始化的交互
+#### 9.4 实验：归一化与初始化的交互
 
 ![初始权重尺度对训练的影响](../../assets/image.png)
 
@@ -484,120 +598,6 @@ Layer Normalization 能消除不同初始化带来的尺度差异，强制各层
 > 2. 初始化的影响**不会被训练消除**，会贯穿整个训练过程
 > 3. 归一化能修复尺度问题，但可能**牺牲部分表达能力**
 > 4. L2 正则化的效果可能被初始化干扰，需要谨慎使用
----
-
-### 7. 权重初始化 (Weight Initialization)
-
-**为什么初始化很重要？**
-
-- 初始化太大 → 激活值爆炸、梯度爆炸
-- 初始化太小 → 激活值消失、梯度消失
-- 好的初始化：让每层的输出方差保持稳定
-
-#### 7.1 Xavier Initialization (Glorot Initialization)
-
-**目标**：让前向传播和反向传播中，每层输出的方差保持不变。
-
-**推导**：对于线性层 $y = Wx$，假设 $x$ 和 $W$ 独立且均值为 0：
-
-$$
-\text{Var}(y) = n_{\text{in}} \cdot \text{Var}(W) \cdot \text{Var}(x)
-$$
-
-要让 $\text{Var}(y) = \text{Var}(x)$，需要：
-
-$$
-\text{Var}(W) = \frac{1}{n_{\text{in}}}
-$$
-
-同时考虑反向传播（梯度从 $y$ 传回 $x$），需要 $\text{Var}(W) = \frac{1}{n_{\text{out}}}$。
-
-**折中方案**：
-
-$$
-W \sim \mathcal{N}\left(0, \frac{2}{n_{\text{in}} + n_{\text{out}}}\right) \quad \text{或} \quad W \sim \mathcal{U}\left(-\sqrt{\frac{6}{n_{\text{in}} + n_{\text{out}}}}, \sqrt{\frac{6}{n_{\text{in}} + n_{\text{out}}}}\right)
-$$
-
-```python
-# PyTorch 中的 Xavier 初始化
-linear = nn.Linear(256, 128)
-nn.init.xavier_uniform_(linear.weight)   # 均匀分布
-nn.init.xavier_normal_(linear.weight)    # 正态分布
-
-print(f"fan_in={linear.weight.shape[1]}, fan_out={linear.weight.shape[0]}")
-# fan_in=256, fan_out=128
-print(f"std={torch.sqrt(torch.tensor(2.0 / (256 + 128))):.4f}")
-# std=0.0722
-```
-
-**适用场景**：Sigmoid、Tanh 激活函数（输出均值为 0 附近）。
-
-#### 7.2 Kaiming Initialization (He Initialization)
-
-**问题**：ReLU 会将一半的激活值置零，导致方差减半。Xavier 没有考虑这一点。
-
-**推导**：对于 ReLU 激活，$\text{Var}(\text{ReLU}(x)) = \frac{1}{2}\text{Var}(x)$，所以：
-
-$$
-\text{Var}(y) = \frac{1}{2} n_{\text{in}} \cdot \text{Var}(W) \cdot \text{Var}(x)
-$$
-
-要让 $\text{Var}(y) = \text{Var}(x)$：
-
-$$
-\text{Var}(W) = \frac{2}{n_{\text{in}}}
-$$
-
-$$
-W \sim \mathcal{N}\left(0, \frac{2}{n_{\text{in}}}\right) \quad \text{或} \quad W \sim \mathcal{U}\left(-\sqrt{\frac{6}{n_{\text{in}}}}, \sqrt{\frac{6}{n_{\text{in}}}}\right)
-$$
-
-```python
-# PyTorch 中的 Kaiming 初始化
-linear = nn.Linear(256, 128)
-nn.init.kaiming_uniform_(linear.weight, mode='fan_in', nonlinearity='relu')
-nn.init.kaiming_normal_(linear.weight, mode='fan_in', nonlinearity='relu')
-
-print(f"fan_in={linear.weight.shape[1]}")
-# fan_in=256
-print(f"std={torch.sqrt(torch.tensor(2.0 / 256)):.4f}")
-# std=0.0884
-```
-
-**`mode` 参数**：
-
-```python
-# fan_in: 保持前向传播方差稳定（常用）
-nn.init.kaiming_normal_(w, mode='fan_in', nonlinearity='relu')
-
-# fan_out: 保持反向传播方差稳定
-nn.init.kaiming_normal_(w, mode='fan_out', nonlinearity='relu')
-```
-
-**适用场景**：ReLU 及其变体（Leaky ReLU、PReLU 等）。
-
-#### 7.3 Xavier vs Kaiming 对比
-
-| | Xavier | Kaiming |
-|---|---|---|
-| **方差** | $\frac{2}{n_{\text{in}} + n_{\text{out}}}$ | $\frac{2}{n_{\text{in}}}$ |
-| **适用激活** | Sigmoid, Tanh | ReLU, Leaky ReLU |
-| **核心思想** | 前向+反向方差折中 | 考虑 ReLU 的半区置零 |
-| **PyTorch** | `xavier_uniform_`, `xavier_normal_` | `kaiming_uniform_`, `kaiming_normal_` |
-
-```python
-# 实际使用示例
-def init_weights(m):
-    if isinstance(m, nn.Linear):
-        nn.init.kaiming_normal_(m.weight, nonlinearity='relu')
-        if m.bias is not None:
-            nn.init.zeros_(m.bias)
-
-model = MyNet()
-model.apply(init_weights)  # 递归应用到所有子模块
-```
-
-> **现代实践**：PyTorch 的 `nn.Linear` 默认使用 Kaiming 初始化（`fan_in` 模式），通常不需要手动设置。但对于自定义层或特殊架构，理解初始化原理仍然很重要。
 
 ---
 
