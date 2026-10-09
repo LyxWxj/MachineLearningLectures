@@ -36,3 +36,4 @@
 # 第四部分 — 高级主题
 
 - [马尔可夫过程与卡尔曼滤波](ch08-markov-kalman.md)
+- [ext-HMM-HGF-KF](ext-HMM-HGF-KF.md)
